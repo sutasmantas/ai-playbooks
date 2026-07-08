@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Lab · R1 · Warp Dive (hyperspace → arrival)</title>
+<!--
+  CANDIDATE: r1-warp
+  BASE EFFECT: "Star Nest" volumetric fractal star field by Pablo Roman Andrioli (Kali),
+               Shadertoy XlfGRj (CC BY-NC-SA). Faithful reproduction of the fractal
+               raymarch math/constants (iterations/formuparam/volsteps/stepsize/tile/
+               distfading/darkmatter/saturation), driven forward as a hyperspace dive.
+  CRAFT PASS:  warm->cosmos color grade biased to the brand palette · radial zoom-blur
+               (streak/speed-lines toward the vanishing point) · chromatic aberration at
+               the rim · UnrealBloom + ACES tone-map · vignette + film grain ·
+               mouse steers the tunnel, hover/scroll drives velocity ·
+               GSAP "jump to lightspeed -> ease into a calm star field" choreography.
+  STACK:       Three.js 0.160 (ESM CDN) + GSAP 3.13 (CDN). Matches the live site stack.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: oklch(0.974 0.006 80);
+    --paper-soft: oklch(0.90 0.010 76 / 0.82);
+    --terra: oklch(0.66 0.13 48);
+    --terra-deep: oklch(0.605 0.118 45);
+    --display: 'Bricolage Grotesque', system-ui, sans-serif;
+    --sans: 'Hanken Grotesk', system-ui, sans-serif;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{
+    font-family:var(--sans); color:var(--paper);
+    background:#05080a; overflow:hidden;
+  }
+  .stage{ position:fixed; inset:0; }
+
+  canvas.webgl{ position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; }
+
+  /* left readability scrim so the headline never competes with the warp */
+  .scrim{ position:absolute; inset:0; z-index:2; pointer-events:none;
+    background:
+      linear-gradient(90deg, rgba(3,6,8,.82) 0%, rgba(3,6,8,.55) 32%, rgba(3,6,8,.10) 58%, transparent 74%),
+      linear-gradient(0deg, rgba(3,6,8,.55) 0%, transparent 30%); }
+
+  /* vignette + grain */
+  .vignette{ position:absolute; inset:0; z-index:3; pointer-events:none;
+    background:radial-gradient(120% 120% at 50% 50%, transparent 48%, rgba(2,4,6,.78) 100%); }
+  .grain{ position:absolute; inset:0; z-index:4; pointer-events:none; opacity:.42; mix-blend-mode:overlay; }
+  .grain svg{ width:100%; height:100%; }
+
+  /* headline */
+  .hero{ position:absolute; inset:0; z-index:5; display:flex; align-items:center; pointer-events:none; }
+  .wrap{ width:100%; max-width:1180px; margin:0 auto; padding:0 clamp(24px,5vw,72px); }
+  .inner{ max-width:60ch; pointer-events:auto; }
+  .eyebrow{ font-family:var(--sans); font-weight:600; font-size:.72rem; letter-spacing:.2em;
+    text-transform:uppercase; color:rgba(231,168,119,.92); margin-bottom:22px; }
+  h1{ font-family:var(--display); font-weight:800; letter-spacing:-0.03em; line-height:0.98;
+    font-size:clamp(2.6rem,6.2vw,5.2rem); text-shadow:0 2px 40px rgba(0,0,0,.6); max-width:15ch; }
+  h1 .w{ display:inline-block; }
+  .sub{ margin-top:26px; max-width:46ch; font-size:clamp(1rem,1.5vw,1.22rem); line-height:1.5; color:rgba(243,237,225,.86); }
+  .row{ display:flex; gap:14px; flex-wrap:wrap; margin-top:36px; }
+  .btn{ font-family:var(--sans); font-weight:600; font-size:.95rem; text-decoration:none;
+    padding:.85em 1.4em; border-radius:100px; border:1.5px solid rgba(243,237,225,.35); color:var(--paper); }
+  .btn--solid{ background:var(--terra); border-color:var(--terra); color:#1a120c; }
+
+  .badge{ position:absolute; z-index:6; left:18px; top:18px; font-family:ui-monospace,Menlo,monospace;
+    font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; color:rgba(243,237,225,.5); }
+  .hint{ position:absolute; z-index:6; left:50%; bottom:16px; transform:translateX(-50%);
+    font-family:ui-monospace,Menlo,monospace; font-size:.62rem; letter-spacing:.12em; color:rgba(243,237,225,.42);
+    text-align:center; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <canvas class="webgl"></canvas>
+    <div class="scrim"></div>
+    <div class="vignette"></div>
+    <div class="grain" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg>
+    </div>
+
+    <div class="hero">
+      <div class="wrap">
+        <div class="inner">
+          <p class="eyebrow">Friends-only trip planning · Kaunas → Kulionys · One fall night</p>
+          <h1 id="h1">One night, one telescope, one clear-sky call.</h1>
+          <p class="sub">A one-day fall run from Kaunas to the Lithuanian Museum of Ethnocosmology — pick a stop on the way, wait for the 14:00 weather call, then finish under the 80&nbsp;cm telescope. Same crew, same drawn line — after dark.</p>
+          <div class="row">
+            <a class="btn btn--solid" href="#">Follow the sky route ↓</a>
+            <a class="btn" href="#">Join the Observatory run</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="badge">R1 · warp dive</div>
+    <div class="hint">move the mouse to steer · hover or scroll to jump to lightspeed</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+    const canvas = document.querySelector('canvas.webgl');
+    const sizes = { w: innerWidth, h: innerHeight };
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+    renderer.setSize(sizes.w, sizes.h);
+    renderer.setPixelRatio(Math.min(1.75, devicePixelRatio));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+    // -----------------------------------------------------------------------
+    //  PASS 1 — the warp field.
+    //  Faithful "Star Nest" volumetric fractal (Kali, Shadertoy XlfGRj),
+    //  re-parameterised so the camera dives forward through the fractal
+    //  (the "from" vector advances along +z), with the original constants kept
+    //  intact. Mouse steers via the original rot1/rot2 matrices; uVel scales the
+    //  forward velocity (the speed-up). Output is color-graded to the brand palette.
+    // -----------------------------------------------------------------------
+    const warpUniforms = {
+      iResolution: { value: new THREE.Vector2(sizes.w, sizes.h) },
+      iTime:       { value: 0 },
+      uSteer:      { value: new THREE.Vector2(0, 0) }, // mouse steering (-.5..-.5)
+      uTravel:     { value: 0 },   // accumulated distance travelled (warp dive)
+      uVel:        { value: 0.5 }, // current velocity 0..1 -> drives streak + brightness
+      uWarm:       { value: 1 }    // 1 = warm road-trip tint, 0 = cool arrival
+    };
+
+    const warpFrag = /* glsl */`
+      precision highp float;
+      uniform vec2  iResolution;
+      uniform float iTime;
+      uniform vec2  uSteer;
+      uniform float uTravel;
+      uniform float uVel;
+      uniform float uWarm;
+      varying vec2 vUv;
+
+      // --- Star Nest constants (verbatim from Kali, Shadertoy XlfGRj) ---
+      #define iterations 17
+      #define formuparam 0.530
+      #define volsteps   18
+      #define stepsize   0.100
+      #define zoom       0.800
+      #define tile       0.850
+      #define brightness 0.0015
+      #define darkmatter 0.300
+      #define distfading 0.760
+      #define saturation 0.800
+
+      void main(){
+        vec2 uv = vUv - 0.5;
+        uv.y *= iResolution.y / iResolution.x;
+        vec3 dir = vec3(uv * zoom, 1.0);
+
+        // steering: drive the original rotation matrices with the mouse
+        float a1 = 0.5 + uSteer.x * 1.6;
+        float a2 = 0.8 + uSteer.y * 1.6;
+        mat2 rot1 = mat2(cos(a1), sin(a1), -sin(a1), cos(a1));
+        mat2 rot2 = mat2(cos(a2), sin(a2), -sin(a2), cos(a2));
+        dir.xz *= rot1;
+        dir.xy *= rot2;
+
+        // forward dive: 'from' advances along z by the accumulated warp distance
+        vec3 from = vec3(1.0, 0.5, 0.5);
+        from += vec3(uTravel * 2.0, uTravel, uTravel * 4.0);
+        from.xz *= rot1;
+        from.xy *= rot2;
+
+        // --- volumetric fractal accumulation (Kali) ---
+        float s = 0.1, fade = 1.0;
+        vec3 v = vec3(0.0);
+        for (int r = 0; r < volsteps; r++){
+          vec3 p = from + s * dir * 0.5;
+          p = abs(vec3(tile) - mod(p, vec3(tile * 2.0)));
+          float pa, a = pa = 0.0;
+          for (int i = 0; i < iterations; i++){
+            p = abs(p) / dot(p, p) - formuparam;
+            a += abs(length(p) - pa);
+            pa = length(p);
+          }
+          float dm = max(0.0, darkmatter - a * a * 0.001);
+          a *= a * a;
+          if (r > 3) fade *= 1.0 - dm;
+          v += fade;
+          v += vec3(s, s*s, s*s*s*s) * a * brightness * fade;
+          fade *= distfading;
+          s += stepsize;
+        }
+        v = mix(vec3(length(v)), v, saturation);
+        vec3 col = v * 0.0065;
+
+        // ------- CRAFT: warm->cosmos color grade biased to the brand palette -------
+        // warm road-trip palette: terracotta core -> warm cream highlights
+        vec3 warmLo = vec3(0.015, 0.008, 0.006);
+        vec3 warmHi = vec3(1.00, 0.78, 0.46);          // #ffc875-ish warm core
+        vec3 warmMid= vec3(0.88, 0.46, 0.27);          // terracotta #e0894c
+        // cool arrival palette: deep night green -> cool blue starlight
+        vec3 coolLo = vec3(0.006, 0.012, 0.016);
+        vec3 coolHi = vec3(0.62, 0.78, 0.96);          // cool blue #6f9fd6 brightened
+        vec3 coolMid= vec3(0.27, 0.42, 0.62);
+
+        float l = clamp((col.r + col.g + col.b) / 3.2, 0.0, 1.0);
+        l = pow(l, 1.5);
+        // three-stop ramp lo->mid->hi for each mood
+        vec3 warm = l < 0.5
+          ? mix(warmLo, warmMid, l * 2.0)
+          : mix(warmMid, warmHi, (l - 0.5) * 2.0);
+        vec3 cool = l < 0.5
+          ? mix(coolLo, coolMid, l * 2.0)
+          : mix(coolMid, coolHi, (l - 0.5) * 2.0);
+        vec3 graded = mix(cool, warm, clamp(uWarm, 0.0, 1.0));
+
+        // keep a hint of the raw fractal energy in the bright cores
+        graded = mix(graded, graded + col * 0.6, smoothstep(0.45, 1.0, l));
+
+        gl_FragColor = vec4(graded, 1.0);
+      }
+    `;
+
+    const warpMat = new THREE.ShaderMaterial({
+      uniforms: warpUniforms,
+      vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
+      fragmentShader: warpFrag,
+      depthWrite: false, depthTest: false
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), warpMat));
+
+    // -----------------------------------------------------------------------
+    //  POST — EffectComposer chain
+    //  1) render the warp field
+    //  2) radial zoom-blur + chromatic aberration (the SPEED — streaks toward the
+    //     vanishing point, RGB split at the rim). This is what sells the warp.
+    //  3) UnrealBloom (glow on the bright cores / vanishing point)
+    //  4) final vignette grade (subtle; CSS vignette also stacks on top)
+    // -----------------------------------------------------------------------
+    const composer = new EffectComposer(renderer);
+    composer.setPixelRatio(Math.min(1.75, devicePixelRatio));
+    composer.setSize(sizes.w, sizes.h);
+    composer.addPass(new RenderPass(scene, camera));
+
+    // radial zoom-blur + chromatic aberration toward a steerable vanishing point
+    const StreakShader = {
+      uniforms: {
+        tDiffuse: { value: null },
+        uCenter:  { value: new THREE.Vector2(0.5, 0.5) },
+        uStrength:{ value: 0.0 },   // 0..1 -> blur reach (driven by velocity)
+        uChroma:  { value: 0.0 },   // rim RGB split
+        uAspect:  { value: sizes.w / sizes.h }
+      },
+      vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy,0.,1.); }`,
+      fragmentShader: /* glsl */`
+        precision highp float;
+        uniform sampler2D tDiffuse;
+        uniform vec2  uCenter;
+        uniform float uStrength;
+        uniform float uChroma;
+        uniform float uAspect;
+        varying vec2 vUv;
+
+        void main(){
+          // vector from this pixel back toward the vanishing point
+          vec2 dir = vUv - uCenter;
+          // radius-driven edge factor: more streak + chroma away from center
+          float edge = clamp(length(dir * vec2(uAspect, 1.0)) * 1.6, 0.0, 1.0);
+
+          // 12-tap radial smear toward the vanishing point => motion streaks
+          const int N = 12;
+          vec3 acc = vec3(0.0);
+          float wsum = 0.0;
+          float c = uChroma * edge;
+          for (int i = 0; i < N; i++){
+            float t = float(i) / float(N - 1);          // 0..1
+            float w = 1.0 - t;                           // weight nearer samples more
+            vec2 p = vUv - dir * uStrength * t;          // step toward center
+            // chromatic aberration: sample R/G/B at staggered radial offsets
+            float r = texture2D(tDiffuse, p + dir * c).r;
+            float g = texture2D(tDiffuse, p).g;
+            float b = texture2D(tDiffuse, p - dir * c).b;
+            acc += vec3(r, g, b) * w;
+            wsum += w;
+          }
+          gl_FragColor = vec4(acc / wsum, 1.0);
+        }
+      `,
+    };
+    const streakPass = new ShaderPass(StreakShader);
+    composer.addPass(streakPass);
+
+    const bloom = new UnrealBloomPass(new THREE.Vector2(sizes.w, sizes.h), 0.55, 0.6, 0.18);
+    composer.addPass(bloom);
+
+    // -----------------------------------------------------------------------
+    //  INTERACTION — mouse steers, hover/scroll boosts velocity
+    // -----------------------------------------------------------------------
+    let steerTX = 0, steerTY = 0, steerX = 0, steerY = 0;   // steering target/current
+    let velTarget = 0.45;   // 0..1 target velocity
+    let vel = 0.45;         // smoothed velocity
+    let hoverBoost = 0;     // decays
+    let scrollBoost = 0;    // decays
+    let pointerInside = false;
+
+    addEventListener('pointermove', e => {
+      steerTX = e.clientX / innerWidth - 0.5;
+      steerTY = e.clientY / innerHeight - 0.5;
+      pointerInside = true;
+      hoverBoost = 0.55;   // moving the mouse nudges the throttle up
+    }, { passive: true });
+    addEventListener('pointerleave', () => { pointerInside = false; });
+
+    addEventListener('wheel', e => {
+      // scroll = throttle. clamp the per-event kick.
+      scrollBoost = Math.min(1.0, scrollBoost + Math.min(0.5, Math.abs(e.deltaY) * 0.0016));
+    }, { passive: true });
+
+    // -----------------------------------------------------------------------
+    //  CHOREOGRAPHY — "jump to lightspeed -> ease into a calm star field"
+    // -----------------------------------------------------------------------
+    const intro = { vel: 0.0, warm: 1.0, exposure: 1.0 };
+    function reveal(){
+      const h1 = document.getElementById('h1');
+      const words = h1.textContent.trim().split(' ');
+      h1.innerHTML = words.map(w => `<span class="w">${w}</span>`).join(' ');
+      gsap.set('.eyebrow,.sub,.row', { opacity: 0, y: 18 });
+      gsap.set('.w', { opacity: 0, yPercent: 120 });
+
+      // 1) JUMP: punch to lightspeed (velocity + exposure flare), warm road-trip tint
+      const tl = gsap.timeline();
+      tl.to(intro, { vel: 1.0, duration: 1.1, ease: 'power3.in' }, 0)
+        .to(intro, { exposure: 1.32, duration: 0.5, ease: 'power2.in' }, 0.4)
+        // 2) ARRIVAL: warp eases off into a calm field; grade cools toward night sky
+        .to(intro, { vel: 0.30, duration: 2.6, ease: 'power3.out' }, 1.1)
+        .to(intro, { exposure: 1.02, duration: 2.4, ease: 'power2.out' }, 1.2)
+        .to(intro, { warm: 0.32, duration: 3.2, ease: 'sine.inOut' }, 1.3);
+
+      // headline rides in on the arrival beat
+      const tlx = gsap.timeline({ delay: 1.35 });
+      tlx.to('.eyebrow', { opacity: 1, y: 0, duration: .7, ease: 'power3.out' })
+         .to('.w', { opacity: 1, yPercent: 0, duration: .9, ease: 'power4.out', stagger: 0.06 }, '-=0.3')
+         .to('.sub', { opacity: 1, y: 0, duration: .7, ease: 'power3.out' }, '-=0.4')
+         .to('.row', { opacity: 1, y: 0, duration: .7, ease: 'power3.out' }, '-=0.45');
+    }
+    reveal();
+
+    // -----------------------------------------------------------------------
+    //  LOOP
+    // -----------------------------------------------------------------------
+    const clock = new THREE.Clock();
+    let travel = 0;
+    function tick(){
+      const dt = Math.min(0.05, clock.getDelta());
+      const t = clock.elapsedTime;
+
+      // steering ease
+      steerX += (steerTX - steerX) * 0.05;
+      steerY += (steerTY - steerY) * 0.05;
+      warpUniforms.uSteer.value.set(steerX, steerY);
+
+      // velocity = intro baseline + hover boost + scroll boost (all smoothed)
+      hoverBoost  *= 0.94;
+      scrollBoost *= 0.95;
+      velTarget = Math.min(1.0, intro.vel + hoverBoost + scrollBoost);
+      vel += (velTarget - vel) * 0.08;
+      warpUniforms.uVel.value = vel;
+
+      // forward warp distance — always advancing, scaled by velocity (continuous motion)
+      const fwd = 0.06 + vel * 0.9;
+      travel += fwd * dt;
+      warpUniforms.uTravel.value = travel;
+      warpUniforms.iTime.value = t;
+      warpUniforms.uWarm.value = intro.warm;
+
+      // steer the vanishing point with the mouse (vignette/streak center follows)
+      streakPass.uniforms.uCenter.value.set(0.5 + steerX * 0.5, 0.5 - steerY * 0.5);
+      // streak length + chromatic split scale with velocity => sense of speed
+      streakPass.uniforms.uStrength.value = 0.04 + vel * 0.32;
+      streakPass.uniforms.uChroma.value   = 0.0015 + vel * 0.010;
+
+      // bloom + exposure breathe with the warp
+      bloom.strength = 0.25 + vel * 0.5;
+      renderer.toneMappingExposure = intro.exposure;
+
+      composer.render();
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    // -----------------------------------------------------------------------
+    //  RESIZE
+    // -----------------------------------------------------------------------
+    addEventListener('resize', () => {
+      sizes.w = innerWidth; sizes.h = innerHeight;
+      renderer.setSize(sizes.w, sizes.h);
+      composer.setSize(sizes.w, sizes.h);
+      renderer.setPixelRatio(Math.min(1.75, devicePixelRatio));
+      composer.setPixelRatio(Math.min(1.75, devicePixelRatio));
+      warpUniforms.iResolution.value.set(sizes.w, sizes.h);
+      streakPass.uniforms.uAspect.value = sizes.w / sizes.h;
+      bloom.setSize(sizes.w, sizes.h);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!--
+TEMPLATE METADATA — REMOVE THIS BLOCK WHEN GENERATING
+Target: <new-project-root>/process_checklist.md
+Always generated. (Renamed from project_checklist.md 2026-06-10 — the old name
+collided with PROJECT_PLAN.md and users opened this file expecting the master
+work checklist. This file is the process loop, not the plan.)
+Placeholders:
+  {{PROJECT_NAME}}       — from interview 01.1
+  {{VALIDATOR_CMD}}      — same as in CLAUDE.md
+  {{TRUTH_SURFACE}}      — from interview 02.1
+  {{TRUTH_SURFACE_TOOL}} — derived from the validator-starter pick in ENTRYPOINT step 6 ("Playwright" for the TS starter, "curl + headless chromium" for the bash starter), not a direct interview answer
+  {{DRIFT_SURFACES}}     — from interview 03.3
+  {{LADDER_COMMANDS}}    — the project's EXACT runnable commands from interview 01.3
+                           (typecheck, unit tests, build, validator, truth-surface open,
+                           repeat-interaction proof, git-diff review). Never generic
+                           ("run the tests") — paste commands. This file is the ONLY
+                           owner of the ladder; PROJECT_PLAN.md references it.
+  (Concerns-in-scope are referenced by name; the actual checks live in CLAUDE.md's inlined concern text, not duplicated here.)
+-->
+
+# {{PROJECT_NAME}} — Process Checklist (iteration gates)
+
+This is the iteration loop — HOW each iteration runs. **It does not say WHAT to build: that is `PROJECT_PLAN.md` (the master checklist). Open the plan first; run these gates around every item you take from it.**
+
+## First-run setup (for new contributors / new machines)
+
+The canonical entry-point for "I just cloned this repo, how do I run it." A new contributor should be able to follow this and reach a green validator within minutes.
+
+- [ ] Copy `.env.example` → `.env`, fill in values for the listed vars
+- [ ] Install dependencies: `{{PKG_MANAGER}} install` (use the lockfile-honoring variant — `{{PKG_MANAGER}} ci` for npm, `--frozen-lockfile` for pnpm/yarn — when you want the exact recorded versions, per the lockfile-discipline rule)
+- [ ] Run the project's setup script if one exists (check `package.json` `scripts.setup`, a `Makefile`'s `setup` target, or `scripts/setup`). If there is no setup script and one is needed for a new contributor to reach green, ADD ONE — "the setup command" is a contract every contributor depends on; an undocumented setup ritual is institutional knowledge that decays.
+- [ ] Start the dev server: `{{DEV_SERVER_CMD}}`
+- [ ] Run the validator once to confirm the baseline is green: `{{VALIDATOR_CMD}}`
+
+If any of these fail on a fresh clone, that IS the work. Do not start any new feature on top of a broken setup.
+
+## Iteration start (do not skip)
+
+- [ ] Open `PROJECT_PLAN.md`. The next step is mechanical: the `Next action:` line = first unchecked item of the SINGLE active workstream (this iteration's work must be an item there — if it isn't, add it first). If nothing is active, picking the next item with the user IS the first task.
+- [ ] Chore-debt check: in `PROJECT_PLAN.md` → Progress-triggered chores, verify no trigger fired without its chore running (lockfile changed since the commit in `Last ran at`? a milestone gate closed without calibration/review?). Fired-but-not-run chores are done FIRST this iteration.
+- [ ] Run `{{VALIDATOR_CMD}}`. Tier 1 must be clean before any new work.
+- [ ] Open {{TRUTH_SURFACE}} via {{TRUTH_SURFACE_TOOL}}. Write one sentence describing what it looks like right now.
+- [ ] Spot-check drift surfaces: {{DRIFT_SURFACES}}.
+- [ ] If a `plans/*/plan.md` is active (Status: active): re-read it top to bottom, plus the last 3 entries of `decision_log.md` (if generated) and the plan's `Discovered work` section. Then run a staleness check: for each file mentioned in the plan's open slices and recent decisions, verify the file still exists and was not modified after the plan's last update — if it was, do NOT start the planned action; re-plan first.
+
+If any of the above is not green, **that** is the work. Do not start the next feature on top of a broken floor.
+
+## Verification ladder (exact commands)
+
+Run bottom-up; stop at the first failure — that failure IS the work. Smallest meaningful subset for tiny changes, the full ladder at gates. (This file is the single owner of these commands; the dispatch table's stage 6 below points here.)
+
+{{LADDER_COMMANDS}}
+
+<!-- Fill with runnable commands, e.g.:
+- Typecheck: `npx tsc --noEmit`
+- Unit/integration tests: `npm run test`
+- Build: `npm run build`
+- Tier-1 validator (truth surface + diagnostics): {{VALIDATOR_CMD}}
+- Open the rendered page via {{TRUTH_SURFACE_TOOL}}; describe it in one sentence; check console for new errors
+- Repeated-interaction proof for changed UI: open → use → dismiss → reuse → reload → reuse
+- If `package.json`/lockfile changed in this change-set: dependency audit (`npm audit`) — high-severity is patched or EXCEPTIONS-logged in the SAME PR
+- `git diff` review for accidental/unrelated changes before commit
+-->
+
+## Working the plan (PROJECT_PLAN.md usage rules)
+
+PROJECT_PLAN.md holds only WHAT + live state; the rules for working it live here with the rest of the HOW.
+
+### Maintenance contract
+
+- **Work lands in the plan BEFORE it starts.** If a task isn't in the plan, the first step is adding it — scope that lives only in chat is scope that gets lost.
+- **Every session starts by opening the plan** and confirming the active item. If nothing is active, picking the next item (with the user) IS the first task.
+- **Exactly ONE workstream is `active` at any time (WIP limit = 1).** Items within a workstream are listed in EXECUTION ORDER. The next step is therefore mechanical: the `Next action:` line = first unchecked item of the active workstream → stage 1 of the dispatch table. No judgment call. Switching the active workstream is an explicit event (a gate or a user decision) recorded in Current status — never a silent drift.
+- **Blocked items name their blocker:** `blocked by: <item ref or Open question #>`. Next-step selection skips them mechanically; an unexplained `blocked` is a violation.
+- **Every item carries a size class:** S (single file, no design choice) / M (a few files, one PR-sized slice) / L (multiple slices/PRs or cross-cutting). Size is measured in COUNTS, never time. An **L item must get a child plan** (`plans/*/plan.md`, task-decomposition procedure) BEFORE work starts.
+- **Status changes only with evidence** (see Completion rules). Never delete a failed item — move it back to `[ ]`/`[~]` and log the exact failure in the Defect log.
+- **When a workstream goes active**, fill its four fields — Output / Decision / Evidence to close / Status — and add its Research, 🧑 User verification, and Acceptance criteria subsections. "N/A" is allowed; silence is not.
+- **When expanding the plan**, start from the strongest similar existing section, then run one adversarial gap pass — "what would a reviewer flag as missing?" — before treating it as good enough. Keep later sections as specified as early ones.
+- Append-only sections (Current status history, gate log, discovered work, defect log) are never rewritten, only appended.
+- **Decision field semantics:** `Decision` is the verdict that CLOSES a workstream, recorded at its gate. Until then it reads `pending — recorded at the gate (target: …)`. Never write `shipped` on unverified work.
+- **Open questions are numbered** (`OQ1`, `OQ2`, …) so `blocked by: OQ<n>` is a resolvable reference.
+- **Non-trivial decisions are recorded BEFORE coding** (architecture, data shape, storage, external API, test strategy) — in the plan's Locked decisions or `decision_log.md`. No implicit on-the-fly architecture.
+
+### Per-item dispatch table (every stage names its OWNING mechanism)
+
+Each discipline has exactly one owner: CLAUDE.md (hard rules, tiers, stake-tags), this file (iteration gates + the verification ladder above), `scripts/verify_prompt.md` (independent review), and the workflow skills available in the environment (brainstorming, writing-plans, TDD, debugging). **This table does not restate them — restating creates two drifting sources of truth.** It says WHEN each mechanism fires for an item and WHAT artifact lands back in the plan. Work the stages in order; a stage may be skipped only by writing "skipped: <reason>" in the item's notes — silence is a violation, not a skip.
+
+1. **Research** — *fires when* the eventual diff cannot be described in one sentence, or the item is parity/reference work (simple items: write "skipped: one-sentence diff" and move on). *Mechanism:* read the named reference docs + the code paths the item touches, AND check `pitfall_register.md` + the plan's Defect log for prior bites in the same area ("didn't we break this before?"); if the needed reference doesn't exist, creating it IS the first sub-task. If reading CAN'T answer the question (an empirical unknown: does library X handle our real data? does the auth flow survive setup Y?), run a **SPIKE**: a count-boxed disposable prototype on a scratch branch — learning goal written FIRST, spike code NEVER merges; only the findings land in the plan. Prevents the prototype quietly becoming the implementation. *Lands in the plan:* 1–5 findings bullets under the item.
+2. **Alternatives** — *fires when* a design choice has more than one plausible shape. *Mechanism:* for direction-level choices (user taste/priorities matter) use the brainstorming skill WITH the user; for technical choices dispatch 2–3 INDEPENDENT fresh-context subagents, each told to propose from a different assigned angle (e.g., simplest-possible / most-robust / least-new-code), then choose between their proposals. One context generating its own alternatives produces strawmen — the same confirmation-bias logic behind verifier-as-gate. *Lands in the plan:* chosen + strongest rejected + event-based flip trigger → Locked decisions (or decision_log if generated).
+3. **Acceptance contract** — *fires* for every non-trivial item, BEFORE coding. *Mechanism:* write it here. Fields: user-visible behavior being changed; files/routes/components affected; reference to compare against (if parity work); exact manual checks to perform; automated tests to add/update; failure states and empty states to check. *Lands in the plan:* the contract, under the item.
+4. **Tests** — *fires* for every behavior change. *Mechanism:* the TDD skill if available; otherwise expected-before-change (CLAUDE.md hard rule). *Lands in the plan:* the list of tests the contract requires.
+5. **Implement** — smallest working slice; no drive-by changes outside the contract's file list. *Lands in the plan:* status flip + notes.
+6. **Verify** — *fires* on every change. *Mechanism:* the verification ladder above in this file — single owner, no drift. *Lands in the plan:* pass/fail + last output lines, in the gate report.
+7. **Review** — *fires* on every non-trivial change; ALL stake-tagged changes. *Mechanism:* tier-2 verifier per `scripts/verify_prompt.md`; stake-tagged → both auditors + paired test + decision_log entry (CLAUDE.md). Self-review never closes an item. *Lands in the plan:* verdict in the gate report.
+8. **Gate report + bookkeeping** — *fires* at milestone gates and any "done" claim. *Mechanism:* the reporting package below; the RESULTS land in the plan. *Lands in the plan:* statuses, Current status, and logs updated in the same sitting — not "later".
+
+### Review-gate reporting package
+
+Every gate report (milestone gates, and any "done" claim on a workstream) must contain ALL of:
+
+- What was built; what changed in files/state.
+- What works now; what is still missing.
+- Screenshots + local URL when there is UI (desktop and one narrower width).
+- Verification ladder results (which commands, pass/fail, last lines of output).
+- Acceptance criteria for the slice, each with pass/fail.
+- Proof of repeated interaction (use → dismiss → reuse → reload → reuse) for changed UI.
+- Console-error review after browser interaction.
+- Known defects and whether each is gate-blocking.
+- Diff review notes (risky files; unrelated dirty files left untouched).
+- Progress-triggered chores due at this gate (see the chores table): each run with its result, or explicitly deferred with a written reason. A gate report without the chore line is incomplete.
+- Recommended next step + the specific questions that need the user's opinion before continuing.
+- **Archive pass:** move PROJECT_PLAN.md gate-log/defect-log/discovered-work entries older than the previous gate, and any section now fully `[x]`-verified, to `PLAN_ARCHIVE.md` (create on first use), leaving one-line stubs. Trigger is the gate event, never a date.
+
+### Optional section shapes (use when the work calls for them)
+
+Three additional section types, proven in prior projects. Use them inside a workstream when the work matches; don't force them.
+
+**Experiment loop (computed-score sweep)** — RARELY needed; default is no loop. Use only when BOTH hold: the best approach is genuinely unknown (parity/copy work doesn't qualify — the reference answers the question), AND the score can be COMPUTED BY A SCRIPT on frozen inputs with known expected outputs. An agent assigning rubric points by looking at the result is judgment dressed as numbers — it Goodharts (documented failure: a prior project's rubric ended up scoring absolutely bad solutions well). If the score can't be computed, it's a refinement loop — cap it at 3 rounds (judged refinement plateaus at ~3–4; same basis as the verifier's RED-round cap).
+- Freeze BEFORE the loop starts: the scoring script + frozen input set (same data every run), the win threshold, the iteration budget (count-based), and the dry rule (K consecutive iterations with no improvement → park with a reopen trigger). A loop without a written termination contract is an infinite cycle.
+- Each iteration: one changed variable, expected result written BEFORE the run; record hypothesis → run → computed score → keep/reject/park. ALSO name the worst concrete failure visible in the output — if the score rises while the same named failures persist, the score is measuring the wrong thing: HALT, fix the metric (decision_log event; pre/post scores not comparable), don't keep looping.
+- Promotion of a winner requires: reproduction on a HELD-OUT input set never used during iteration, plus a 🧑 user spot-check of the actual artifact. Score alone never promotes.
+
+**Research adoption section** — the standard landing place when a research pass (web, expert practices, competitor features) produces findings. Three mandatory parts, so nothing is silently dropped or re-researched later:
+- Rank-ordered adoption candidates (each: what, expected leverage, cost).
+- "Considered, declined" list WITH reasons — prevents re-researching the same idea next month.
+- Coverage map: every research finding maps to either a candidate above or a declined entry. A finding mapped to neither is an audit failure.
+
+**Reusable pipeline** — when the same multi-step recipe applies to every instance of a thing (every new entity type, every imported dataset, every new page). Write the ordered steps ONCE with per-step evidence, then track instances as a simple checklist against the pipeline. Update the pipeline, not the instances, when a step changes.
+
+### Plan quality audit
+
+Run when the plan is created, at every milestone gate, and whenever the plan is expanded. Each "no" is a gap to fix before continuing:
+
+- [ ] Does every ACTIVE workstream have Output / Decision / Evidence-to-close / Status filled (or explicit N/A)?
+- [ ] Does every active item have its acceptance contract written BEFORE its implementation started?
+- [ ] Are alternatives recorded for the non-trivial choices made since the last audit (here or in decision_log)?
+- [ ] Does the dispatch table still point at mechanisms that exist (skills available, `process_checklist.md` ladder current, verifier prompt path unchanged)?
+- [ ] Are 🧑 items genuinely user-only, and has no agent checked one?
+- [ ] Are later sections as well-specified as earlier ones?
+- [ ] Is exactly ONE workstream `active`, and does `Next action:` point at its first unchecked item?
+- [ ] Do all `blocked` items name their blocker; are all L items backed by a child plan?
+- [ ] For each chore: did any trigger fire since `Last ran at` without the chore running (lockfile changed since last audit; gates closed without calibration/review)? Fired-but-not-run = work now.
+- [ ] Is anything being worked on right now that is NOT in the plan?
+- [ ] Do statuses match actual project state (open the truth surface — don't trust memory)?
+- [ ] Does every active `plans/*/plan.md` link back to exactly one item here?
+- [ ] Was the last expansion gap-passed against the strongest similar checklist, not written from memory?
+
+## Before marking any task done
+
+- [ ] Expected values were declared BEFORE the change. Validator was not back-filled from output.
+- [ ] Assertion describes BEHAVIOR, not COUNT.
+- [ ] Truth surface opened, described, screenshot attached if relevant.
+- [ ] Tier 2 verifier (independent subagent or person) has signed off via `scripts/verify_prompt.md`.
+- [ ] If verification was blocked by missing tooling, the tooling was built — not noted-and-skipped.
+- [ ] Concern checks (below) all pass for any concern the change touches.
+- [ ] Tests pass (tier 3 scenario tests, if applicable, included).
+
+## Concern checks
+
+For each concern in scope (see CLAUDE.md's "Concerns in scope" preamble for the full list and the per-concern `How to apply` items inlined there), confirm at iteration end:
+
+- [ ] The concern's `How to apply` bullets were exercised for any code path this iteration touched.
+- [ ] The validator script's relevant check passed (e.g., axe for accessibility, hydration listener for SSR drift, bundle secret-scan for security).
+- [ ] No `Skip if` carve-out was silently invoked — if a concern was de facto skipped this iteration, note it in the iteration log (= the PR description, or the plan's Current status entry for non-PR work) with the reason.
+
+The concerns themselves are NOT duplicated here. The single source of truth for each concern's rule is its inlined text in CLAUDE.md. This file's iteration gate just verifies that the gate was run.
+
+## "Done" definition
+
+A task is done when:
+1. Tier 1 validator is clean.
+2. Truth surface visibly reflects the change.
+3. Every applicable concern check above passes.
+4. Tier 2 verifier has not raised any blocker.
+5. Iteration log entry (or decision-log entry, for non-trivial changes) describes REAL state observed, not test state asserted.
+
+Anything else is "in progress" — including "tests pass and I think it works."
+
+## Evidence-not-checkbox rule
+
+At least one item on this checklist per PR MUST produce CONCRETE EVIDENCE, not a checkmark:
+- Command output pasted (e.g., the validator script's exit code + last 10 lines of stdout)
+- Screenshot attached (the truth surface, with the change visible)
+- Test pass log linked (CI URL, local test output)
+- Trace artifact saved (`diagnostics/trace.zip` for behavior verification)
+
+Process theater research finding: checked boxes without evidence give false confidence, especially when filled by an LLM that will produce plausible text on demand. The verifier's Completeness Auditor flags any PR where every checklist item is a checkmark with no evidence as `violates evidence-not-checkbox rule`.

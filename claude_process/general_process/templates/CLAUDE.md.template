@@ -1,0 +1,144 @@
+<!--
+TEMPLATE METADATA — REMOVE THIS BLOCK WHEN GENERATING
+Target: <new-project-root>/CLAUDE.md
+Always generated.
+Placeholders:
+  {{PROJECT_NAME}}            — from interview 01.1
+  {{PROJECT_DESCRIPTION}}     — from interview 01.1
+  {{PROJECT_KIND}}            — from interview 01.2: "CLI tool", "library", "service", "script", "data pipeline", or a mix
+  {{LANGUAGE}}                — from interview 01.3 (e.g., "Python 3.12", "Go 1.23", "Rust stable") — INCLUDES the runtime version inline
+  {{KEY_LIBRARIES}}           — from interview 01.3 (e.g., "FastAPI + SQLAlchemy", or "stdlib only")
+  {{TRUTH_SURFACE}}           — from interview 02.1 (e.g., "stdout + exit code", "library return value + file written", "HTTP response body + status")
+  {{TRUTH_SURFACE_TOOL}}      — derived from validator-starter pick in ENTRYPOINT step 6 ("pytest" / "vitest" / "go test" / "cargo test" / "<adapted from adapt template>")
+  {{BEHAVIOR_INVOCATION}}     — from interview 02.4 (the concrete command/code the validator runs to exercise the truth surface)
+  {{STATE_LOCATION}}          — from interview 03.2, or literally "none — no persistent state"
+  {{CATASTROPHIC_STATE}}      — from interview 03.2, or "(N/A — no persistent state)"
+  {{DRIFT_SURFACES}}          — from interview 03.3 (comma-separated, e.g., "config across environments, upstream API contract, scheduled-job dependency versions")
+  {{TEST_CMD}}                — from interview 01.4 (e.g., "pytest", "npm test", "go test ./...", "cargo test"); write "(none yet)" if not configured
+  {{BUILD_CMD}}               — from interview 01.4 (e.g., "python -m build", "npm run build", "go build ./...", "cargo build --release"); "(none yet)" if not configured
+  {{LINT_CMD}}                — from interview 01.4 (e.g., "ruff check", "eslint .", "golangci-lint run", "cargo clippy"); "(none yet)" if not configured
+  {{FORMAT_CMD}}              — from interview 01.4 (e.g., "ruff format", "prettier -w .", "gofmt", "cargo fmt"); "(none yet)" if not configured
+  {{RUN_CMD}}                 — from interview 01.4 (e.g., "python my_app.py", "go run ./cmd/server", "cargo run", "npm run start"); for libraries/scripts with no long-running process, write "(N/A — not a long-running process)"
+  {{VALIDATOR_CMD}}           — the first command the validator script will be invokable as (e.g., "python scripts/validate_state.py", "pnpm tsx scripts/validate_state.ts", "bash scripts/validate_state.sh")
+  {{SELECTED_CONCERNS}}       — comma-separated list of concerns that apply (e.g., "error-handling-and-logging, secrets-and-config, dependency-and-supply-chain, ai-authoring-security, security")
+  {{PKG_MANAGER}}             — from interview 01.4: "pip", "uv", "poetry", "npm", "pnpm", "yarn", "bun", "go", "cargo", etc.
+  {{CI_PROVIDER}}             — from interview 01.5: "GitHub Actions", "GitLab CI", "CircleCI", "Jenkins", "none yet", etc.
+  {{CRITICALITY}}             — from interview 03.5: "Throwaway/experiment", "Internal tool", "External product", or "Safety/regulated"
+  {{LIFESPAN}}                — from interview 03.6: "Hackathon/days", "Short-lived/weeks", or "Long-lived/months+"
+  {{KIT_VERSION}}             — the date of the bootstrap kit version used at generation time (use today's date in ISO format)
+  {{CONCERNS_BLOCK}}          — for each selected concern, INLINE the FULL text of programming-concerns/<name>.md (rule + why + how-to-apply + skip-if + language-specific addendum filled in for the project's stack). Do NOT reference the kit by path — the generated file must be self-contained after the kit is deleted.
+  {{SKIP_NOTES}}              — list of templates + concerns skipped, with reason; "(none)" if all generated
+-->
+
+# {{PROJECT_NAME}} — Agent Instructions
+
+{{PROJECT_DESCRIPTION}}
+
+**Kind:** {{PROJECT_KIND}}
+**Language / runtime:** {{LANGUAGE}}
+**Key libraries:** {{KEY_LIBRARIES}}
+**Truth surface:** {{TRUTH_SURFACE}} (exercise via {{TRUTH_SURFACE_TOOL}}, invocation `{{BEHAVIOR_INVOCATION}}`)
+**Persistent state:** {{STATE_LOCATION}}
+**Concerns in scope:** {{SELECTED_CONCERNS}}
+**Package manager:** {{PKG_MANAGER}}
+**Tooling commands:**
+- Test: `{{TEST_CMD}}`
+- Build: `{{BUILD_CMD}}`
+- Lint: `{{LINT_CMD}}`
+- Format: `{{FORMAT_CMD}}`
+- Run: `{{RUN_CMD}}`
+- Validator (the tier-1 entry point): `{{VALIDATOR_CMD}}`
+
+**CI provider:** {{CI_PROVIDER}}
+**Criticality:** {{CRITICALITY}} (Throwaway / Internal / External / Safety — drives auditor count and artifact generation)
+**Lifespan:** {{LIFESPAN}} (Hackathon / Short-lived / Long-lived)
+**Bootstrap kit version:** {{KIT_VERSION}} (record at bootstrap; EXCEPTIONS entries carry this for cross-version tracking)
+
+## Validation tiers (inlined here so this file is self-contained)
+
+The kit defines three validation tiers; references to them throughout this file mean:
+
+- **Tier 1 — Automated diagnostics.** The validator script (`{{VALIDATOR_CMD}}`). Cheap, run constantly. Catches what static checks and the test suite can catch.
+- **Tier 2 — Independent verifier.** A fresh subagent with zero producer context dispatched via `scripts/verify_prompt.md`. The actual gate. Catches what the producer's frame excludes.
+- **Tier 3 — Scenario tests.** End-to-end tests that simulate a real user session (or end-to-end pipeline run). Catches what tier 1 and 2 cannot see.
+
+Tier 1 alone is never sufficient. A feature is done when Tier 1 is clean AND Tier 2 has signed off.
+
+## Hard rules
+
+These are the non-negotiables. Every iteration follows them.
+
+1. **Behavior, not counts.** Validator assertions describe what the feature DOES. Counts are diagnostic only.
+2. **Expected before change.** Acceptance criteria written BEFORE the change. Never back-fill validators from outputs.
+3. **Open the truth surface.** No iteration is done until {{TRUTH_SURFACE}} has been exercised (via {{TRUTH_SURFACE_TOOL}}, invocation `{{BEHAVIOR_INVOCATION}}`) and described in one sentence. Unit-test green doesn't count.
+4. **Verifier-as-gate.** "Done" is decided by an independent reviewer (subagent or human) with zero context of what was just built and a "find problems" prompt. Self-review doesn't decide done.
+5. **Feature-gap rule.** If verification is blocked by missing tooling, **build the tool first**. "Couldn't verify because X, marking done" is forbidden.
+6. **Iteration starts with validation.** Every iteration begins by running the validator and exercising the truth surface. If they're not green, that's the work — no new feature on top of a broken floor.
+7. **Destructive operations require explicit user authorization at execution time.** `DROP TABLE`, force-push to a protected branch, `rm -rf` on a real directory, delete production records, drop a database, mass-revoke credentials, run a migration on a real environment — every one of these is gated by a fresh "yes, do this now" from the user, NOT by the plan saying "will run migration." The plan plans; the user authorizes. The Replit incident (July 2025) showed agents will fabricate cover-up when stuck and given destructive capability without a gate. No agent self-authorization on destructive ops, regardless of plan, schedule, or apparent urgency.
+
+## Size caps (empirical — past these, agents start ignoring rules)
+
+Hard caps applied to this CLAUDE.md and adjacent rule files. When a cap is breached, run a rule-retirement pass: for each rule, ask "would removing this line cause a real mistake within a month?" Keep if yes-with-evidence, demote to pitfall watch-item if not. Audit at fixed cadence (quarterly is a reasonable default).
+
+- This file's rule content: ≤ 350 words (preamble + structural sections excluded from the count)
+- Principles directory: ≤ 7 files (each addition requires a removal — the kit ships at the cap)
+- `pitfall_register.md` active entries: ≤ 200 lines (retired entries below the line are unbounded)
+- `EXCEPTIONS.md`: reviewed monthly; no permanent waivers (every entry has a `Revisit by:` date or condition)
+
+Background: empirical research on AGENTS.md and CLAUDE.md effectiveness (Tianpan 2026; rams901 dev.to 2026) found median high-performing files are 300-350 words; diminishing returns past 500; *negative* correlation past 1000 words / 200 lines. Past the cliff, the agent silently ignores rules — the kit's discipline becomes noise.
+
+## Priority when rules conflict
+
+When two rules or concerns disagree on the same change, follow this order (Priority 1 wins):
+
+1. **Security** — both deployed-artifact security AND AI-authoring security
+2. **Behavior correctness** — does the feature actually do its job, end-to-end on the truth surface
+3. **Data integrity** — for projects with persistent state, schema correctness and migration safety beat performance
+4. **Concurrency safety** — for services / data pipelines, no race conditions or orphaned async work
+5. **Performance** — only when a stated budget or SLO exists; speculative optimization is below code quality
+6. **Code quality / aesthetics**
+
+If two concerns of equal priority disagree, surface the tradeoff in `decision_log.md` (or the PR description if decision_log is not generated) and ask the user — do not silently resolve.
+
+## Concerns in scope
+
+The following concerns apply to this project. The full text of each — rule, why, how to apply, skip-if, language-specific addendum — is inlined below so this file remains self-contained even after the bootstrap kit is removed.
+
+{{CONCERNS_BLOCK}}
+
+## Self-validation protocol
+
+Before marking any task done:
+
+1. Run `{{VALIDATOR_CMD}}`. Tier 1 (diagnostics + behavior assertion) must be clean.
+2. Exercise the truth surface via `{{BEHAVIOR_INVOCATION}}`. Write one sentence about what it produces now.
+3. Verify each in-scope concern per its `How to apply` items inlined above.
+4. Dispatch the verifier subagent (see `scripts/verify_prompt.md`). Tier 2 (independent eyes) must sign off.
+5. Log the outcome in your iteration notes (or `decision_log.md` if the change was non-trivial).
+
+## Session start
+
+<!-- AGENT: if {{RUN_CMD}} is "(N/A — not a long-running process)", REPLACE the code block below
+     with "(Skip — this project has no long-running process to start.)" and adjust prose accordingly. -->
+
+1. Open `PROJECT_PLAN.md` — the master checklist. Confirm the active workstream item; if none is active, picking the next item with the user IS the first task. All work this session must map to an item there (add it first if missing).
+2. Run:
+```
+{{RUN_CMD}}
+```
+3. Verify state: `{{STATE_LOCATION}}` exists and isn't corrupted. Drift surfaces to spot-check: {{DRIFT_SURFACES}}.
+
+## State and isolation
+
+<!-- AGENT: if the project has no persistent state, DELETE this entire section
+     (h2 heading + body paragraphs) AND the "Then verify state:" sentence in the Session
+     start section above, AND the "Persistent state:" line in the preamble. -->
+
+Persistent state lives at: {{STATE_LOCATION}}.
+Catastrophic-if-corrupted state: {{CATASTROPHIC_STATE}}.
+
+Tests must NEVER write to the live state path. State paths come from env var or config at module load; tests inject an ephemeral path. (This project has persistent state, so test-isolation discipline is in force here.)
+
+## What was skipped at bootstrap and why
+
+{{SKIP_NOTES}}

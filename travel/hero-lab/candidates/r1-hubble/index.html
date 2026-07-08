@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Lab · R1 · Hubble Dive (real night-sky plate)</title>
+<!--
+  CANDIDATE: r1-hubble  —  REAL HUBBLE/ESO IMAGERY DIVE
+  PLATE:      milkyway.jpg — a real long-exposure night sky over a dark-sky landscape
+              (the actual Milky Way the crew will see). cosmos.png — a second real
+              starfield, used as a parallax depth layer. Both copied locally, no hotlink.
+  TECHNIQUE:  full-screen ShaderMaterial quad (OrthographicCamera). The real photo is
+              composited with PARALLAX DEPTH (plate + starfield + procedural dust),
+              a slow cinematic Ken-Burns push-in toward the galactic band, a drifting
+              fbm dust layer in front for 3D depth + constant motion, and per-star twinkle.
+  BASE MATH:  Inigo Quilez fbm domain-warping (iquilezles.org/articles/warp) for the dust,
+              + the classic Shadertoy "parallax depth layers" compositing pattern.
+              Reproduced faithfully, then art-directed onto the photographic plate.
+  CRAFT PASS: ACES-ish tone map · warm terracotta core glow + cool blue rim grade ·
+              airglow lift · vignette + film grain · GSAP choreographed word reveal.
+  STACK:      Three.js 0.160 (ESM CDN) + GSAP 3.13 (CDN). Matches the live site stack.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: oklch(0.974 0.006 80);
+    --terra: oklch(0.66 0.13 48);
+    --display: 'Bricolage Grotesque', system-ui, sans-serif;
+    --sans: 'Hanken Grotesk', system-ui, sans-serif;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{ font-family:var(--sans); color:var(--paper); background:#05080a; overflow:hidden; }
+  .stage{ position:fixed; inset:0; }
+
+  canvas.webgl{ position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; }
+
+  /* left scrim so the headline never competes with the plate */
+  .scrim{ position:absolute; inset:0; z-index:2; pointer-events:none;
+    background:
+      linear-gradient(90deg, rgba(3,6,8,.86) 0%, rgba(3,6,8,.62) 26%, rgba(3,6,8,.18) 50%, transparent 68%),
+      linear-gradient(0deg, rgba(3,6,8,.55) 0%, transparent 30%); }
+  /* vignette + grain */
+  .vignette{ position:absolute; inset:0; z-index:2; pointer-events:none;
+    background:radial-gradient(120% 120% at 52% 48%, transparent 50%, rgba(2,4,5,.78) 100%); }
+  .grain{ position:absolute; inset:0; z-index:3; pointer-events:none; opacity:.42; mix-blend-mode:overlay; }
+  .grain svg{ width:100%; height:100%; }
+
+  /* headline */
+  .hero{ position:absolute; inset:0; z-index:4; display:flex; align-items:center; pointer-events:none; }
+  .wrap{ width:100%; max-width:1180px; margin:0 auto; padding:0 clamp(24px,5vw,72px); }
+  .inner{ max-width:60ch; pointer-events:auto; }
+  .eyebrow{ font-family:var(--sans); font-weight:600; font-size:.72rem; letter-spacing:.2em;
+    text-transform:uppercase; color:rgba(231,168,119,.92); margin-bottom:22px; }
+  h1{ font-family:var(--display); font-weight:800; letter-spacing:-0.03em; line-height:0.98;
+    font-size:clamp(2.6rem,6.2vw,5.2rem); text-shadow:0 2px 40px rgba(0,0,0,.6); max-width:15ch; }
+  h1 .w{ display:inline-block; }
+  .sub{ margin-top:26px; max-width:46ch; font-size:clamp(1rem,1.5vw,1.22rem); line-height:1.5; color:rgba(243,237,225,.86); }
+  .row{ display:flex; gap:14px; flex-wrap:wrap; margin-top:36px; }
+  .btn{ font-family:var(--sans); font-weight:600; font-size:.95rem; text-decoration:none;
+    padding:.85em 1.4em; border-radius:100px; border:1.5px solid rgba(243,237,225,.35); color:var(--paper); }
+  .btn--solid{ background:var(--terra); border-color:var(--terra); color:#1a120c; }
+
+  .badge{ position:absolute; z-index:6; left:18px; top:18px; font-family:ui-monospace,Menlo,monospace;
+    font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; color:rgba(243,237,225,.5); }
+  .hint{ position:absolute; z-index:6; left:50%; bottom:16px; transform:translateX(-50%);
+    font-family:ui-monospace,Menlo,monospace; font-size:.62rem; letter-spacing:.12em; color:rgba(243,237,225,.42); }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <canvas class="webgl"></canvas>
+    <div class="scrim"></div>
+    <div class="vignette"></div>
+    <div class="grain" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg>
+    </div>
+
+    <div class="hero">
+      <div class="wrap">
+        <div class="inner">
+          <p class="eyebrow">Friends-only trip planning · Kaunas → Kulionys · One fall night</p>
+          <h1 id="h1">One night, one telescope, one clear-sky call.</h1>
+          <p class="sub">A one-day fall run from Kaunas to the Lithuanian Museum of Ethnocosmology — pick a stop on the way, wait for the 14:00 weather call, then finish under the 80&nbsp;cm telescope. Same crew, same drawn line — after dark.</p>
+          <div class="row">
+            <a class="btn btn--solid" href="#">Follow the sky route ↓</a>
+            <a class="btn" href="#">Join the Observatory run</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="badge">R1 · hubble dive</div>
+    <div class="hint">move the mouse to parallax · scroll to push in</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+
+    const canvas = document.querySelector('canvas.webgl');
+    const sizes = { w: innerWidth, h: innerHeight };
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+    renderer.setSize(sizes.w, sizes.h);
+    renderer.setPixelRatio(Math.min(1.8, devicePixelRatio));
+
+    // ---- load the real photographic plates (local, no hotlink) ----
+    const loader = new THREE.TextureLoader();
+    const plate = loader.load('milkyway.jpg');   // real night sky over a dark-sky landscape
+    const stars = loader.load('cosmos.png');      // second real starfield (parallax depth)
+    [plate, stars].forEach(t=>{ t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; });
+
+    const uniforms = {
+      uTime:     { value: 0 },
+      uPlate:    { value: plate },
+      uStars:    { value: stars },
+      uRes:      { value: new THREE.Vector2(sizes.w, sizes.h) },
+      uPlateRes: { value: new THREE.Vector2(1, 1) },     // set on image load (aspect-correct cover)
+      uMouse:    { value: new THREE.Vector2(0, 0) },     // smoothed pointer parallax
+      uZoom:     { value: 0.42 },                         // entrance dolly value (owned by GSAP, decays to 0)
+      uDive:     { value: 0.0 },                           // continuous forever Ken-Burns dive (owned by loop)
+      uScroll:   { value: 0.0 },                           // extra push from scroll
+      uIntro:    { value: 0.0 }                           // 0->1 entrance dolly
+    };
+
+    // keep the plate covering the viewport regardless of aspect (CSS background-cover in GLSL)
+    plate.image && (uniforms.uPlateRes.value.set(plate.image.width, plate.image.height));
+    new THREE.ImageLoader().load('milkyway.jpg', img => uniforms.uPlateRes.value.set(img.width, img.height));
+
+    const frag = /* glsl */`
+      precision highp float;
+      varying vec2 vUv;
+      uniform float uTime, uZoom, uDive, uScroll, uIntro;
+      uniform vec2  uRes, uPlateRes, uMouse;
+      uniform sampler2D uPlate, uStars;
+
+      // ---- iq value noise + fbm (iquilezles.org) ----
+      float hash(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p+45.32); return fract(p.x*p.y); }
+      float noise(vec2 p){
+        vec2 i = floor(p), f = fract(p);
+        vec2 u = f*f*(3.0-2.0*f);
+        float a = hash(i), b = hash(i+vec2(1.0,0.0)), c = hash(i+vec2(0.0,1.0)), d = hash(i+vec2(1.0,1.0));
+        return mix(mix(a,b,u.x), mix(c,d,u.x), u.y);
+      }
+      float fbm(vec2 p){
+        float v = 0.0, a = 0.5;
+        mat2 m = mat2(1.6,1.2,-1.2,1.6);
+        for(int i=0;i<5;i++){ v += a*noise(p); p = m*p; a *= 0.5; }
+        return v;
+      }
+
+      // aspect-correct "cover" sampling of a plate, around a focal point, with zoom
+      vec2 coverUv(vec2 uv, vec2 res, vec2 plateRes, float zoom, vec2 focus){
+        float sa = res.x/res.y;
+        float ia = plateRes.x/plateRes.y;
+        vec2 scale = sa > ia ? vec2(1.0, ia/sa) : vec2(sa/ia, 1.0);
+        vec2 c = (uv - 0.5);                       // center
+        c /= max(zoom, 0.0001);                     // zoom in
+        c *= scale / max(scale.x, scale.y);         // cover fit (no stretch)
+        c += focus;                                 // pan toward focal point
+        return c + 0.5;
+      }
+
+      // ACES-ish filmic tone map (Krzysztof Narkowicz approximation)
+      vec3 aces(vec3 x){
+        const float a=2.51,b=0.03,c=2.43,d=0.59,e=0.14;
+        return clamp((x*(a*x+b))/(x*(c*x+d)+e), 0.0, 1.0);
+      }
+
+      void main(){
+        vec2 uv = vUv;
+        // pointer parallax: each depth layer shifts by a different amount
+        vec2 m = uMouse;
+
+        // cinematic dive: entrance dolly + forever push-in + scroll push
+        float dive = uZoom + uDive + uScroll;
+        vec2 focus = vec2(0.02*sin(uTime*0.03), 0.06 + 0.04*sin(uTime*0.018)); // slow wander up into the band
+
+        // --- LAYER 1: deep starfield plate (cosmos.png), slowest parallax, slow drift ---
+        vec2 sUv = coverUv(uv, uRes, vec2(1.5,1.0), 1.04 + 0.05*dive, focus*0.4 + m*0.010 + vec2(uTime*0.0035,0.0));
+        vec3 deep = texture2D(uStars, sUv).rgb;
+
+        // --- LAYER 2: the real night-sky plate (milkyway.jpg), the hero, mid parallax ---
+        vec2 pUv = coverUv(uv, uRes, uPlateRes, 1.02 + 0.16*dive, focus + m*0.022);
+        vec3 sky = texture2D(uPlate, pUv).rgb;
+
+        // luminance of the plate (drives twinkle + glow)
+        float lum = dot(sky, vec3(0.299,0.587,0.114));
+
+        // --- per-star TWINKLE: modulate bright pixels with animated noise ---
+        float starMask = smoothstep(0.42, 0.85, lum);
+        float tw = noise(pUv*900.0 + uTime*1.4) * noise(pUv*420.0 - uTime*0.9);
+        sky += starMask * (0.55*tw) * vec3(1.0, 0.96, 0.88);
+
+        // --- LAYER 3: drifting FOREGROUND DUST (fbm domain warp), nearest parallax ---
+        vec2 dUv = uv*vec2(uRes.x/uRes.y,1.0)*1.7 + m*0.10;
+        vec2 q = vec2(fbm(dUv + vec2(0.0, uTime*0.02)), fbm(dUv + vec2(5.2,1.3) - uTime*0.015));
+        vec2 r = vec2(fbm(dUv + 4.0*q + vec2(1.7,9.2) + uTime*0.012),
+                      fbm(dUv + 4.0*q + vec2(8.3,2.8) - uTime*0.010));
+        float dust = fbm(dUv + 4.0*r);
+        dust = smoothstep(0.55, 0.98, dust);
+        // brand-tinted dust: terracotta -> warm core, only in upper portion (nebular band).
+        // kept subtle so the REAL photographic plate stays dominant (photoreal, not haze).
+        vec3 dustCol = mix(vec3(0.85,0.52,0.30), vec3(0.78,0.84,1.0), r.x); // warm -> cool blue
+        float band = smoothstep(0.05, 0.8, uv.y) * (1.0 - smoothstep(0.75,1.0,uv.y));
+        sky += dust * band * 0.065 * dustCol;
+
+        // composite deep field behind the sky where the sky is dark (additive star depth)
+        sky += deep * 0.35 * (1.0 - smoothstep(0.05,0.30,lum));
+
+        // --- COLOR GRADE: warm terracotta core glow toward the band, cool blue rim ---
+        vec2 c = uv - vec2(0.5, 0.62);
+        float coreGlow = exp(-dot(c,c)*3.2);
+        sky += coreGlow * 0.20 * vec3(1.0, 0.78, 0.50);            // warm core lift (#ffd9a0-ish)
+        float rim = smoothstep(0.3, 1.0, length(uv-0.5)*1.3);
+        sky = mix(sky, sky*vec3(0.80,0.90,1.08), rim*0.30);        // cool blue rim (#6f9fd6-ish)
+
+        // airglow lift near the horizon (matches the real plate's warm airglow)
+        sky += smoothstep(0.34,0.0,uv.y) * vec3(0.10,0.055,0.02);
+
+        // entrance: exposure ramps up as the dolly settles
+        float exposure = mix(0.55, 1.18, uIntro);
+
+        vec3 col = aces(sky * exposure);
+
+        // subtle filmic vignette baked in (CSS adds more)
+        col *= 1.0 - 0.25*dot(uv-0.5,uv-0.5)*2.2;
+
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `;
+
+    const mat = new THREE.ShaderMaterial({
+      uniforms,
+      vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
+      fragmentShader: frag,
+      depthTest: false, depthWrite: false
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), mat));
+
+    // ---- pointer parallax (smoothed) ----
+    let mx=0,my=0;
+    addEventListener('pointermove', e => {
+      mx = (e.clientX/innerWidth  - 0.5);
+      my = (e.clientY/innerHeight - 0.5);
+    }, {passive:true});
+
+    // ---- subtle scroll push-in ----
+    let scrollPush = 0;
+    addEventListener('wheel', e => {
+      scrollPush = Math.max(0, Math.min(0.6, scrollPush + e.deltaY*0.0004));
+    }, {passive:true});
+
+    // ---- choreographed entrance ----
+    function reveal(){
+      const h1 = document.getElementById('h1');
+      const words = h1.textContent.trim().split(' ');
+      h1.innerHTML = words.map(w=>`<span class="w">${w}</span>`).join(' ');
+      gsap.set('.eyebrow,.sub,.row', {opacity:0, y:18});
+      gsap.set('.w', {opacity:0, yPercent:120});
+      // entrance dolly: push the plate in, then settle, while exposure ramps up
+      gsap.fromTo(uniforms.uIntro, {value:0}, {value:1, duration:2.4, ease:'power2.out'});
+      gsap.fromTo(uniforms.uZoom,  {value:0.42}, {value:0.0, duration:2.8, ease:'power3.out'});
+      const tl = gsap.timeline({ delay:0.4 });
+      tl.to('.eyebrow', {opacity:1,y:0,duration:.7,ease:'power3.out'})
+        .to('.w', {opacity:1,yPercent:0,duration:.9,ease:'power4.out',stagger:0.06}, '-=0.3')
+        .to('.sub', {opacity:1,y:0,duration:.7,ease:'power3.out'}, '-=0.4')
+        .to('.row', {opacity:1,y:0,duration:.7,ease:'power3.out'}, '-=0.45');
+    }
+    reveal();
+
+    // ---- render loop ----
+    const clock = new THREE.Clock();
+    let cmx=0, cmy=0, baseZoom=0, cScroll=0;
+    function tick(){
+      const t = clock.getElapsedTime();
+      uniforms.uTime.value = t;
+
+      // continuous slow Ken-Burns dive — owned by the loop, never fights GSAP.
+      // uZoom (entrance) decays to 0 via GSAP; uDive keeps the push-in going forever.
+      // A slow sine breath keeps it from ever drifting too far, so it loops gracefully.
+      baseZoom = 0.10 + 0.10*Math.sin(t*0.06 - 1.5707);   // 0 -> 0.20 -> 0 ... gentle endless dive
+      cScroll += (scrollPush - cScroll)*0.05;
+      uniforms.uDive.value = baseZoom;
+      uniforms.uScroll.value = cScroll;
+
+      cmx += (mx - cmx)*0.05; cmy += (my - cmy)*0.05;
+      uniforms.uMouse.value.set(cmx, cmy);
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    // ---- resize ----
+    addEventListener('resize', ()=>{
+      sizes.w=innerWidth; sizes.h=innerHeight;
+      renderer.setSize(sizes.w,sizes.h);
+      renderer.setPixelRatio(Math.min(1.8,devicePixelRatio));
+      uniforms.uRes.value.set(sizes.w,sizes.h);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planetary Loader</title>
+<style>
+  :root{--bg:#06101d;--text:#f8f1e7;--muted:rgba(248,241,231,.65);--sky:#8fd7ff;--amber:#d8a15f}
+  body{margin:0;min-height:100svh;display:grid;place-items:center;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
+  .loader{display:grid;gap:22px;justify-items:center;text-align:center}.system{position:relative;width:220px;aspect-ratio:1;border:1px solid rgba(248,241,231,.18);border-radius:50%}
+  .system:before{content:"";position:absolute;inset:42px;border:1px solid rgba(143,215,255,.22);border-radius:50%}.sun{position:absolute;inset:92px;border-radius:50%;background:var(--amber);box-shadow:0 0 42px rgba(216,161,95,.5)}
+  .planet{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px;border-radius:50%;background:var(--sky);transform:rotate(0deg) translateX(108px)}
+  h1{margin:0;font-size:28px;letter-spacing:0}.loader p{margin:0;color:var(--muted)}
+  @media(prefers-reduced-motion:no-preference){.planet{animation:orbit 1.8s linear infinite}.system{animation:pulse 2.4s ease-in-out infinite alternate}}
+  @keyframes orbit{to{transform:rotate(1turn) translateX(108px)}}@keyframes pulse{to{box-shadow:0 0 48px rgba(143,215,255,.12)}}
+</style>
+</head>
+<body><main class="loader"><div class="system" aria-hidden="true"><span class="sun"></span><span class="planet"></span></div><h1>Finding clear sky</h1><p>Use only if the road-to-constellation handover is not already the loader.</p></main></body>
+</html>

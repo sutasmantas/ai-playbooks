@@ -1,0 +1,89 @@
+# [KIT NAME] — Design Log
+
+Running in-session capture. Better than memory for long sessions. Append-only during build — discoveries go here, not into the current phase.
+
+---
+
+## Session [DATE]
+
+### Domain Brief (Phase 2 output)
+[One paragraph: what domain, what the kit will produce, what the user already knows, what is explicitly out of scope]
+
+---
+
+### Reflection Checkpoints
+
+#### Phase [N] — [Phase name] — [DATE]
+1. Patterns not yet named: [answer]
+2. Alternatives not considered: [answer]
+3. Adjacent problems missed: [answer]
+4. Implications for subsequent phases: [answer]
+5. What a critic would say is missing: [answer]
+
+Produced findings: [YES — see Discovered Work] / [NO — checkpoint produced nothing, proceeding]
+
+---
+
+### Discovered Work (append-only)
+
+Items found during the build that are NOT in the current phase scope. Reviewed at phase boundaries — not mid-phase.
+
+- [DATE] [Phase discovered in] [What needs doing] — [Why it can't wait until later / can wait until Phase N]
+
+---
+
+### Problem Classes Discovered
+
+[Use procedures/class-before-instance.md when filling this section]
+
+#### [Class name]
+- **General class:** [abstract description]
+- **Triggering instance:** [what was observed that triggered class identification]
+- **Other instances found (scan):** [list]
+- **Class-level fix applied:** [what was done]
+- **Design log cross-reference:** [pitfall_register.md entry if promoted]
+
+---
+
+### Alternatives Considered
+
+[Use procedures/alternatives-generation.md when filling this section]
+
+#### [Phase/File]: [Approach name]
+- **Approach taken:** [one sentence + underlying assumption]
+- **Alternative 1:** [name] — assumes ___ instead of ___ — would produce ___ differently
+- **Alternative 2:** [name] — assumes ___ instead of ___ — would produce ___ differently
+- **Choice:** [current approach / alternative N] because [reason]
+
+---
+
+### User Questions and Answers
+
+[Contested and gap-spot questions only — from Phase 4 Synthesis]
+
+**Q [N]:** [question — specific, not general]
+**A:** [user's answer]
+**Implication:** [what this changes in the plan or confidence map]
+
+---
+
+### Adversarial Check on User Assumptions
+
+[From Phase 4 — research findings that contradict user's stated assumptions]
+
+- **User assumption:** [from intake brief]
+- **Research finding that contradicts it:** [with evidence classification]
+- **User response:** [after being shown the conflict]
+- **Resolution:** [how this was handled]
+
+---
+
+### Milestone Log
+
+- Phase [N] completed [DATE] — [reflection checkpoint: findings or none] — [next phase start state]
+
+---
+
+## Session [DATE+N] (append new sessions here)
+
+[Same structure. Never overwrite previous sessions — append only.]

@@ -1,0 +1,241 @@
+[
+  {
+    "topicKey": "caffeine",
+    "topicName": "Caffeine — Ergogenic Effects and Dependency",
+    "claims": [
+      {
+        "claim": "Pre-workout caffeine supplementation (3–6 mg/kg) produces a small but statistically significant improvement in maximal muscular strength (1RM and similar measures), with a pooled SMD of 0.18 (95% CI: 0.14–0.21) across 9 meta-analyses and 1,628 participants. The effect is larger for upper body than lower body, and higher doses (≥5 mg/kg) yield SMD 0.34 vs 0.18 for lower doses. Percent improvement in strength ranges from approximately 2–7%.",
+        "effect_size": "SMD = 0.18 (95% CI: 0.14–0.21); 2–7% improvement in 1RM/maximal strength; SMD rises to 0.34 at doses ≥5 mg/kg",
+        "source_id": "PMID 29527137 (Grgic et al. 2018, J Int Soc Sports Nutr); PMC11336343 (umbrella meta-analysis, Heliyon 2024)",
+        "study_desc": "Grgic et al. 2018: systematic review and meta-analysis of RCTs on caffeine and muscle strength/power (JISSN). Validated by a 2024 umbrella meta-analysis pooling 9 prior meta-analyses (n=1,628).",
+        "confidence": "consensus"
+      },
+      {
+        "claim": "Caffeine supplementation significantly improves time-to-exhaustion (an endurance and high-intensity effort measure) with a medium pooled SMD of 0.39 (95% CI: 0.21–0.57, p<0.001), corresponding to approximately 17% longer time to exhaustion. Time-trial performance improvement is smaller (SMD ~0.10, ~0.7% reduction in completion time). These effects apply across aerobic and high-intensity protocols. The Grgic et al. 2020 umbrella review (PMID 30926628) across 21 published meta-analyses confirms caffeine's broad ergogenic benefit for aerobic exercise.",
+        "effect_size": "SMD = 0.39 (95% CI: 0.21–0.57) for time-to-exhaustion; ~17% improvement; SMD ~0.10 for time-trial",
+        "source_id": "PMC9824573 (systematic review and meta-analysis, Nutrients 2023); PMID 30926628 (Grgic et al. 2020, BJSM umbrella review)",
+        "study_desc": "PMC9824573: meta-analysis of 21 RCTs (n=254, predominantly male) examining caffeine and endurance running performance including time-to-exhaustion and time-trial outcomes. Grgic et al. 2020 umbrella review of 21 meta-analyses in British Journal of Sports Medicine.",
+        "confidence": "consensus"
+      },
+      {
+        "claim": "The effect of caffeine tolerance on ergogenic benefit is genuinely contested. One 2025 meta-analysis (PMC12537405) found habitual consumers above 3 mg/kg/day showed markedly blunted velocity response (SMD 0.21 vs 0.87 for naive/low consumers). However, a separate RCT (PMID 28495846, Gonçalves et al.) found that low (58 mg/day), moderate (143 mg/day), and high (351 mg/day) habitual consumers all showed similar ~3% improvement in cycling time-trial with 6 mg/kg acute caffeine, with no significant group difference (p=0.0002 for caffeine vs placebo, non-significant group interaction). A 28-day tolerance study (PMC6343867) showed cycling power improvements persisted for 15–18 days at 3 mg/kg/day before diminishing. Pre-competition caffeine abstinence is not recommended due to withdrawal side effects outweighing any re-sensitization benefit; the minimum abstinence period needed to fully restore sensitivity remains unknown (studies up to 4-day withdrawal showed no restoration).",
+        "effect_size": "Naive consumers: SMD 0.87 for movement velocity; habitual consumers (>3 mg/kg/day): SMD 0.21 — a 76% attenuation. At 6 mg/kg dose, one RCT found no significant blunting across habitual consumption levels (58–351 mg/day).",
+        "source_id": "PMC12537405 (meta-analysis, Frontiers Nutrition 2025); PMID 28495846 (Gonçalves et al., J Appl Physiol 2017); PMC6343867 (Beaumont et al., PLOS ONE 2019)",
+        "study_desc": "PMC12537405: meta-analysis of 12 RCTs (n=230) on caffeine and muscular power with habitual intake as moderator. PMID 28495846: RCT, 40 male cyclists in tertiles by habitual caffeine intake (low/moderate/high), acute 6 mg/kg caffeine. PMC6343867: 20-day daily caffeine supplementation trial tracking tolerance timecourse.",
+        "confidence": "contested"
+      },
+      {
+        "claim": "Physical dependence on caffeine can develop after as few as 3 days of regular use and at doses as low as 100 mg/day (roughly one standard cup of coffee). Withdrawal symptoms — including headache, fatigue, irritability, difficulty concentrating, and flu-like symptoms — begin within 12–24 hours of cessation, peak at 20–51 hours, and resolve within 2–9 days. Approximately 13% of regular caffeine users experience clinically significant functional impairment from withdrawal. DSM-5 recognizes Caffeine Withdrawal as a diagnosis. Caffeine Use Disorder (requiring compulsive use despite harm plus failed quit attempts) affects an estimated 9% of the general population but is NOT classified as a substance of addiction in the same clinical category as alcohol or opioids; it does not produce compulsive drug-seeking behavior at the population level, though individual cases of clinically significant loss of control are documented.",
+        "effect_size": "Dependence threshold: ~100 mg/day; withdrawal onset: 12–24h; peak: 20–51h; duration: 2–9 days; 13% of users experience clinically significant impairment; caffeine use disorder prevalence ~9% general population",
+        "source_id": "NBK430790 (StatPearls Caffeine Withdrawal, NCBI Bookshelf); PMC3777290 (Meredith et al., J Caffeine Res 2013)",
+        "study_desc": "NBK430790: StatPearls clinical review of caffeine withdrawal, DSM-5 criteria, and epidemiology. PMC3777290: comprehensive review of caffeine use disorder criteria, DSM-5 framework, and clinical differentiation from physical dependence, including prevalence estimates across populations.",
+        "confidence": "consensus"
+      },
+      {
+        "claim": "The optimal caffeine dose for ergogenic effect in exercise is 3–6 mg/kg body mass, taken approximately 60 minutes before exercise. At 3 mg/kg (~210 mg for a 70 kg person), meaningful performance benefits are observed; at 6 mg/kg (~420 mg), benefits are larger (SMD 0.34 vs 0.18 for lower doses for strength). Doses of 9 mg/kg or above are associated with a high incidence of adverse effects (anxiety, GI distress, sleep disruption, cardiovascular effects) and provide no additional ergogenic benefit over 6 mg/kg. The minimum effective dose may be as low as 2 mg/kg (~140 mg). Sleep disruption is dose-dependent and significantly moderated by individual genetics (CYP1A2 genotype): slow metabolizers (CC genotype) may experience performance impairment and worse sleep disruption even at moderate doses, while fast metabolizers (AA genotype) may see up to 6.8% time-trial improvement at 4 mg/kg.",
+        "effect_size": "3–6 mg/kg = effective range; SMD 0.18 at <5 mg/kg vs 0.34 at ≥5 mg/kg for strength; 9 mg/kg = high side-effect threshold with no additional benefit; fast metabolizers: 6.8% improvement at 4 mg/kg; slow metabolizers: up to 13.7% performance impairment at 4 mg/kg",
+        "source_id": "PMC7777221 (ISSN Position Stand, Maughan et al. / Grgic et al. 2021, JISSN); PMC11336343 (umbrella meta-analysis 2024)",
+        "study_desc": "PMC7777221: International Society of Sports Nutrition position stand on caffeine and exercise performance, synthesizing evidence from meta-analyses and RCTs including dose-response and timing data. PMC11336343: umbrella meta-analysis of 9 prior meta-analyses reporting dose-stratified SMD values.",
+        "confidence": "consensus"
+      }
+    ]
+  },
+  {
+    "topicKey": "magnesium",
+    "topicName": "Magnesium in Athletes",
+    "claims": [
+      {
+        "claim": "Sweat magnesium concentration during exercise averages 9.8 mg/L by whole-body wash-down collection in trained athletes cycling 90 minutes in the heat.",
+        "effect_size": "9.8 ± 4.8 mg/L whole-body sweat magnesium concentration",
+        "source_id": "PMID 21719904",
+        "study_desc": "Fudge et al. (2011). Exercise-induced trace mineral element concentration in regional versus whole-body wash-down sweat. International Journal of Sport Nutrition and Exercise Metabolism. N=8 athletes (4M/4F), 90-min cycling in heat. Whole-body wash-down method used as reference standard.",
+        "confidence": "medium"
+      },
+      {
+        "claim": "22% of elite Olympic and Paralympic track and field athletes showed clinical magnesium deficiency on at least one blood test over an 8-year monitoring period, defined as red cell magnesium below 1.19 mmol/L.",
+        "effect_size": "22% prevalence of red cell magnesium deficiency (< 1.19 mmol/L) across 510 blood samples from 192 elite athletes",
+        "source_id": "PMID 31829845",
+        "study_desc": "Pollock et al. (2020). An 8-year Analysis of Magnesium Status in Elite International Track & Field Athletes. Journal of the American College of Nutrition. N=192 Olympic and Paralympic athletes, 510 blood samples collected longitudinally 2010-2018.",
+        "confidence": "high"
+      },
+      {
+        "claim": "Magnesium supplementation at 500 mg/day for 8 weeks significantly improved sleep in elderly subjects with primary insomnia: sleep time increased (P=0.002), sleep onset latency decreased (P=0.02), sleep efficiency improved (P=0.03), and insomnia severity (ISI) decreased (P=0.006) vs placebo.",
+        "effect_size": "Significant reductions in ISI score (P=0.006) and sleep onset latency (P=0.02); significant increase in sleep time (P=0.002) and sleep efficiency (P=0.03) vs placebo",
+        "source_id": "PMID 23853635",
+        "study_desc": "Abbasi et al. (2012). The effect of magnesium supplementation on primary insomnia in elderly: A double-blind placebo-controlled clinical trial. Journal of Research in Medical Sciences. N=46 elderly subjects (randomized 1:1), 500 mg/day elemental magnesium vs placebo for 8 weeks.",
+        "confidence": "medium"
+      },
+      {
+        "claim": "In men aged 65 and older, serum magnesium is independently and positively associated with total testosterone after full adjustment for BMI, IL-6, DHEAS, SHBG, insulin, IGF-1, grip strength, and comorbidities (β = 48.72 ± 12.61, P<0.001).",
+        "effect_size": "β = 48.72 ± 12.61 (fully adjusted regression coefficient for magnesium predicting total testosterone, P<0.001)",
+        "source_id": "PMID 21675994",
+        "study_desc": "Maggio et al. (2011). Magnesium and anabolic hormones in older men. International Journal of Andrology. N=399 men aged ≥65 years. Cross-sectional analysis from the InCHIANTI cohort. Linear regression adjusted for multiple confounders.",
+        "confidence": "high"
+      },
+      {
+        "claim": "Magnesium chelate (diglycinate) and magnesium oxide show similar fractional absorption overall (23.5% vs 22.8%), but in patients with significant malabsorption the chelate form achieves nearly double the absorption (23.5% vs 11.8%, P<0.05); the chelate also produced an earlier absorption peak by a mean of 3.2 hours.",
+        "effect_size": "Overall absorption: chelate 23.5% vs oxide 22.8% (NS); in malabsorbers: chelate 23.5% vs oxide 11.8% (P<0.05); peak absorption 3.2 hours earlier with chelate (P<0.05)",
+        "source_id": "PMID 7815675",
+        "study_desc": "Schuette et al. (1994). Bioavailability of magnesium diglycinate vs magnesium oxide in patients with ileal resection. JPEN Journal of Parenteral and Enteral Nutrition. N=12 patients with ileal resections. Stable isotope (26Mg) crossover pharmacokinetic design.",
+        "confidence": "medium"
+      }
+    ]
+  },
+  {
+    "topicKey": "omega3",
+    "topicName": "Omega-3 Fatty Acids",
+    "claims": [
+      {
+        "claim": "Omega-3 supplementation (EPA+DHA) significantly reduces CRP in cancer patients, with a pooled SMD of -0.628 (95% CI: -0.914 to -0.342) by random-effects model, and -0.456 (95% CI: -0.590 to -0.322) by fixed-effects model. Effect is statistically significant but population is cancer patients; effect in healthy resistance-trained males is unconfirmed by this study.",
+        "effect_size": "SMD -0.628 (random effects, 95% CI -0.914 to -0.342)",
+        "source_id": "PMID 34060403",
+        "study_desc": "Systematic review and meta-analysis of 17 RCTs; N=916 cancer patients; omega-3 PUFA supplementation vs. placebo; CRP as primary outcome; Fabian et al. 2021, Nutrients.",
+        "confidence": "medium"
+      },
+      {
+        "claim": "In older adults, 4 g/day omega-3 (1.86 g EPA + 1.50 g DHA as ethyl esters) for 8 weeks did not change basal muscle protein synthesis rate (0.051 vs. 0.053 %/h, p=0.80) but increased the above-basal stimulated MPS response to hyperaminoacidemia-hyperinsulinemia from 0.009 ± 0.005 %/h to 0.031 ± 0.003 %/h (p<0.01), an approximately 3.4-fold increase in the anabolic response. A 2025 meta-analysis of 8 RCTs (N=188) found no significant pooled effect on muscle protein synthesis (SMD 0.03, 95% CI -0.35 to 0.40, p=0.89), indicating the anabolic signal is not robust across studies.",
+        "effect_size": "Stimulated MPS above basal: 0.009 to 0.031 %/h (approx. 3.4-fold increase, p<0.01); pooled across 8 RCTs: SMD 0.03 (95% CI -0.35 to 0.40, p=0.89, NS)",
+        "source_id": "PMID 21159787 (Smith et al. 2011); PMID 38777807 (meta-analysis 2025)",
+        "study_desc": "RCT: N=16 older adults randomized to 4g/day omega-3 or corn oil for 8 weeks; MPS measured via stable isotope tracer during hyperaminoacidemia-hyperinsulinemia clamp; Smith GI et al., Am J Clin Nutr 2011. Meta-analysis: 8 RCTs, N=188 participants, omega-3 vs. control on MPS rates, 2025.",
+        "confidence": "contested"
+      },
+      {
+        "claim": "VITAL trial: 1 g/day marine omega-3 supplementation for a median of 5.3 years did not significantly reduce the primary composite endpoint of major cardiovascular events (MI, stroke, cardiovascular death) in 25,871 adults without prior CVD: HR 0.92 (95% CI 0.80-1.06, p=0.24). In contrast, REDUCE-IT trial: 4 g/day icosapent ethyl (pure EPA, as icosapent ethyl) in 8,179 statin-treated patients with elevated triglycerides reduced the primary composite cardiovascular endpoint: HR 0.75 (95% CI 0.68-0.83, p<0.001), a 25% relative risk reduction over median 4.9 years. The two trials are not directly comparable: VITAL used a mixed EPA+DHA supplement at a primary-prevention dose; REDUCE-IT used high-dose pure EPA in secondary-prevention patients.",
+        "effect_size": "VITAL: HR 0.92 (95% CI 0.80-1.06, p=0.24, NS); REDUCE-IT: HR 0.75 (95% CI 0.68-0.83, p<0.001)",
+        "source_id": "VITAL: PMID 30415637 (Manson et al., NEJM 2019); REDUCE-IT: PMID 30415628 (Bhatt et al., NEJM 2019)",
+        "study_desc": "VITAL: randomized, placebo-controlled 2x2 factorial trial, N=25,871 men ≥50 and women ≥55 years, 1g/day omega-3, primary prevention, median 5.3-year follow-up; Manson JE et al., NEJM 2019. REDUCE-IT: randomized, double-blind, placebo-controlled trial, N=8,179 statin-treated patients with elevated triglycerides plus CVD or diabetes, 4g/day icosapent ethyl, median 4.9-year follow-up; Bhatt DL et al., NEJM 2019.",
+        "confidence": "high"
+      },
+      {
+        "claim": "Omega-3 PUFA supplementation produces a statistically significant but clinically modest reduction in delayed-onset muscle soreness (DOMS) after eccentric exercise: pooled MD -0.93 on a 10-unit VAS (95% CI -1.44 to -0.42, p=0.0004) across 12 RCTs. This falls below the minimal clinically important difference (MCID) of 1.4 VAS units, meaning the effect is unlikely to represent a meaningful reduction in soreness for a resistance-trained individual.",
+        "effect_size": "MD -0.93 on 10-unit VAS (95% CI -1.44 to -0.42, p=0.0004); below MCID of 1.4 units",
+        "source_id": "PMID 32382573",
+        "study_desc": "Systematic review and meta-analysis of 12 RCTs; N=301 (145 omega-3, 156 control); omega-3 PUFA supplementation vs. placebo; primary outcome DOMS measured on 10-unit VAS after eccentric exercise; published in Nutrients 2020.",
+        "confidence": "high"
+      },
+      {
+        "claim": "A meta-analysis of 96 clinical trials found that combined EPA+DHA doses of 1-3 g/day showed the most consistent reductions in CRP, TNF-alpha, and IL-6. A separate dose-response meta-analysis of 40 RCTs in cardiometabolic disorder patients identified 1200 mg/day (~1.2 g/day) as an effective threshold for CRP reduction, with non-linear dose-response relationships; no significant additional anti-inflammatory benefit was demonstrated above this dose in the cardiometabolic populations studied. EPA:DHA ratio also modulates outcomes: lower EPA:DHA ratios (<1.0) maximize cytokine reduction, while higher ratios better elevate blood EPA:DHA concentrations.",
+        "effect_size": "CRP reduction effective up to 1200 mg/day EPA+DHA; 1-3 g/day range most consistent across inflammatory markers; no pooled MD/SMD reported for plateau dose",
+        "source_id": "PMID 41568426 (96 trials, EPA:DHA ratio meta-analysis); PMID 40263171 (40 RCTs, dose-response meta-analysis)",
+        "study_desc": "PMID 41568426: systematic review and meta-analysis of 96 clinical trials examining EPA:DHA dosing ratio and effects on inflammatory markers and blood fatty acid profiles, 2025. PMID 40263171: dose-response meta-analysis of 40 RCTs in cardiometabolic disorder patients examining omega-3 dose and CRP concentration, Inflammopharmacology 2025.",
+        "confidence": "medium"
+      }
+    ]
+  },
+  {
+    "topicKey": "zinc",
+    "topicName": "Zinc and Exercise",
+    "claims": [
+      {
+        "claim": "Sweat zinc concentration during exercise ranges from 0.5 to 1.0 mg per liter, meaning a male athlete losing 1–2 liters of sweat per session loses approximately 0.5–2 mg of zinc per training session through sweat alone.",
+        "effect_size": "0.5–1.0 mg Zn per liter of sweat; Montain et al. 2007 (PMID 18156662) measured initial sweat zinc at approximately 0.655 mg/L (655 µg/L), declining 42–45% after the first hour of exercise-heat stress",
+        "source_id": "PMID 18156662 (Montain SJ, Cheuvront SN, Lukaski HC. Int J Sport Nutr Exerc Metab. 2007;17(6):574-582); corroborated by NCBI Bookshelf NBK236242 and DeRuisseau et al. PMID 12500986",
+        "study_desc": "Montain et al. 2007: 7 heat-acclimated subjects (6 male, 1 female) performed 5x60-min treadmill bouts in 27°C or 35°C conditions; sweat zinc measured at bouts 1, 3, and 5. DeRuisseau et al. 2002 (PMID 12500986): sweat iron and zinc during 2-hour prolonged exercise, showed zinc losses representing ~9% of the male RDA per session.",
+        "confidence": "high"
+      },
+      {
+        "claim": "Four weeks of oral zinc sulfate supplementation (3 mg/kg/day) in physically active males preserves and elevates both resting and post-exercise total and free testosterone levels, which are otherwise suppressed by exhaustive exercise.",
+        "effect_size": "Statistically significant increase in both resting and post-exhaustion total and free testosterone after 4-week zinc sulfate (3 mg/kg/day) supplementation vs pre-supplementation baseline (p<0.05); exact ng/mL values not available in abstract",
+        "source_id": "PMID 16648789 (Kilic M et al. Neuro Endocrinol Lett. 2006;27(1-2):247-52); replicated in PMID 17984944 (Kilic M. Neuro Endocrinol Lett. 2007;28(5):681-5)",
+        "study_desc": "Kilic et al. 2006 (PMID 16648789): 10 male elite wrestlers (mean age 18.7 ± 2.4 years) supplemented with oral zinc sulfate (3 mg/kg/day) for 4 weeks; testosterone measured at rest and post-exhaustion before and after supplementation. Kilic 2007 (PMID 17984944) replicated design in sedentary males with fatiguing bicycle exercise.",
+        "confidence": "medium"
+      },
+      {
+        "claim": "A meal combination of 200g cooked chicken breast (~1.8 mg Zn), 2 large eggs (~1.6 mg Zn), and 100g cooked beans (~1.2 mg Zn) provides approximately 4.6 mg zinc — less than half the adult male RDA of 11 mg/day — and is insufficient to cover both baseline RDA needs and the additional ~1 mg/day sweat losses from a 7-session-per-week training schedule. Athletes systematically show lower serum zinc (-0.93 µmol/L) than sedentary controls despite consuming more dietary zinc.",
+        "effect_size": "4.6 mg Zn from the three food sources vs 11 mg/day RDA; athletes' serum zinc -0.93 µmol/L lower than sedentary controls (Chu et al. 2018, PMID 29164533); sweat losses estimated at ~0.5–1 mg per session x 7 sessions = ~3.5–7 mg/week additional zinc loss",
+        "source_id": "PMID 29164533 (Chu A et al. Sports Med. 2018;48(2):327-336); dietary zinc figures from USDA FoodData Central and Aprifel nutritional database (navy beans 1.20 mg/100g); NIH ODS Zinc Health Professional Fact Sheet for RDA",
+        "study_desc": "Chu et al. 2018 (PMID 29164533): systematic review and meta-analysis comparing serum zinc in athletes vs sedentary controls; n=24 studies; athletes consumed ~2.57 mg/day more dietary zinc yet maintained significantly lower serum zinc levels. Dietary zinc figures based on USDA SR Legacy data: chicken breast ~0.9 mg/100g, eggs ~0.8 mg/large egg, cooked beans ~1.2 mg/100g.",
+        "confidence": "medium"
+      },
+      {
+        "claim": "The NIH/Food and Nutrition Board tolerable upper intake level (UL) for zinc is 40 mg/day for adults; the EFSA sets a more conservative UL of 25 mg/day. Chronic intake of 50 mg/day or more of supplemental zinc induces copper deficiency (hypocupremia) by upregulating intestinal metallothionein, which preferentially binds copper. For physically active males supplementing zinc, staying at or below 25–40 mg total daily zinc (diet plus supplement) avoids copper interference.",
+        "effect_size": "UL: 40 mg/day (NIH/FNB) or 25 mg/day (EFSA); copper interference threshold: ≥50 mg/day elemental zinc chronically; at 65 mg/day zinc, neutropenia and undetectable copper levels have been reported in case reports",
+        "source_id": "NIH Office of Dietary Supplements Zinc Health Professional Fact Sheet; PMC11243279 (Zinc Toxicity: Understanding the Limits. Molecules. 2024;29(13):3130); Copper Health Professional Fact Sheet (ODS)",
+        "study_desc": "PMC11243279 (2024 review in Molecules): comprehensive review of zinc toxicity thresholds, UL definitions across regulatory bodies, and mechanistic evidence for copper deficiency via metallothionein pathway at high zinc doses. Case report evidence cited for neutropenia at 65 mg/day. NIH ODS fact sheet provides FNB UL = 40 mg/day for adults.",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "topicKey": "lowcarb",
+    "topicName": "Low-Carb vs Low-Fat Diet Structure",
+    "claims": [
+      {
+        "claim": "Sacks et al. 2009 (POUNDS LOST trial, n=811, 2-year RCT): At 6 months all four diet groups (ranging 20-40% fat, 35-65% carbs) lost an average of ~6 kg (~7% of initial weight) with no statistically significant difference between low-fat and high-fat or low-carb and high-carb arms. At 2 years, mean weight loss was: lowest-carb group (35% carbs) 3.4 kg vs highest-carb group (65% carbs) 2.9 kg; low-fat (20% fat) 3.3 kg vs high-fat (40% fat) 3.3 kg. All pairwise comparisons were non-significant (p > 0.20). Adherence to counseling sessions was the strongest predictor of weight loss (0.2 kg per session attended), not macronutrient composition.",
+        "effect_size": "Weight loss difference between lowest-carb and highest-carb at 2 years: 0.5 kg (p > 0.20, non-significant). Low-fat vs high-fat at 2 years: 0.0 kg (p > 0.20, non-significant).",
+        "source_id": "PMID 19246357",
+        "study_desc": "Sacks FM et al. 'Comparison of Weight-Loss Diets with Different Compositions of Fat, Protein, and Carbohydrates.' NEJM 2009; 360:859-873. 2-year RCT, n=811 overweight adults, four diet arms varying fat (20-40%), protein (15-25%), and carbohydrate (35-65%). All arms calorie-restricted equally.",
+        "confidence": "consensus"
+      },
+      {
+        "claim": "Hall et al. 2015 metabolic ward study (n=19, controlled isocaloric feeding): Low-carbohydrate (carbohydrate restriction, RC) diet produced 53 ± 6 g/day of body fat loss; low-fat (fat restriction, RF) diet produced 89 ± 6 g/day of body fat loss — a statistically significant advantage for the low-fat condition (p=0.002). The low-carb diet did raise fat oxidation substantially and reduced insulin secretion (24-hr urinary C-peptide fell significantly in RC only), yet this did not translate into greater fat loss. Low-fat produced ~36 g/day more fat loss despite no change in fat oxidation or insulin. Both arms were isocaloric with protein clamped.",
+        "effect_size": "Low-fat: 89 ± 6 g/day fat loss vs low-carb: 53 ± 6 g/day fat loss. Difference: ~36 g/day favoring low-fat (p=0.002).",
+        "source_id": "PMID 26278052",
+        "study_desc": "Hall KD et al. 'Calorie for Calorie, Dietary Fat Restriction Results in More Body Fat Loss than Carbohydrate Restriction in People with Obesity.' Cell Metabolism 2015; 22(3):427-436. Crossover metabolic ward RCT, n=19 adults with obesity, 6-day isocaloric low-carb vs low-fat phases after 5-day baseline, both with protein held constant.",
+        "confidence": "high"
+      },
+      {
+        "claim": "Naude et al. 2014 (19 RCTs, n=3,209, isoenergetic comparison): When low-carbohydrate diets were compared against isoenergetic (calorie-matched) balanced diets, the pooled weight loss difference was just -0.74 kg (95% CI -1.49 to 0.01 kg) at 3-6 months favoring low-carb, and -0.48 kg (95% CI -1.44 to 0.49 kg) at 1-2 years — neither reaching statistical significance (CIs crossing zero). The Johnston 2014 JAMA meta-analysis (17 RCTs, n=1,797, <1 year) found low-carb associated with 2.0 kg greater weight loss (95% CI -3.1 to -0.9 kg, p<0.0001), but critically protein was NOT equated: the low-fat arm consumed 36 g/day less protein on average, introducing a protein confound that likely explains part of the low-carb advantage.",
+        "effect_size": "Naude 2014 isocaloric comparison: -0.74 kg at 3-6 months (NS) and -0.48 kg at 1-2 years (NS). Johnston 2014 (protein not equated): -2.0 kg favoring low-carb (p<0.0001).",
+        "source_id": "PMID 25007189 (Naude); PMID 25182101 (Johnston)",
+        "study_desc": "Naude CE et al. 'Low Carbohydrate versus Isoenergetic Balanced Diets for Reducing Weight and Cardiovascular Risk.' PLoS ONE 2014; 9(7):e100652. 19 RCTs, n=3,209. Johnston BC et al. 'Comparison of Weight Loss Among Named Diet Programs in Overweight and Obese Adults.' JAMA 2014; 312(9):923-933. 17 RCTs, n=1,797.",
+        "confidence": "consensus"
+      },
+      {
+        "claim": "Hall 2015 directly tested the carbohydrate-insulin model (CIM) of obesity, which predicts that lowering carbohydrates reduces insulin, thereby unlocking fat stores and producing superior fat loss. The study confirmed that the low-carb condition did reduce insulin (24-hr urinary C-peptide fell significantly) and did substantially increase fat oxidation (fat oxidation reached a plateau within days). However, despite these mechanistic changes predicted by CIM, participants lost significantly LESS body fat on low-carb than on low-fat (53 vs 89 g/day, p=0.002). The result dissociates increased fat oxidation from net fat balance: low-carb burned more fat but also supplied more dietary fat. This is widely interpreted as falsifying the strong form of the CIM (though proponents argue 6 days is insufficient for full metabolic adaptation).",
+        "effect_size": "Insulin (C-peptide) fell on low-carb but not low-fat. Fat oxidation rose on low-carb but not low-fat. Despite this, fat mass loss was 36 g/day less on low-carb than low-fat (p=0.002).",
+        "source_id": "PMID 26278052",
+        "study_desc": "Hall KD et al. 'Calorie for Calorie, Dietary Fat Restriction Results in More Body Fat Loss than Carbohydrate Restriction in People with Obesity.' Cell Metabolism 2015; 22(3):427-436. Metabolic ward crossover, n=19, 6-day isocaloric conditions, protein clamped. Key controversy: critics argue 6 days may be insufficient for full keto-adaptation; Hall's mathematical models predict body fat differences diminish to near zero with prolonged isocaloric low-carb vs low-fat.",
+        "confidence": "contested"
+      },
+      {
+        "claim": "When protein is equated in trials lasting >6 months, low-carb and low-fat diets produce near-identical long-term fat loss. DIETFITS (Gardner 2018, n=609, 12 months, protein ~21-23% in both arms) found weight loss of -5.3 kg (low-fat) vs -6.0 kg (low-carb), difference 0.7 kg (95% CI -0.2 to 1.6 kg, non-significant), and body fat percentage change of -1.97% vs -2.15% (difference 0.18%, non-significant). Sacks 2009 (2 years, protein 15-25% in all arms) found no significant difference between any macronutrient pattern. In POUNDS LOST, behavioral adherence (sessions attended) was the strongest outcome predictor (r=0.52 at 6 months, r=0.37 at 24 months), not diet composition. Both low-carb and low-fat groups fail to maintain their initially prescribed targets long-term (low-carb participants averaging ~132 g/day carbs by trial end vs target ≤20 g/day).",
+        "effect_size": "DIETFITS: 0.7 kg difference NS (p=NS). POUNDS LOST: 0.5 kg difference NS (p>0.20). Adherence correlation with weight loss: r=0.52 at 6 months.",
+        "source_id": "PMID 29466592 (DIETFITS Gardner 2018); PMID 19246357 (Sacks 2009); PMID 20195742 (POUNDS LOST adherence)",
+        "study_desc": "Gardner CD et al. 'Effect of Low-Fat vs Low-Carbohydrate Diet on 12-Month Weight Loss.' JAMA 2018; 319(7):667-679. n=609, 12-month RCT, protein ~21-23% in both arms. Sacks FM et al. NEJM 2009 (see above). Teixeira PJ et al. 'Early behavioral adherence predicts short and long-term weight loss in the POUNDS LOST study.' J Behav Med 2010; 33(4):305-313.",
+        "confidence": "consensus"
+      }
+    ]
+  },
+  {
+    "topicKey": "mps_timing",
+    "topicName": "Protein Per Meal and MPS Timing",
+    "claims": [
+      {
+        "claim": "Whey protein dose-response for myofibrillar MPS: 0g yields a baseline FSR of 0.041 ± 0.015%/h; 10g produces no significant increase above baseline; 20g increases MPS by ~49% above baseline (estimated ~0.061%/h); 40g increases MPS by ~56% above baseline (estimated ~0.064%/h). The study concludes 20g is sufficient for maximal stimulation in ~80kg resistance-trained young men, as the additional MPS from 40g was not statistically different from 20g, while excess amino acids were diverted to oxidation rather than additional synthesis.",
+        "effect_size": "20g whey: +49% MPS above 0g control (baseline 0.041%/h); 40g whey: +56% above 0g control; 10g whey: no significant increase. 20g vs 40g difference was not statistically significant, indicating a practical plateau at 20g.",
+        "source_id": "PMID 24257722",
+        "study_desc": "Witard OC, Jackman SR, Breen L, Smith K, Selby A, Tipton KD. Myofibrillar muscle protein synthesis rates subsequent to a meal in response to increasing doses of whey protein at rest and after resistance exercise. Am J Clin Nutr. 2014 Jan;99(1):86-95. Crossover RCT, n=48 resistance-trained young men (~80kg), unilateral leg exercise, 0/10/20/40g whey protein isolate consumed post-exercise, 4-hour measurement window.",
+        "confidence": "high"
+      },
+      {
+        "claim": "Even distribution of ~94g protein across 3 meals (breakfast ~31.5g, lunch ~29.9g, dinner ~32.7g) produces a 24-hour myofibrillar FSR of 0.075 ± 0.006%/h on Day 1 and 0.077 ± 0.006%/h on Day 7. A skewed distribution of ~90g/day (breakfast ~10.7g, lunch ~16.0g, dinner ~63.4g) produces an FSR of 0.056 ± 0.006%/h on both Days 1 and 7. The even distribution yielded 25% higher 24-hour MPS than the skewed distribution, and this advantage was maintained after 7 days of dietary habituation.",
+        "effect_size": "EVEN vs SKEW: 0.075 vs 0.056%/h on Day 1 (~34% higher in absolute FSR terms; study reports 25% higher; p=0.003). Day 7: 0.077 vs 0.056%/h (p=0.001). The 25% figure cited in the paper likely refers to a specific analytical comparison; the absolute FSR difference is 0.019-0.021%/h.",
+        "source_id": "PMID 24477298",
+        "study_desc": "Mamerow MM, Mettler JA, English KL, et al. Dietary protein distribution positively influences 24-h muscle protein synthesis in healthy adults. J Nutr. 2014 Jun;144(6):876-80. Crossover feeding study, n=8 healthy adults (age ~36.9 y), 7-day dietary period with 30-day washout, mixed muscle FSR measured via stable isotope tracer.",
+        "confidence": "high"
+      },
+      {
+        "claim": "The leucine threshold for maximal mTOR-mediated muscle protein synthesis in young adults is approximately 2.5g of leucine per meal. This corresponds to roughly 20-25g of whey protein (which contains ~10-11% leucine by weight) or approximately 130g of cooked chicken breast. Older adults require a higher threshold of approximately 3.0-4.0g leucine per meal due to anabolic resistance. Moore et al. 2009 (PMID 19056590) established that MPS is maximally stimulated at 20g egg protein; combined with Witard 2014 (PMID 24257722), the threshold is placed near 20-25g high-quality protein containing ~2.5g leucine.",
+        "effect_size": "Leucine threshold: ~2.5g per meal for young adults (~10-11% of 25g whey). Below threshold (e.g., 1.7g leucine / ~15g whey): no maximal MPS response. Above threshold: MPS plateau, excess leucine oxidized. Food equivalents: ~25g whey protein, or ~130g chicken breast, or 3-4 whole eggs.",
+        "source_id": "PMID 19056590",
+        "study_desc": "Moore DR, Robinson MJ, Fry JL, et al. Ingested protein dose response of muscle and albumin protein synthesis after resistance exercise in young men. Am J Clin Nutr. 2009 Jan;89(1):161-8. Dose-response study, n=6 young men, 0/5/10/20/40g egg protein post-resistance exercise, 4-hour measurement using [1-13C]leucine tracer infusion. Leucine threshold synthesis from cross-study inference with Witard 2014.",
+        "confidence": "medium"
+      },
+      {
+        "claim": "Distributing 80g total whey protein as 4 servings of 20g every 3 hours (intermediate/INT condition) produces the highest 12-hour myofibrillar FSR at 0.079%/h. Pulse feeding of 8 x 10g every 1.5h produces 0.060%/h. Bolus feeding of 2 x 40g every 6h produces 0.053%/h. The INT condition elicited 31-48% greater MPS than PULSE and BOLUS respectively. All three conditions increased MPS above rest (88-148%), but the intermediate pattern was superior, consistent with a per-meal leucine threshold that is under-served by 10g doses and over-supplied by 40g doses.",
+        "effect_size": "INT (4x20g): 0.079%/h; PULSE (8x10g): 0.060%/h; BOLUS (2x40g): 0.053%/h over 12 hours post-exercise. INT vs BOLUS: +49% FSR; INT vs PULSE: +32% FSR.",
+        "source_id": "PMID 23459753",
+        "study_desc": "Areta JL, Burke LM, Ross ML, et al. Timing and distribution of protein ingestion during prolonged recovery from resistance exercise alters myofibrillar protein synthesis. J Physiol. 2013 May 1;591(9):2319-31. RCT, n=24 resistance-trained males randomized to three protein distribution conditions (PULSE/INT/BOLUS), 80g total whey protein over 12h post-resistance exercise, myofibrillar FSR measured via muscle biopsy and stable isotope tracer.",
+        "confidence": "high"
+      },
+      {
+        "claim": "Ingestion of 40g casein protein 30 minutes before sleep, following an evening resistance exercise bout and 20g protein recovery drink at 2100h, increases overnight mixed muscle fractional protein synthesis to 0.059 ± 0.005%/h versus 0.048 ± 0.004%/h for placebo (water). This represents approximately 22% higher overnight MPS in the protein group. The pre-sleep protein was digested and absorbed during sleep, with labeled amino acids appearing in newly synthesized myofibrillar protein.",
+        "effect_size": "Pre-sleep 40g casein: 0.059%/h vs placebo: 0.048%/h. Absolute difference: 0.011%/h. Relative increase: ~22.9% higher overnight MPS (p=0.05, borderline significance). Duration: overnight sleep (~7.5h).",
+        "source_id": "PMID 22330017",
+        "study_desc": "Res PT, Groen B, Pennings B, Beelen M, Wallis GA, Gijsen AP, Senden JM, van Loon LJC. Protein ingestion before sleep improves postexercise overnight recovery. Med Sci Sports Exerc. 2012 Aug;44(8):1560-9. Crossover RCT, n=16 healthy young males, single evening resistance exercise bout, 40g casein or placebo 30 min pre-sleep, mixed muscle FSR measured via stable isotope tracer throughout overnight sleep period.",
+        "confidence": "high"
+      }
+    ]
+  }
+]

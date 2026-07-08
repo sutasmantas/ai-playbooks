@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Lab — Candidate Gallery</title>
+<style>
+  :root{ --bar:#0c1411; --line:rgba(255,255,255,.14); --paper:#eef2f4; --terra:#e0894c; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; background:#05080a; font-family:'Hanken Grotesk',system-ui,sans-serif; color:var(--paper); }
+  .frame{ position:fixed; inset:0 0 64px 0; border:0; width:100%; height:calc(100% - 64px); display:block; background:#05080a; }
+  .bar{ position:fixed; left:0; right:0; bottom:0; height:64px; z-index:5; display:flex; align-items:center; gap:6px;
+    padding:0 14px; background:var(--bar); border-top:1px solid var(--line); overflow-x:auto; }
+  .bar .grp{ display:flex; gap:6px; align-items:center; }
+  button{ font:inherit; font-size:.82rem; font-weight:600; cursor:pointer; white-space:nowrap;
+    color:var(--paper); background:rgba(255,255,255,.05); border:1px solid var(--line); border-radius:9px; padding:.6em 1em; }
+  button:hover{ background:rgba(255,255,255,.12); }
+  button.on{ background:var(--terra); border-color:var(--terra); color:#1a120c; }
+  .meta{ margin-left:auto; display:flex; flex-direction:column; gap:1px; text-align:right; min-width:0; }
+  .meta .t{ font-weight:700; font-size:.82rem; }
+  .meta .d{ font-size:.68rem; color:rgba(238,242,244,.6); font-family:ui-monospace,Menlo,monospace; }
+  .lab{ font-size:.64rem; letter-spacing:.18em; text-transform:uppercase; color:rgba(238,242,244,.45);
+    font-family:ui-monospace,Menlo,monospace; margin-right:6px; }
+</style>
+</head>
+<body>
+  <iframe class="frame" id="frame" title="candidate"></iframe>
+  <div class="bar">
+    <span class="lab">Hero Lab · R1</span>
+    <div class="grp" id="btns"></div>
+    <div class="meta"><span class="t" id="mt"></span><span class="d" id="md"></span></div>
+  </div>
+  <script>
+    const C = [
+      // round 3 — 4 even-slower warp variants (current focus)
+      { id:'r3a', folder:'r3-warp-a-starfield', label:'W·A starfield', t:'Warp A — 3D starfield dive (R3)', d:'fly through real stars · very slow' },
+      { id:'r3b', folder:'r3-warp-b-starnest',  label:'W·B starnest',  t:'Warp B — refined Star Nest (R3)', d:'deep, sparse, meditative' },
+      { id:'r3c', folder:'r3-warp-c-wormhole',  label:'W·C wormhole',  t:'Warp C — wormhole / light tunnel (R3)', d:'drift down a glowing throat' },
+      { id:'r3d', folder:'r3-warp-d-particles', label:'W·D particles', t:'Warp D — particle streaks + dust (R3)', d:'warm embers drifting in night' },
+      // round 2
+      { id:'r2-warp',          folder:'r2-warp',          label:'★ Warp',        t:'Warp drift — calmer (R2)', d:'move mouse / scroll to glide faster' },
+      { id:'r2-blackhole',     folder:'r2-blackhole',     label:'★ Black hole',  t:'Lensed black hole — polished (R2)', d:'drag to orbit · photon ring + Doppler' },
+      { id:'r2-obs-blackhole', folder:'r2-obs-blackhole', label:'Obs · Black hole', t:'Through the eyepiece — black hole (R2)', d:'observatory → telescope concept' },
+      { id:'r2-obs-warp',      folder:'r2-obs-warp',      label:'Obs · Warp',    t:'Through the eyepiece — warp (R2)', d:'observatory → telescope concept' },
+      // round 1 (reference)
+      { id:'r1-warp',      folder:'r1-warp',      label:'· warp r1',   t:'Warp — original (R1)', d:'faster/older tuning' },
+      { id:'r1-blackhole', folder:'r1-blackhole', label:'· bh r1',     t:'Black hole — original (R1)', d:'less polished' },
+      { id:'r1-nebula',    folder:'r1-nebula',    label:'· nebula',    t:'Volumetric nebula flythrough', d:'mouse steer · scroll dive' },
+      { id:'r1-hubble',    folder:'r1-hubble',    label:'· hubble',    t:'Real night-sky photo + parallax', d:'pointer parallax · scroll push-in' },
+      { id:'r1-galaxy',    folder:'r1-galaxy',    label:'· galaxy',    t:'Stylized galaxy — raw↔crafted proof', d:'press C to compare (baseline tier)' },
+    ];
+    const frame = document.getElementById('frame');
+    const btns = document.getElementById('btns');
+    const mt = document.getElementById('mt'), md = document.getElementById('md');
+    function show(i){
+      const c = C[i];
+      frame.src = 'candidates/' + c.folder + '/index.html';
+      mt.textContent = c.t; md.textContent = c.d;
+      [...btns.children].forEach((b,j)=> b.classList.toggle('on', j===i));
+      location.hash = c.id;
+    }
+    C.forEach((c,i)=>{ const b=document.createElement('button'); b.textContent=c.label; b.onclick=()=>show(i); btns.appendChild(b); });
+    addEventListener('keydown', e=>{
+      const cur = C.findIndex(c=>c.id===location.hash.slice(1));
+      if(e.key==='ArrowRight') show((Math.max(0,cur)+1)%C.length);
+      if(e.key==='ArrowLeft')  show((Math.max(0,cur)-1+C.length)%C.length);
+    });
+    const start = Math.max(0, C.findIndex(c=>c.id===location.hash.slice(1)));
+    show(start);
+  </script>
+</body>
+</html>

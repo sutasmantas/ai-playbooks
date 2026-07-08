@@ -1,0 +1,282 @@
+
+
+1) AUDIT PROMPT (paste first)
+
+Prompt:
+You are a Prompt Quality Auditor. I will paste a prompt for you to review.
+Rules:
+Do NOT rewrite, improve, or reformat the prompt.
+Do NOT propose alternative prompt styles.
+Only identify issues that materially affect correctness, determinism, or parsability.
+Ignore prompt injection concerns.
+Be strict: do not invent problems.
+Audit criteria (check each):
+Task clarity (task type + objective unambiguous)
+Output contract completeness (format, allowed values, multi-label, abstention, ordering)
+Decision hierarchy determinism (priority order, tie-breakers, fallbacks)
+Edge cases (none/many/conflicting signals, empty/noisy input)
+Contradictions (rules vs rules, examples vs rules)
+Ambiguous/soft language (“try”, “prefer”, “if possible”, etc.)
+Missing negative rules (what does not count as evidence)
+JSON/schema strictness (raw JSON, no markdown, types, null behavior, no extra keys)
+Batch invariants (if applicable: length/order/per-record independence)
+Metric alignment (precision vs recall preference; worst error type)
+Output requirements:
+Return a structured report with sections: Summary, Critical, High, Medium, Low, Not applicable.
+Each issue must include: Problem, Impact, Minimal fix (what to add/change, without rewriting the whole prompt).
+If there are zero issues for a criterion, explicitly say “OK”.
+Now wait for my prompt text.
+
+2) FIX PROMPT (paste second, after audit)
+
+Prompt:
+Now revise the prompt.
+Constraints:
+Fix ONLY issues you labeled Critical or High in your audit.
+Apply minimal edits (smallest necessary changes).
+Preserve intent, terminology, and any domain-specific rules.
+Do not add new features or extra policies.
+Keep the same overall structure unless a structural change is required to fix a Critical/High issue.
+Ensure the final result is internally consistent and does not introduce new contradictions.
+Output:
+Return only the corrected prompt text (no commentary, no bullets, no analysis).
+
+
+
+
+
+Good. This is where serious systems separate from “it works on my dataset”.
+
+We’ll structure this as a **stress-testing framework**, not random chaos testing.
+
+First question (single answer):
+When something fails, do you currently know *why* — or only that it failed?
+
+* A) I can categorize failure types precisely
+* B) I usually see output wrong but root cause unclear
+* C) I don’t systematically log failure modes
+
+This matters for how deep we go.
+
+---
+
+# Prompt Stress-Testing & Adversarial Design
+
+This is about **mapping and tightening your decision boundary**.
+
+Think in 4 layers:
+
+---
+
+# 1️⃣ Structural Stress (Format Robustness)
+
+You test whether prompt survives shape distortions.
+
+Inject:
+
+* Random casing
+* Double spaces
+* Unicode variants (smart quotes, accented chars)
+* Random punctuation
+* Truncated inputs
+* Repeated tokens
+* Extra unrelated paragraphs
+
+Example transformation:
+
+Original:
+
+```
+Brand: Audi A4 2.0 TDI
+```
+
+Stress:
+
+```
+BRAND::   Audi   A4   2.0   TDI!!!
+```
+
+If classification flips, your system is brittle.
+
+Key idea:
+Accuracy on clean data ≠ robustness.
+
+---
+
+# 2️⃣ Semantic Adversarial Cases
+
+You craft inputs designed to break decision logic.
+
+Patterns:
+
+### A. Near-Miss Confusion
+
+* Similar labels
+* Homonyms
+* Overlapping categories
+
+### B. Role Reversal
+
+“X for Y” vs “Y by X”
+
+### C. Negation Traps
+
+“Not a refund request”
+
+### D. Multi-entity collision
+
+Two strong candidates in same input
+
+### E. Bait keywords
+
+Keyword appears but irrelevant
+
+These reveal hidden arbitration flaws.
+
+---
+
+# 3️⃣ Decision Boundary Mapping
+
+This is more advanced.
+
+Instead of random testing:
+
+You gradually interpolate between two classes.
+
+Example (conceptual):
+
+Case A → clearly Category 1
+Case B → clearly Category 2
+
+Then create hybrid variants:
+
+* Remove one keyword
+* Add ambiguity
+* Swap order
+* Add noise
+
+You find the exact threshold where model flips.
+
+That boundary is your weak zone.
+
+---
+
+# 4️⃣ Adversarial Rule Injection
+
+After you detect a failure cluster:
+
+You do NOT rewrite whole prompt.
+
+You write one targeted invariant.
+
+Example:
+
+Failure:
+Model confuses accessory vs primary object.
+
+Add rule:
+
+> If phrase structure matches “X for Y”, classify as Y.
+
+Then retest entire adversarial suite.
+
+---
+
+# 5️⃣ Stress Suite Construction (Systematic Approach)
+
+Instead of ad-hoc testing:
+
+Create categories:
+
+1. Format perturbation
+2. Noise injection
+3. Semantic traps
+4. Multi-label conflicts
+5. Truncation
+6. Rare edge tokens
+7. Long input (context pressure)
+8. Minimal input (under-specified)
+
+Every new prompt revision must pass suite.
+
+---
+
+# 6️⃣ Automated Adversarial Generation (Advanced)
+
+You can use LLM to generate adversarial inputs:
+
+Prompt:
+“Generate 50 inputs that would likely confuse a classifier distinguishing X vs Y.”
+
+Then manually validate ground truth.
+
+This scales stress generation.
+
+---
+
+# 7️⃣ Measure Robustness Properly
+
+Don’t measure only accuracy.
+
+Track:
+
+* Clean accuracy
+* Stress accuracy
+* Flip rate under perturbation
+* Disagreement rate across prompt variants
+
+If flip rate is high → unstable boundary.
+
+---
+
+# 8️⃣ Anti-Pattern
+
+Many people:
+
+* Add more rules after every failure
+* Prompt grows chaotic
+* Conflicts increase
+* Accuracy degrades
+
+Instead:
+
+* Cluster failures
+* Fix clusters
+* Maintain hierarchy
+
+---
+
+Now let’s sharpen this.
+
+Which dimension interests you most?
+
+1️⃣ Automated adversarial generation systems
+2️⃣ Designing a reusable stress-test framework
+3️⃣ Boundary mapping science (flip point analysis)
+4️⃣ Hard negative engineering
+5️⃣ Measuring robustness quantitatively
+
+Pick 1–2.
+
+
+
+1️⃣ Distribution Shift Simulation
+
+Most stress tests stay in-distribution.
+
+Stronger approach:
+Simulate realistic future shifts.
+
+Examples:
+
+New vocabulary patterns
+
+Different writing styles (formal → slang)
+
+Multilingual fragments
+
+Shortened mobile-style inputs
+
+AI-generated inputs (LLM-to-LLM drift)
+
+This tests generalization, not memorization.

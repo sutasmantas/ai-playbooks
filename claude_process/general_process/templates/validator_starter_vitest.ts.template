@@ -1,0 +1,210 @@
+/*
+TEMPLATE METADATA — REMOVE THIS BLOCK WHEN GENERATING
+Target: <new-project-root>/scripts/validate_state.ts
+Generated when the project has a Node/TypeScript toolchain WITHOUT a browser surface
+(e.g., a library, a CLI, a service without UI). For web apps, use validator_starter_playwright.ts.template
+from website_process/ instead.
+Placeholders the agent fills in from interview answers:
+  {{BEHAVIOR_INVOCATION}}  — concrete code that exercises the truth surface, e.g.,
+                             `const result = await myFunction(sampleInput);`
+                             or `const result = execSync('node ./cli.js --list', { encoding: 'utf8' });`
+  {{BEHAVIOR_ASSERTION}}   — what the result must satisfy, e.g.,
+                             `if (!result.includes('expected')) throw new Error(...);`
+
+ESCAPING: single quotes inside template substitutions must be backslash-escaped if landing in single-quoted contexts.
+Run with: pnpm tsx scripts/validate_state.ts  (or: npx tsx, npm run validate)
+*/
+
+import { execSync } from 'node:child_process';
+import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { join, extname } from 'node:path';
+
+const ARTIFACT_DIR = 'diagnostics';
+mkdirSync(ARTIFACT_DIR, { recursive: true });
+
+let failed = false;
+
+async function assertBehavior(): Promise<boolean> {
+  // Derived from interview 02.4: the concrete user-visible behavior.
+  // {{BEHAVIOR_INVOCATION}} must produce a `result` variable (function return value,
+  // execSync stdout, HTTP response body, etc.). {{BEHAVIOR_ASSERTION}} must throw on failure.
+  // The result is written to diagnostics/behavior.log so the tier-2 auditor can read it.
+  const logPath = `${ARTIFACT_DIR}/behavior.log`;
+  try {
+    // {{BEHAVIOR_INVOCATION}}
+    // Example: const result = await myFunction(sampleInput);
+    //          OR  const result = execSync('node ./cli.js --list', { encoding: 'utf8' });
+    // {{BEHAVIOR_ASSERTION}}
+    // Example: if (!result.includes('expected')) throw new Error('missing expected output');
+    writeFileSync(logPath, `[behavior] OK\nresult: ${JSON.stringify(result)}\n`);
+    console.log('[behavior] OK');
+    return true;
+  } catch (e) {
+    const msg = (e as Error).message;
+    writeFileSync(logPath, `[behavior] FAIL: ${msg}\n`);
+    console.error(`[behavior] FAIL: ${msg}`);
+    return false;
+  }
+}
+
+function runTests(): boolean {
+  if (!existsSync('package.json')) {
+    writeFileSync(`${ARTIFACT_DIR}/tests.log`, '(skipped: no package.json)');
+    console.log('[tests] skipped: no package.json');
+    return true;
+  }
+  try {
+    const output = execSync('npx vitest run --reporter=json --outputFile=' + ARTIFACT_DIR + '/tests.json', {
+      encoding: 'utf8', stdio: 'pipe',
+    });
+    writeFileSync(`${ARTIFACT_DIR}/tests.log`, output);
+    console.log('[tests] OK');
+    return true;
+  } catch (e: unknown) {
+    const err = e as { stdout?: Buffer; stderr?: Buffer; message?: string };
+    const output = (err.stdout?.toString() || '') + (err.stderr?.toString() || '') || err.message || '';
+    writeFileSync(`${ARTIFACT_DIR}/tests.log`, output);
+    console.error(`[tests] FAIL: see ${ARTIFACT_DIR}/tests.log`);
+    return false;
+  }
+}
+
+function captureTypecheck(): void {
+  if (!existsSync('tsconfig.json')) {
+    writeFileSync(`${ARTIFACT_DIR}/typecheck.log`, '(skipped: no tsconfig.json)');
+    console.log('[typecheck] skipped: no tsconfig.json');
+    return;
+  }
+  try {
+    execSync('npx tsc --noEmit', { encoding: 'utf8', stdio: 'pipe' });
+    writeFileSync(`${ARTIFACT_DIR}/typecheck.log`, '(clean: no type errors)');
+    console.log('[typecheck] OK');
+  } catch (e: unknown) {
+    const err = e as { stdout?: Buffer; stderr?: Buffer; message?: string };
+    const output = (err.stdout?.toString() || '') + (err.stderr?.toString() || '') || err.message || '';
+    writeFileSync(`${ARTIFACT_DIR}/typecheck.log`, output);
+    console.error(`[typecheck] FAIL: see ${ARTIFACT_DIR}/typecheck.log`);
+  }
+}
+
+function captureGitDiffSummary(): void {
+  try {
+    const filesRaw = execSync('git diff --name-only HEAD', { encoding: 'utf8' });
+    const files = filesRaw.split('\n').filter(Boolean);
+    const numstatRaw = execSync('git diff --numstat HEAD', { encoding: 'utf8' });
+    const totalLoC = numstatRaw.split('\n').filter(Boolean).reduce((sum, line) => {
+      const [add, del] = line.split('\t').map((n) => parseInt(n, 10) || 0);
+      return sum + add + del;
+    }, 0);
+    const summary = {
+      available: true,
+      total_loc: totalLoC,
+      file_count: files.length,
+      files,
+      only_markdown: files.length > 0 && files.every((f) => f.endsWith('.md')),
+    };
+    writeFileSync(`${ARTIFACT_DIR}/diff_summary.json`, JSON.stringify(summary, null, 2));
+    console.log(`[diff] saved diff_summary.json (${totalLoC} LoC across ${files.length} files)`);
+  } catch {
+    writeFileSync(`${ARTIFACT_DIR}/diff_summary.json`, JSON.stringify({ available: false, reason: 'not a git repo or no diff vs HEAD' }));
+    console.log('[diff] WARN: no git diff available');
+  }
+}
+
+function captureDepCheck(): void {
+  if (!existsSync('package.json')) {
+    writeFileSync(`${ARTIFACT_DIR}/dep_check.json`, JSON.stringify({ available: false, reason: 'no package.json' }));
+    return;
+  }
+  try {
+    const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
+    const declared = Object.keys({ ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}) });
+    let lockEntries: Set<string> = new Set();
+    const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (existsSync('pnpm-lock.yaml')) {
+      const lock = readFileSync('pnpm-lock.yaml', 'utf8');
+      declared.forEach((d) => {
+        if (new RegExp(`^\\s*'?/${esc(d)}@`, 'm').test(lock)) lockEntries.add(d);
+      });
+    } else if (existsSync('package-lock.json')) {
+      const lock = JSON.parse(readFileSync('package-lock.json', 'utf8'));
+      lockEntries = new Set(
+        Object.keys(lock.packages || {})
+          .map((p) => p.replace(/^node_modules\//, '').split('/node_modules/').pop() || '')
+          .filter(Boolean),
+      );
+    } else if (existsSync('yarn.lock')) {
+      const lock = readFileSync('yarn.lock', 'utf8');
+      declared.forEach((d) => {
+        if (new RegExp(`^"?${esc(d)}@`, 'm').test(lock)) lockEntries.add(d);
+      });
+    }
+    const unlocked = declared.filter((d) => !lockEntries.has(d));
+    writeFileSync(`${ARTIFACT_DIR}/dep_check.json`, JSON.stringify({
+      available: true, declared_count: declared.length, unlocked_deps: unlocked, unlocked_count: unlocked.length,
+    }, null, 2));
+    if (unlocked.length > 0) {
+      console.error(`[deps] WARN: ${unlocked.length} dep(s) not in lockfile: ${unlocked.join(', ')}`);
+    } else {
+      console.log(`[deps] OK: all ${declared.length} declared deps present in lockfile`);
+    }
+  } catch (e) {
+    writeFileSync(`${ARTIFACT_DIR}/dep_check.json`, JSON.stringify({ available: false, reason: (e as Error).message }));
+  }
+}
+
+const SECRET_PATTERNS: Array<{ name: string; re: RegExp }> = [
+  { name: 'AWS Access Key',    re: /AKIA[0-9A-Z]{16}/ },
+  { name: 'Stripe Live Key',   re: /sk_live_[0-9a-zA-Z]{24,}/ },
+  { name: 'OpenAI Key',        re: /sk-(proj-)?[A-Za-z0-9_-]{40,}/ },
+  { name: 'GitHub Token',      re: /gh[pousr]_[A-Za-z0-9]{36,}/ },
+  { name: 'Slack Token',       re: /xox[abprs]-[A-Za-z0-9-]{10,}/ },
+  { name: 'Private Key Block', re: /-----BEGIN (RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/ },
+  { name: 'Google API Key',    re: /AIza[0-9A-Za-z_-]{35}/ },
+];
+const SCAN_EXTS = new Set(['.ts', '.tsx', '.js', '.jsx', '.json', '.yml', '.yaml', '.md', '.env', '.txt']);
+const SCAN_SKIP = new Set(['.git', 'node_modules', 'dist', 'build', '.next', '.turbo', ARTIFACT_DIR]);
+
+function scanForSecrets(dir = '.'): string[] {
+  const findings: string[] = [];
+  for (const name of readdirSync(dir)) {
+    const path = join(dir, name);
+    if (SCAN_SKIP.has(name)) continue;
+    const st = statSync(path);
+    if (st.isDirectory()) {
+      findings.push(...scanForSecrets(path));
+      continue;
+    }
+    if (!SCAN_EXTS.has(extname(name))) continue;
+    let content: string;
+    try { content = readFileSync(path, 'utf8'); } catch { continue; }
+    for (const { name: pname, re } of SECRET_PATTERNS) {
+      const m = content.match(re);
+      if (m) findings.push(`${pname} in ${path}: ${m[0].slice(0, 20)}...`);
+    }
+  }
+  return findings;
+}
+
+async function main() {
+  if (!(await assertBehavior())) failed = true;
+  if (!runTests()) failed = true;
+
+  captureTypecheck();
+  captureGitDiffSummary();
+  captureDepCheck();
+
+  const findings = scanForSecrets();
+  writeFileSync(`${ARTIFACT_DIR}/secrets.json`, JSON.stringify(findings, null, 2));
+  if (findings.length > 0) {
+    console.error(`[secrets] FAIL: ${findings.length} match(es):`);
+    for (const f of findings) console.error(`  ${f}`);
+    failed = true;
+  } else {
+    console.log('[secrets] OK: no known patterns in source files');
+  }
+
+  process.exit(failed ? 1 : 0);
+}
+
+main().catch((e) => { console.error(e); process.exit(1); });

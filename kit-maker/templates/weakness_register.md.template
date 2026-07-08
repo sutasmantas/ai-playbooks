@@ -1,0 +1,92 @@
+# Weakness Register: {{KIT_NAME}}
+
+Shipped with the kit at Phase 8 HANDOFF. This document is the honest gap disclosure for anyone using or improving the kit.
+
+**Anti-pattern to avoid:** "No known weaknesses." A kit with no acknowledged weaknesses is not trustworthy — it means the builder didn't look, not that there's nothing to find. If Phase 7 auditing produced GREEN on every file, this register should still contain the architectural uncertainties, provisional decisions, and coverage gaps from the design log.
+
+---
+
+## How to read this register
+
+- **Confirmed gaps** — auditors found these; not fixed before shipping; reason documented
+- **Provisional decisions** — made before research confirmed them; flip triggers documented
+- **Coverage limits** — domains or use cases this kit does not handle
+- **Known fragile spots** — rules that are right on average but fail at the edges
+- **Open research questions** — things we wanted to research but couldn't (see research archive for angles)
+
+---
+
+## Pre-identified gaps (known before Phase 7)
+
+Gaps identified during design that research could not fully resolve. These must appear here regardless of what Phase 7 finds — they are architectural uncertainties, not audit findings.
+
+| Gap | Where it shows up | Status | What would close it |
+|-----|------------------|--------|---------------------|
+| Goal-directed advisor behavior in generated kits | Every kit Phase 6 builds | Open — no empirical guidance on minimal file set | Angle 119 research + real-use lessons |
+| Behavioral testing against live tasks is not automated | Phase 7 VERIFY | Confirmed gap — Phase 7 is verbal review only | No agent-executable alternative found (angles 22-24) |
+| Rule-writing guidance is consensus-not-empirical | Every kit rule | Open — field has no controlled studies yet | Angles 59-63 research; may remain consensus indefinitely |
+| Canary spec is provisional | scripts/canary_spec.md | Provisional — flip trigger on angle 67 | Angle 67 research (LLM-as-judge calibration ceiling) |
+| Kit rule compliance under novel inputs untested | All procedures | Open — systematic edge cases not known | Angle 24 research + real-use failure capture |
+
+---
+
+## Confirmed gaps
+
+From Phase 7 VERIFY audit findings that were YELLOW (not blocking but real):
+
+| Gap | File | Why not fixed | Workaround |
+|-----|------|--------------|------------|
+| {{GAP_DESCRIPTION}} | {{FILE}} | {{REASON}} | {{WORKAROUND_IF_ANY}} |
+
+---
+
+## Provisional decisions still unconfirmed
+
+Decisions made at plan time before research could confirm them. Flip triggers documented — if the condition fires, the rule should change.
+
+| Decision | Where | Flip trigger | Research angle (see archive) |
+|----------|-------|-------------|------------------------------|
+| {{DECISION}} | {{FILE:LINE}} | {{FLIP_TRIGGER}} | Angle #{{N}} |
+
+---
+
+## Coverage limits
+
+What this kit explicitly does NOT handle. Use cases that will produce wrong or incomplete output if attempted with this kit.
+
+- {{COVERAGE_LIMIT_1}}
+- {{COVERAGE_LIMIT_2}}
+
+---
+
+## Known fragile spots
+
+Rules or procedures that work well for common cases but are known to fail at edges:
+
+| Location | What works | What fails | Signal that you've hit the edge |
+|----------|------------|-----------|--------------------------------|
+| {{FILE:LINE}} | {{COMMON_CASE}} | {{EDGE_CASE}} | {{SIGNAL}} |
+
+---
+
+## Open research questions
+
+Wave 2 or later research that was not completed before shipping. See research_archive/ for the full angle list.
+
+| Question | Research angle | Priority |
+|----------|---------------|---------|
+| {{QUESTION}} | Angle #{{N}} — {{ANGLE_TITLE}} | HIGH / MEDIUM / LOW |
+
+---
+
+## Improvement process
+
+To improve this kit after real use:
+
+1. Log failure in the pitfall_register.md (included in kit_archive/)
+2. If count reaches 2: open a targeted research question (add to RESEARCH_ANGLES.md in kit_archive/)
+3. Run targeted Phase 6 gap-check research for that specific question
+4. Patch the relevant file; re-dispatch auditors on the patched file only
+5. Update this weakness register — remove the entry if resolved, or update it if the patch is partial
+
+**Do not** re-run the full kit-making process to patch a single rule. Targeted gap-check is the right scope.

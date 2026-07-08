@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Telescope Data Cards</title>
+<style>
+  :root{--bg:#06101d;--panel:#0d1a2c;--text:#f8f1e7;--muted:rgba(248,241,231,.65);--line:rgba(248,241,231,.14);--sky:#8fd7ff;--amber:#d8a15f}
+  *{box-sizing:border-box} body{margin:0;min-height:100svh;display:grid;place-items:center;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;padding:28px}.grid{width:min(1050px,100%);display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;min-height:190px}.k{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}.v{display:block;font-size:clamp(34px,5vw,62px);line-height:.9;margin:28px 0 10px;color:var(--sky);font-weight:800}.amber .v{color:var(--amber)}p{margin:0;color:var(--muted);line-height:1.45}
+  @media(max-width:860px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:520px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body><section class="grid"><article class="card"><span class="k">Night anchor</span><b class="v">80 cm</b><p>Headline telescope choice when available.</p></article><article class="card amber"><span class="k">Weather call</span><b class="v">14:00</b><p>Same-day confirmation by SMS/phone.</p></article><article class="card"><span class="k">Program</span><b class="v">1-1.5h</b><p>Late observation after sunset.</p></article><article class="card amber"><span class="k">Return</span><b class="v">2h</b><p>Drive back to Kaunas after dark.</p></article></section></body>
+</html>

@@ -1,0 +1,107 @@
+# Kit Build Plan: {{KIT_NAME}}
+
+Generated at Phase 5 PLAN. This document is the execution contract for Phase 6 BUILD.
+
+**Hard rule:** If what you build in Phase 6 does not match this plan, update the plan first — then build. The plan is not a constraint to route around; it is the artifact that makes Phase 7 auditing possible.
+
+---
+
+## Domain brief (from Phase 2 INTAKE)
+
+- **Domain:** {{DOMAIN}}
+- **Kit purpose:** {{KIT_PURPOSE}}
+- **User expertise:** {{EXPERTISE_LEVEL}}
+- **Gold standard (success condition):** {{SUCCESS_CONDITION}}
+- **Known failures (negative scope):** {{KNOWN_FAILURES}}
+- **Out of scope:** {{OUT_OF_SCOPE}}
+- **Broader goal:** {{BROADER_GOAL}}
+
+---
+
+## Strongest unsupported assumption
+
+> {{STRONGEST_UNSUPPORTED_ASSUMPTION}}
+
+This is the claim that, if wrong, would most break this plan. Name it explicitly. If research later falsifies it, this plan is invalidated — flip trigger below.
+
+**How to find it:** Look at the Phase 5 plan and ask: "What am I most confident in that I actually have no evidence for?" Common candidates:
+- An assumption about what the user needs (from Phase 2) that was never verified against real use
+- A structural choice (e.g., separate sections for decisions vs open questions) that assumes a mental model the user may not share
+- A quality dimension that seemed obvious but has no research backing
+
+If you cannot name the strongest unsupported assumption: you haven't looked hard enough. Produce at least one candidate. Name the CLAIM, not just the uncertainty.
+
+**Flip trigger:** If {{CONDITION_THAT_INVALIDATES_ASSUMPTION}}, revise plan before continuing to Phase 6.
+
+---
+
+## What this kit is NOT
+
+Be explicit. A kit that doesn't say what it won't do will be stretched to cover everything.
+
+- NOT: {{EXPLICIT_NON_GOAL_1}}
+- NOT: {{EXPLICIT_NON_GOAL_2}}
+- NOT: {{EXPLICIT_NON_GOAL_3}}
+
+---
+
+## File manifest
+
+Every file that will be produced in Phase 6. No file gets built that isn't here. No file here gets skipped without logging the skip and reason.
+
+Order: riskiest/highest-stakes files first (from Phase 3 research synthesis).
+
+| # | File | Purpose | Done-criteria | Stakes |
+|---|------|---------|---------------|--------|
+| 1 | `CLAUDE.md` *(behavioral contract — ALWAYS FIRST)* | Goal-directed advisor behavior for the agent using this kit | Contains: gold standard, agent-owns/user-owns delegation model, after-every-task rule, proactive surfacing rule, decay warning | HIGH |
+| 2 | `ENTRYPOINT.md` | Execution contract for the kit | Agent can start from this file alone and reach all other files without producer help | HIGH |
+| 3 | {{FILE_3}} | {{PURPOSE_3}} | {{DONE_CRITERIA_3}} | {{STAKES_3}} |
+| … | … | … | … | … |
+
+**Ordering rule:** File #1 is always the behavioral contract. Non-negotiable. If riskiest-first ordering would place a different file first: the behavioral contract still goes first. Riskiest-first applies to all files from #2 onward.
+
+### Done-criteria format
+
+Each done-criterion must be testable without running the kit. Acceptable forms:
+- "File contains X" / "File does not contain X"
+- "Agent reading only this file can perform action Y"
+- "Auditor (read-only) can verify claim Z from this file alone"
+
+Not acceptable: "is complete", "is high quality", "covers the domain well"
+
+---
+
+## Riskiest-first rationale
+
+The files are ordered above based on:
+1. Which failures would be hardest to fix after the kit is partially built?
+2. Which file, if wrong, would invalidate the most other files?
+3. Which design decisions are most uncertain (from Phase 3 synthesis)?
+
+Justify the ordering here if non-obvious: {{ORDERING_RATIONALE}}
+
+---
+
+## Research gaps and provisional decisions
+
+List any research question that remains unanswered at plan time. For each: state the provisional decision made, and the flip trigger that would change it.
+
+| Question | Provisional decision | Flip trigger |
+|----------|---------------------|--------------|
+| {{RESEARCH_QUESTION}} | {{PROVISIONAL_DECISION}} | {{FLIP_TRIGGER}} |
+
+---
+
+## Discovered work (append-only during Phase 6)
+
+Things found during Phase 6 that weren't in the plan. Append here; never delete. At Phase 7: review this list to check if any discovered work was skipped.
+
+- (empty at plan time)
+
+---
+
+## Verify schedule
+
+Phase 7 VERIFY runs after all files are built. In addition: two auditors dispatch after any file with stakes = HIGH or any file that took more than one fix loop during Phase 6.
+
+Canary: {{CANARY_FILE_IF_EXISTS | "none yet — skip canary section in verify_prompt.md"}}

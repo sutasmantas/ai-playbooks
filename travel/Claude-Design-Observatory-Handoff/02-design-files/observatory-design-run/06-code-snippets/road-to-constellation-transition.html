@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Road Line To Constellation Transition</title>
+<style>
+  :root{
+    --road:#c66b43;
+    --star:#edf6ff;
+    --night:#07111f;
+    --dusk:#593427;
+    --ink:#f6f1e8;
+    --muted:rgba(246,241,232,.66);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100svh;
+    display:grid;
+    place-items:center;
+    font-family:Inter,system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 20% 35%, rgba(198,107,67,.22), transparent 28rem),
+      linear-gradient(160deg, var(--dusk), var(--night) 68%);
+    overflow:hidden;
+  }
+  .stage{
+    width:min(1100px,94vw);
+    display:grid;
+    gap:22px;
+    justify-items:center;
+  }
+  .label{
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  h1{
+    margin:0;
+    max-width:13ch;
+    text-align:center;
+    font-size:clamp(42px,8vw,104px);
+    line-height:.9;
+    letter-spacing:0;
+  }
+  svg{
+    width:100%;
+    height:auto;
+    overflow:visible;
+  }
+  .ghost{
+    fill:none;
+    stroke:rgba(246,241,232,.13);
+    stroke-width:5;
+    stroke-linecap:round;
+  }
+  .route,.constellation{
+    fill:none;
+    stroke-width:5;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    filter:drop-shadow(0 0 14px rgba(237,246,255,.28));
+  }
+  .route{stroke:var(--road)}
+  .constellation{stroke:var(--star); opacity:0}
+  .star{
+    fill:var(--star);
+    opacity:0;
+    filter:drop-shadow(0 0 10px rgba(237,246,255,.8));
+  }
+  .pin{
+    fill:var(--road);
+    stroke:var(--ink);
+    stroke-width:3;
+  }
+  .copy{
+    max-width:52ch;
+    text-align:center;
+    color:var(--muted);
+    line-height:1.6;
+  }
+  button{
+    border:1px solid rgba(246,241,232,.35);
+    background:rgba(246,241,232,.08);
+    color:var(--ink);
+    border-radius:999px;
+    padding:12px 18px;
+    cursor:pointer;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .route{opacity:0}
+    .constellation,.star{opacity:1}
+  }
+</style>
+</head>
+<body>
+<main class="stage">
+  <p class="label">Poland route becomes Observatory sky route</p>
+  <h1>Orbit To The Telescope</h1>
+  <svg viewBox="0 0 1000 360" aria-hidden="true">
+    <path class="ghost" d="M100 250 C210 115 330 125 430 210 C525 290 600 270 690 170 C760 92 850 105 915 64"/>
+    <path id="roadPath" class="route" d="M100 250 C210 115 330 125 430 210 C525 290 600 270 690 170 C760 92 850 105 915 64"/>
+    <path id="skyPath" class="constellation" d="M100 250 L238 126 L430 210 L602 268 L690 170 L802 102 L915 64"/>
+    <circle class="pin" cx="100" cy="250" r="10"/>
+    <circle class="pin" cx="915" cy="64" r="10"/>
+    <circle class="star" cx="100" cy="250" r="5"/>
+    <circle class="star" cx="238" cy="126" r="5"/>
+    <circle class="star" cx="430" cy="210" r="5"/>
+    <circle class="star" cx="602" cy="268" r="5"/>
+    <circle class="star" cx="690" cy="170" r="5"/>
+    <circle class="star" cx="802" cy="102" r="5"/>
+    <circle class="star" cx="915" cy="64" r="7"/>
+  </svg>
+  <p class="copy">Use this as loader, first-screen handover, or destination-switch transition. The old route draws first, the page darkens, then the route resolves into a constellation landing at Observatory.</p>
+  <button type="button" id="replay">Replay</button>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/DrawSVGPlugin.min.js"></script>
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (window.gsap && window.DrawSVGPlugin) gsap.registerPlugin(DrawSVGPlugin);
+
+  function play(){
+    if (reduce || !window.gsap) return;
+    const tl = gsap.timeline();
+    tl.set('#roadPath', { drawSVG:'0% 0%', opacity:1 })
+      .set('#skyPath', { drawSVG:'0% 0%', opacity:0 })
+      .set('.star', { scale:0, opacity:0, transformOrigin:'center' })
+      .set('.pin', { opacity:1 })
+      .fromTo('body', { '--dusk':'#593427' }, { '--dusk':'#07111f', duration:1.2 }, 0)
+      .to('#roadPath', { drawSVG:'0% 100%', duration:1.2, ease:'power3.inOut' }, 0)
+      .to('.pin', { opacity:0, duration:.35 }, .9)
+      .to('#roadPath', { opacity:0, duration:.35 }, 1.05)
+      .to('#skyPath', { opacity:1, drawSVG:'0% 100%', duration:1.05, ease:'power3.inOut' }, 1.05)
+      .to('.star', { opacity:1, scale:1, duration:.45, stagger:.08, ease:'back.out(2)' }, 1.25);
+  }
+  document.getElementById('replay').addEventListener('click', play);
+  play();
+</script>
+</body>
+</html>

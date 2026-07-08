@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan draft · Poland — Where To, Crew?</title>
+<link rel="stylesheet" href="../assets/motion.css">
+<style>
+  .drive{ position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+  .drive .sky{ position:absolute; inset:0; background:linear-gradient(180deg, var(--sky-top,#10201a) 0%, var(--sky-bot,#16241c) 100%); }
+  .drive .stars{ position:absolute; inset:0; opacity:0; background-image:
+    radial-gradient(1.4px 1.4px at 12% 18%, rgba(243,237,225,.9), transparent),
+    radial-gradient(1.2px 1.2px at 28% 32%, rgba(243,237,225,.7), transparent),
+    radial-gradient(1.4px 1.4px at 44% 12%, rgba(243,237,225,.85), transparent),
+    radial-gradient(1.5px 1.5px at 72% 16%, rgba(243,237,225,.9), transparent),
+    radial-gradient(1.3px 1.3px at 36% 44%, rgba(243,237,225,.7), transparent),
+    radial-gradient(1.5px 1.5px at 92% 10%, rgba(243,237,225,.85), transparent); }
+  .drive .orb{ position:absolute; width:130px; height:130px; left:var(--orb-x,12%); top:var(--orb-y,72%); transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(circle at 50% 50%, var(--orb,#d98c5f) 0%, transparent 66%); filter:blur(3px); opacity:.8; }
+  .drive .orb::after{ content:''; position:absolute; inset:42px; border-radius:50%; background:var(--orb-core,#e7a877); box-shadow:0 0 60px 16px var(--orb-core,#e7a877); }
+  .drive .haze{ position:absolute; left:-12%; right:-12%; bottom:-4%; height:62%; background:radial-gradient(120% 100% at 50% 118%, var(--glow,rgba(192,97,63,.26)) 0%, transparent 70%); }
+
+  main{ position:relative; z-index:2; }
+  .page-top{ padding-top:104px; }
+  .route-eyebrow{ font-family:var(--mono); font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:var(--terra-2); }
+  .trip-head .display{ font-size:clamp(2.4rem,5.4vw,4.2rem); }
+
+  .draft-grid{ display:grid; grid-template-columns:1fr 360px; gap:clamp(24px,4vw,52px); align-items:start; }
+  @media(max-width:900px){ .draft-grid{ grid-template-columns:1fr; } }
+
+  /* summary */
+  .summary{ position:sticky; top:96px; background:var(--forest-3); border:1px solid var(--line); border-radius:16px; padding:28px 26px; }
+  .summary .lab{ font-family:var(--mono); font-size:.7rem; letter-spacing:.16em; text-transform:uppercase; color:var(--paper-soft); }
+  .summary .total{ font-family:var(--display); font-weight:800; letter-spacing:-.03em; line-height:1; margin:8px 0 4px; }
+  .summary .total .num{ font-size:3.6rem; color:var(--paper); }
+  .summary .days{ font-size:1.02rem; color:var(--paper-soft); } .summary .days b{ color:var(--paper); }
+  .sum-line{ height:1px; background:var(--line); margin:20px 0; border:0; }
+  .breakdown{ display:flex; flex-direction:column; gap:9px; font-size:.92rem; }
+  .breakdown .row{ display:flex; justify-content:space-between; gap:12px; color:var(--paper-soft); }
+  .breakdown .row .v{ font-family:var(--mono); white-space:nowrap; }
+  .breakdown .row.base{ color:var(--paper); font-weight:600; }
+  .lean{ display:flex; flex-direction:column; gap:8px; font-size:.88rem; }
+  .lean .lr{ display:flex; justify-content:space-between; gap:10px; color:var(--paper-soft); }
+  .lean .lr .pick{ color:var(--paper); font-weight:600; display:inline-flex; gap:7px; align-items:center; }
+  .summary .btn{ width:100%; justify-content:center; margin-top:24px; }
+  .summary .foot{ font-family:var(--mono); font-size:.68rem; color:var(--paper-soft); margin-top:14px; text-align:center; line-height:1.5; }
+  .flash{ animation:flash .6s var(--ease); } @keyframes flash{ 0%{ color:var(--terra-2); } 100%{} }
+
+  .minibar{ display:none; }
+  @media(max-width:900px){
+    .summary{ position:static; }
+    .minibar{ display:flex; position:fixed; left:0; right:0; bottom:0; z-index:50; align-items:center; justify-content:space-between; gap:14px; background:var(--forest-3); border-top:1px solid var(--line); color:var(--paper); padding:12px 18px; }
+    .minibar .mb-total{ font-family:var(--display); font-weight:800; font-size:1.5rem; line-height:1; }
+    .minibar .mb-days{ font-family:var(--mono); font-size:.7rem; color:var(--paper-soft); }
+    main{ padding-bottom:84px; }
+  }
+</style>
+</head>
+<body data-screen-label="Poland — Plan draft" data-auto-env data-auto-journey>
+
+<div class="preload" aria-hidden="true"><svg viewBox="0 0 340 120"><path class="pl-line" d="M14,86 C70,40 120,40 170,64 C220,88 270,88 326,44"/><circle class="pl-dot" cx="14" cy="86" r="6"/><circle class="pl-dot" cx="170" cy="64" r="6"/><circle class="pl-dot" cx="326" cy="44" r="6"/><text class="pl-word" x="170" y="112" text-anchor="middle">Where To, Crew?</text></svg></div>
+<div class="routebar"><div class="track"></div><div class="fill"></div><div class="dot"></div></div>
+<div class="transition"><span class="mark">Where To, Crew?</span></div>
+<svg class="grain" aria-hidden="true"><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"><animate attributeName="baseFrequency" dur="8s" values="0.9;0.72;0.9" repeatCount="indefinite"/></feTurbulence><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#grain)"/></svg>
+<div class="drive" aria-hidden="true"><div class="sky"></div><div class="stars"></div><div class="orb"></div><div class="haze"></div></div>
+<div class="bg-amb bg-amb--page" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+<div class="journey" aria-hidden="true"><div class="j-track"></div><div class="j-fill"></div><div class="j-marker"></div></div>
+
+<nav class="nav">
+  <a class="brand" href="../index.html"><svg viewBox="0 0 30 18"><path class="bl" d="M2,14 C9,3 13,3 16,9 C19,15 23,15 28,5"/><circle class="bd" cx="2" cy="14" r="2.4"/><circle class="bd" cx="28" cy="5" r="2.4"/></svg> Where To, Crew?</a>
+  <div class="nav-links">
+    <a href="sign-up.html" class="underline hide-sm" data-transition data-cursor="link">Sign up</a>
+    <a class="btn" href="plan.html" data-transition data-magnetic data-cursor="label" data-label="Next"><span class="fill"></span><span class="lbl">The plan</span></a>
+  </div>
+</nav>
+
+<main class="page-top">
+  <div class="wrap">
+    <div class="stepper" style="padding-top:22px;">
+      <a href="sign-up.html" class="step-done" data-transition>01 · Sign up ✓</a><span class="sep">———</span>
+      <span class="step-on">02 · Plan draft</span><span class="sep">———</span>
+      <a href="plan.html" data-transition>03 · The plan</a>
+    </div>
+
+    <header class="trip-head" data-journey="Decide" style="padding:34px 0 28px;">
+      <p class="route-eyebrow" data-reveal data-reveal-mode="fade">Decide it together</p>
+      <h1 class="display" data-reveal data-reveal="words" style="margin-top:14px;">Build the plan. Watch it add up.</h1>
+      <p class="lede" data-reveal style="max-width:54ch; margin-top:16px;">Nothing's locked. Toggle the options — the per-person total and trip length update live, and you can see how the rest of the crew is leaning under each choice.</p>
+    </header>
+
+    <div class="draft-grid">
+      <div class="opts">
+
+        <div class="opt" data-group="length" data-type="single">
+          <div class="opt-head"><h3>Trip length</h3></div>
+          <p class="opt-sub">Until the crew decides, we cost it as the 4-day core trip.</p>
+          <div class="choices">
+            <button type="button" class="choice" data-val="4d" data-price="0" data-days="4"><span class="mark"></span><span class="ctext"><span class="clabel">4 days / 3 nights</span><span class="cnote">The full trip — Day 4 is optional, set it below.</span></span><span class="price free">core</span></button>
+            <button type="button" class="choice" data-val="3d" data-price="-35" data-days="3"><span class="mark"></span><span class="ctext"><span class="clabel">3 days / 2 nights</span><span class="cnote">Tighter trip — drops the optional Day 4 and a night.</span></span><span class="price down">−€35</span></button>
+          </div>
+        </div>
+
+        <div class="opt" data-group="day4" data-type="single">
+          <div class="opt-head"><h3>Day 4</h3><span class="tag-opt">optional</span></div>
+          <div class="choices">
+            <button type="button" class="choice" data-val="skip" data-price="0"><span class="mark"></span><span class="ctext"><span class="clabel">Skip — relaxed drive home</span><span class="cnote">Leave the mountains in the morning, easier day.</span></span><span class="price free">€0</span></button>
+            <button type="button" class="choice" data-val="bochnia" data-price="16"><span class="mark"></span><span class="ctext"><span class="clabel">Bochnia Salt Mine</span><span class="cnote">140 m underground slide + salt-lake boat — fewer crowds. Better for us.</span></span><span class="price up">+€16</span></button>
+            <button type="button" class="choice" data-val="wieliczka" data-price="33"><span class="mark"></span><span class="ctext"><span class="clabel">Wieliczka Salt Mine</span><span class="cnote">The famous carved chapel — bigger name, busier, pricier.</span></span><span class="price up">+€33</span></button>
+            <button type="button" class="choice" data-val="warsaw" data-price="0"><span class="mark"></span><span class="ctext"><span class="clabel">Warsaw stopover instead</span><span class="cnote">Splits the long drive home — lodging cost varies, count it later.</span></span><span class="price free">±€0</span></button>
+          </div>
+          <p class="disabled-note">Day 4 isn't part of the 3-day trip — switch back to 4 days to add it.</p>
+        </div>
+
+        <div class="opt" data-group="pass" data-type="single">
+          <div class="opt-head"><h3>Energylandia queue pass</h3><span class="tag-opt">optional</span></div>
+          <div class="choices">
+            <button type="button" class="choice" data-val="none" data-price="0"><span class="mark"></span><span class="ctext"><span class="clabel">None — rope-drop &amp; smart timing</span><span class="cnote">At the gate for 10:00, ride Zadra → Hyperion first. Free, just disciplined.</span></span><span class="price free">€0</span></button>
+            <button type="button" class="choice" data-val="fast" data-price="47"><span class="mark"></span><span class="ctext"><span class="clabel">Fast Pass</span><span class="cnote">Skip-queue on 5 coasters, one skip each.</span></span><span class="price up">+€47</span></button>
+            <button type="button" class="choice" data-val="energy" data-price="56"><span class="mark"></span><span class="ctext"><span class="clabel">Energy Pass</span><span class="cnote">~14 attractions — the works on a busy day.</span></span><span class="price up">+€56</span></button>
+          </div>
+        </div>
+
+        <div class="opt" data-group="base2" data-type="single">
+          <div class="opt-head"><h3>Night-2 base</h3></div>
+          <div class="choices">
+            <button type="button" class="choice" data-val="zakopane" data-price="0"><span class="mark"></span><span class="ctext"><span class="clabel">Zakopane</span><span class="cnote">Mountain-town vibe, highlander food, closest to the Morskie Oko bus.</span></span><span class="price free">incl.</span></button>
+            <button type="button" class="choice" data-val="zator" data-price="0"><span class="mark"></span><span class="ctext"><span class="clabel">Zator (by the park)</span><span class="cnote">Less evening driving after Energylandia.</span></span><span class="price free">incl.</span></button>
+          </div>
+        </div>
+
+        <div class="opt" data-group="addons" data-type="multi">
+          <div class="opt-head"><h3>Tatra adventure add-ons</h3><span class="tag-opt">pick any</span></div>
+          <p class="opt-sub">The Morskie Oko hike is already included — these are extras for the mountain day.</p>
+          <div class="choices">
+            <button type="button" class="choice" data-multi data-val="kasprowy" data-price="40"><span class="mark"></span><span class="ctext"><span class="clabel">Kasprowy Wierch cable car</span><span class="cnote">Up to the high ridge — timed slot, sells out.</span></span><span class="price up">+€40</span></button>
+            <button type="button" class="choice" data-multi data-val="gubalowka" data-price="10"><span class="mark"></span><span class="ctext"><span class="clabel">Gubałówka funicular + slide + zipline</span><span class="cnote">Cheap in-town adrenaline.</span></span><span class="price up">+€10</span></button>
+            <button type="button" class="choice" data-multi data-val="dunajec" data-price="15"><span class="mark"></span><span class="ctext"><span class="clabel">Dunajec gorge raft / kayak</span><span class="cnote">Self-paddle is more fun than the slow wooden raft.</span></span><span class="price up">+€15</span></button>
+            <button type="button" class="choice" data-multi data-val="thermal" data-price="12"><span class="mark"></span><span class="ctext"><span class="clabel">Thermal baths evening</span><span class="cnote">Bukovina — best value + mountain views to recover after the hike.</span></span><span class="price up">+€12</span></button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="summary" id="summary" data-journey="Total">
+        <p class="lab">Your trip, per person</p>
+        <div class="total"><span class="num tnum" id="sum-total">€285</span></div>
+        <p class="days" id="sum-days"><b>4 days</b> · 3 nights</p>
+        <div class="fuelbar"><div class="fuelfill" id="fuelfill"></div></div>
+        <hr class="sum-line">
+        <div class="breakdown" id="breakdown"></div>
+        <hr class="sum-line">
+        <p class="lab">Where the crew's leaning</p>
+        <div class="lean" id="lean" style="margin-top:12px;"></div>
+        <a class="btn btn--solid" href="plan.html" id="lock-btn" data-transition data-magnetic data-cursor="label" data-label="Lock in"><span class="fill"></span><span class="lbl">Lock it in → The plan</span></a>
+        <p class="foot">Estimate per person, split 3 ways. May-2026 prices — re-check at booking.</p>
+      </aside>
+    </div>
+  </div>
+  <div style="height:70px;"></div>
+</main>
+
+<div class="minibar">
+  <div><div class="mb-total tnum" id="mb-total">€285</div><div class="mb-days" id="mb-days">4 days · per person</div></div>
+  <a class="btn btn--solid" href="plan.html" data-transition><span class="fill"></span><span class="lbl">The plan</span></a>
+</div>
+
+<footer class="footer">
+  <div class="wrap footer-grid">
+    <div><a class="brand" href="../index.html"><svg viewBox="0 0 30 18" style="width:30px;height:18px;overflow:visible;"><path class="bl" d="M2,14 C9,3 13,3 16,9 C19,15 23,15 28,5"/><circle class="bd" cx="2" cy="14" r="2.4"/><circle class="bd" cx="28" cy="5" r="2.4"/></svg> Where To, Crew?</a>
+      <p class="muted" style="margin-top:14px;">Plan the trip. Bring the crew.</p></div>
+    <div style="max-width:32ch;"><small>Made by friends, for friends — no bookings taken here, just planning. © 2026.</small></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/DrawSVGPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+<script src="../assets/crew.js"></script>
+<script>
+document.querySelectorAll('[data-reveal-mode]').forEach(function(el){ el.setAttribute('data-reveal', el.getAttribute('data-reveal-mode')); });
+window.WTC = window.WTC || { save:function(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }, load:function(k,f){ try{ var v=localStorage.getItem(k); return v?JSON.parse(v):f; }catch(e){ return f; } } };
+</script>
+<script>
+(function(){
+  var BASE = 285;
+  var labels = { '3d':'3-day trip (−€35)', 'wieliczka':'Wieliczka Salt Mine', 'bochnia':'Bochnia Salt Mine', 'fast':'Fast Pass', 'energy':'Energy Pass', 'kasprowy':'Kasprowy Wierch', 'gubalowka':'Gubałówka funicular', 'dunajec':'Dunajec gorge', 'thermal':'Thermal baths' };
+  var shortLabel = { '4d':'4-day trip','3d':'3-day trip','skip':'Skip Day 4','bochnia':'Bochnia mine','wieliczka':'Wieliczka mine','warsaw':'Warsaw stopover','none':'No pass','fast':'Fast Pass','energy':'Energy Pass','zakopane':'Zakopane','zator':'Zator' };
+  var sel = { length:null, day4:null, pass:null, base2:null, addons:[] };
+  var people = window.CREW.all();
+  var PALETTE = ['#c0613f','#3f7a52','#9a7b2e','#7a5a86','#36707f'];
+  function colorFor(name){ var h=0; for(var i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))>>>0; return PALETTE[h%PALETTE.length]; }
+  function initials(name){ return name.replace(/\(you\)/,'').trim().slice(0,1).toUpperCase(); }
+  function votesFor(group, val){ return people.filter(function(p){ if(!p.plan) return false; return group==='addons' ? (p.plan.addons||[]).indexOf(val)>=0 : p.plan[group]===val; }).map(function(p){ return p.name; }); }
+  function avatarStack(names){
+    if(!names.length) return '';
+    var avs = names.map(function(n){ return '<span class="av" style="background:'+colorFor(n)+'" title="'+n+'">'+initials(n)+'</span>'; }).join('');
+    var label = names.map(function(n){ return n.replace(' (you)',''); }).join(', ');
+    return '<span class="votes"><span class="av-stack">'+avs+'</span><span class="vlabel">'+label+' picked this</span></span>';
+  }
+  document.querySelectorAll('.choice').forEach(function(c){
+    var g = c.closest('.opt').getAttribute('data-group'); var v = c.getAttribute('data-val');
+    var names = votesFor(g, v); if(names.length){ c.querySelector('.ctext').insertAdjacentHTML('beforeend', avatarStack(names)); }
+  });
+  function groupEls(g){ return document.querySelector('.opt[data-group="'+g+'"]'); }
+  document.querySelectorAll('.opt[data-type="single"]').forEach(function(opt){
+    var g = opt.getAttribute('data-group');
+    opt.addEventListener('click', function(e){
+      var c = e.target.closest('.choice'); if(!c || opt.classList.contains('disabled')) return;
+      var val = c.getAttribute('data-val');
+      if(sel[g]===val){ sel[g]=null; c.classList.remove('sel'); }
+      else { opt.querySelectorAll('.choice').forEach(function(x){ x.classList.toggle('sel', x===c); }); sel[g]=val; }
+      if(g==='length') syncLength();
+      compute();
+    });
+  });
+  groupEls('addons').addEventListener('click', function(e){
+    var c = e.target.closest('.choice'); if(!c) return;
+    var v = c.getAttribute('data-val'); var on = c.classList.toggle('sel');
+    if(on) sel.addons.push(v); else sel.addons = sel.addons.filter(function(x){return x!==v;});
+    compute();
+  });
+  function syncLength(){
+    var day4 = groupEls('day4');
+    if(sel.length==='3d'){ day4.querySelectorAll('.choice').forEach(function(x){ x.classList.remove('sel'); }); sel.day4=null; day4.classList.add('disabled'); }
+    else day4.classList.remove('disabled');
+  }
+  function priceOf(g,val){ var c=groupEls(g).querySelector('.choice[data-val="'+val+'"]'); return c?(parseInt(c.getAttribute('data-price'),10)||0):0; }
+  var lastTotal = BASE;
+  function compute(){
+    var threeDay = sel.length==='3d';
+    var base = threeDay ? BASE - 35 : BASE;
+    var total = base;
+    var bd = [{ label: threeDay ? '3-day core trip' : '4-day core trip' + (sel.length? '' : ' (default)'), v:'€'+base, base:true }];
+    if(!threeDay && sel.day4 && sel.day4!=='skip' && sel.day4!=='warsaw'){ var p=priceOf('day4',sel.day4); total+=p; bd.push({label:labels[sel.day4], v:'+€'+p}); }
+    else if(!threeDay && sel.day4==='warsaw'){ bd.push({label:'Warsaw stopover', v:'varies'}); }
+    if(sel.pass && sel.pass!=='none'){ var pp=priceOf('pass',sel.pass); total+=pp; bd.push({label:labels[sel.pass], v:'+€'+pp}); }
+    sel.addons.forEach(function(a){ var ap=priceOf('addons',a); total+=ap; bd.push({label:labels[a], v:'+€'+ap}); });
+    var days = threeDay ? 3 : 4, nights = days-1;
+    var st=document.getElementById('sum-total');
+    if(window.gsap){ var o={v:lastTotal}; gsap.to(o,{v:total,duration:.5,ease:'power2.out',onUpdate:function(){ st.textContent='€'+Math.round(o.v); }}); } else { st.textContent='€'+total; }
+    var ff=document.getElementById('fuelfill'); if(ff) ff.style.width=Math.min(100,(total/450)*100)+'%';
+    document.getElementById('sum-days').innerHTML='<b>'+days+' days</b> · '+nights+' nights';
+    document.getElementById('mb-total').textContent='€'+total;
+    document.getElementById('mb-days').textContent=days+' days · per person';
+    document.getElementById('breakdown').innerHTML = bd.map(function(r){ return '<div class="row'+(r.base?' base':'')+'"><span>'+r.label+'</span><span class="v">'+r.v+'</span></div>'; }).join('');
+    if(total!==lastTotal){ var t=document.getElementById('sum-total'); t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash'); lastTotal=total; }
+    WTC.save('wtc-poland-plan', {sel:sel, total:total, days:days});
+  }
+  function renderLean(){
+    var groups = [['length','Trip length'],['day4','Day 4'],['pass','Queue pass'],['base2','Night-2 base']];
+    var rows = groups.map(function(g){
+      var tally = window.CREW.tally(people.filter(function(p){return p.plan;}), function(p){ return p.plan[g[0]] ? [p.plan[g[0]]] : []; });
+      if(!tally.length) return '';
+      var top = tally[0];
+      return '<div class="lr"><span>'+g[1]+'</span><span class="pick">'+(shortLabel[top[0]]||top[0])+' <span class="av av-sm" style="background:var(--terra)">'+top[1]+'</span></span></div>';
+    }).join('');
+    document.getElementById('lean').innerHTML = rows || '<span class="muted">No crew picks yet</span>';
+  }
+  var saved = WTC.load('wtc-poland-plan', null);
+  if(saved && saved.sel){
+    sel = Object.assign({length:null,day4:null,pass:null,base2:null,addons:[]}, saved.sel);
+    if(!Array.isArray(sel.addons)) sel.addons=[];
+    ['length','day4','pass','base2'].forEach(function(g){ if(sel[g]) groupEls(g).querySelectorAll('.choice').forEach(function(x){ x.classList.toggle('sel', x.getAttribute('data-val')===sel[g]); }); });
+    groupEls('addons').querySelectorAll('.choice').forEach(function(x){ x.classList.toggle('sel', sel.addons.indexOf(x.getAttribute('data-val'))>=0); });
+    syncLength();
+  }
+  renderLean();
+  compute();
+})();
+</script>
+<script src="../assets/motion.js"></script>
+</body>
+</html>

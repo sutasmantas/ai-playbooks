@@ -1,0 +1,138 @@
+/* ============================================================
+   Where To, Crew? — DESIGN TOKENS (the cohesion foundation)
+   ONE palette · ONE easing set · ONE timing scale · ONE type system.
+   Everything on every page inherits from here. Never deviate.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Space+Mono:wght@400;700&display=swap');
+
+:root{
+  /* ── Palette (brief: forest / terracotta / paper) ── */
+  --forest:#16241c;          /* base dark ground */
+  --forest-2:#1f3328;        /* raised dark surface */
+  --forest-3:#0f1813;        /* deepest shade */
+  --terra:#c0613f;           /* the route line / primary accent */
+  --terra-2:#d98c5f;         /* lighter accent / eyebrows */
+  --terra-ink:#7e3a22;       /* terracotta on light */
+  --paper:#f3ede1;           /* warm paper text / light bg */
+  --paper-soft:#cdbfa8;      /* muted paper */
+  --sand:#e6d9cd;            /* light section neutral */
+  --sand-2:#d6c9bc;
+  --line:#3a4d3f;            /* hairline on dark */
+  --line-soft:rgba(243,237,225,.12);
+  --good:#7faa6a;            /* green meter / agreed */
+  --amber:#e0a23c;           /* time meter amber */
+  --red:#d4563b;             /* time meter red / over */
+
+  /* ── ONE easing set (never deviate) ── */
+  --ease:cubic-bezier(.785,.135,.15,.86);   /* primary in-out (Kudanil) */
+  --ease-out:cubic-bezier(.19,1,.22,1);     /* expo-out for reveals */
+  --ease-pop:cubic-bezier(.175,.885,.32,1.275); /* small overshoot */
+
+  /* ── ONE timing scale ── */
+  --dur-micro:.3s;
+  --dur:.8s;
+  --dur-std:.85s;
+  --dur-hero:1s;
+
+  /* ── Type ── */
+  --display:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Space Mono",ui-monospace,"SFMono-Regular",monospace;
+
+  /* ── Layout ── */
+  --pad:clamp(20px,5vw,64px);
+  --maxw:1180px;
+  --radius:16px;
+  --radius-sm:10px;
+  --nav-h:68px;
+}
+
+*{box-sizing:border-box;margin:0;}
+html{ -webkit-text-size-adjust:100%; }
+html,body{
+  background:var(--forest);
+  color:var(--paper);
+  font-family:var(--body);
+  line-height:1.55;
+  font-size:16px;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+body{ overflow-x:hidden; }
+img{ max-width:100%; display:block; }
+a{ color:inherit; }
+button{ font-family:inherit; }
+
+/* GSAP sets transforms on the route/marker; keep SVG text crisp */
+svg text{ paint-order:stroke; }
+
+/* ── Shared type primitives ── */
+.eyebrow{
+  font-family:var(--mono); font-weight:700; font-size:.72rem;
+  letter-spacing:.22em; text-transform:uppercase; color:var(--terra-2);
+}
+h1,h2,h3{ font-weight:700; letter-spacing:-.02em; line-height:1.02; }
+.h-hero{ font-size:clamp(2.7rem,7.5vw,6rem); font-weight:800; line-height:.98; }
+.h2{ font-size:clamp(1.9rem,4.6vw,3.4rem); font-weight:700; }
+.h3{ font-size:clamp(1.3rem,2.6vw,1.9rem); font-weight:700; }
+.lede{ font-size:clamp(1.05rem,1.5vw,1.2rem); color:var(--paper-soft); max-width:48ch; }
+.mono{ font-family:var(--mono); }
+
+.wrap{ width:100%; max-width:var(--maxw); margin:0 auto; padding-inline:var(--pad); }
+.section{ position:relative; padding-block:clamp(72px,11vw,140px); }
+
+/* ── Buttons (one component, fill + label + magnetic-ready) ── */
+.btn{
+  position:relative; overflow:hidden; isolation:isolate;
+  display:inline-flex; align-items:center; gap:10px;
+  border:1px solid var(--terra); color:var(--paper); background:transparent;
+  border-radius:100px; padding:15px 28px; font:600 1rem/1 var(--body);
+  text-decoration:none; cursor:pointer; -webkit-tap-highlight-color:transparent;
+}
+.btn .fill{ position:absolute; inset:0; background:var(--terra); transform:scaleY(0);
+  transform-origin:bottom; transition:transform var(--dur) var(--ease); z-index:-1; }
+.btn:hover .fill,.btn:focus-visible .fill{ transform:scaleY(1); }
+.btn:hover, .btn:focus-visible{ color:var(--paper); }
+.btn .lbl{ transition:transform .45s var(--ease); }
+.btn:hover .lbl{ transform:translateX(2px); }
+.btn--solid{ background:var(--terra); border-color:var(--terra); color:var(--forest-3); font-weight:700; }
+.btn--solid .fill{ background:var(--forest-3); }
+.btn--solid:hover, .btn--solid:focus-visible{ color:var(--paper); }
+.btn--sm{ padding:10px 18px; font-size:.85rem; }
+.btn--ghost{ border-color:var(--line); }
+.btn[disabled]{ opacity:.45; pointer-events:none; }
+
+.link-u{ color:var(--paper); text-decoration:none; position:relative; padding-bottom:2px; }
+.link-u::after{ content:''; position:absolute; left:0; bottom:0; width:100%; height:1px;
+  background:var(--terra-2); transform:scaleX(0); transform-origin:left; transition:transform .4s var(--ease); }
+.link-u:hover::after{ transform:scaleX(1); }
+
+/* ── Custom cursor ── */
+.cur,.cur-ring{ position:fixed; top:0; left:0; pointer-events:none; z-index:10000; border-radius:50%;
+  transform:translate(-50%,-50%); }
+.cur{ width:7px; height:7px; background:var(--terra); }
+.cur-ring{ width:38px; height:38px; border:1.5px solid var(--terra-2);
+  transition:width .3s var(--ease),height .3s var(--ease),background .3s,opacity .3s; }
+.cur-ring.is-view{ width:74px; height:74px; background:oklch(.7 .1 45/.16); }
+.cur-ring.is-link{ width:54px; height:54px; }
+.cur-ring .ring-lbl{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font:700 .58rem/1 var(--mono); letter-spacing:.06em; color:var(--paper); opacity:0; transition:opacity .25s; }
+.cur-ring.is-view .ring-lbl,.cur-ring.is-link .ring-lbl{ opacity:1; }
+@media(hover:none){ .cur,.cur-ring{ display:none!important; } }
+
+/* ── Reveal default (JS upgrades these; this is the no-JS / reduced-motion floor) ── */
+[data-reveal]{ will-change:transform,opacity; }
+
+/* ── Reduced motion: everything instant, no idle loops ── */
+@media(prefers-reduced-motion:reduce){
+  *{ animation-duration:.001ms!important; animation-iteration-count:1!important;
+     transition-duration:.001ms!important; scroll-behavior:auto!important; }
+}
+
+/* ── Visually-hidden (a11y) ── */
+.vh{ position:absolute!important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+  clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+
+/* focus ring */
+:focus-visible{ outline:2px solid var(--terra-2); outline-offset:3px; border-radius:4px; }

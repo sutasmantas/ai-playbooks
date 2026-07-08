@@ -1,0 +1,395 @@
+================================================================================
+CLAUDE CODE SETUP & USAGE GUIDE
+================================================================================
+
+This document explains the three main ways you tell Claude Code how to behave in
+a project (skills, CLAUDE.md, rules), what subagents are, and which plugins are
+worth installing on day one.
+
+
+================================================================================
+1. CLAUDE.md, rules, and skills - what they are and when each fires
+================================================================================
+
+These are three different mechanisms with three different lifecycles. Picking
+the wrong one is the most common source of "Claude ignored my instructions" or
+"Claude wastes context on stuff that doesn't apply."
+
+--------------------------------------------------------------------------------
+CLAUDE.md  (always-on project memory)
+--------------------------------------------------------------------------------
+
+- Loaded automatically into context at the start of every session, for every
+  request, in the directory it lives in (and parent directories merge upward).
+- Best for: conventions that apply to almost every change in the repo - coding
+  style baseline, what "done" means, validation expectations, communication
+  tone, the project's core objective.
+- Worst for: long reference material, niche workflows, or instructions that
+  only matter for 5% of tasks. That content burns tokens on every turn.
+- Location: repo root (./CLAUDE.md), subdirectory roots (e.g. ./frontend/CLAUDE.md),
+  or globally at ~/.claude/CLAUDE.md for personal defaults.
+- Keep it short. If it grows past ~200 lines you are probably storing things
+  that belong in a skill.
+
+--------------------------------------------------------------------------------
+rules  (file-scoped instructions)
+--------------------------------------------------------------------------------
+
+- Smaller markdown files that apply only when the agent is working on a
+  matching set of files (matched by glob, e.g. "src/api/**/*.ts" or
+  "*.sql"). Think of them as CLAUDE.md fragments scoped to a path instead
+  of the whole repo.
+- Best for: conventions that are real in one area and wrong elsewhere -
+  "always use parameterized queries in this folder", "every React component
+  in src/ui/ must be a named export", "migrations in db/migrations must be
+  reversible".
+- Why not just put it in CLAUDE.md: it would either bloat every turn with
+  irrelevant rules, or contradict itself when the same rule does not apply
+  elsewhere in the repo.
+- Why not a skill: skills trigger on task description ("the user is doing
+  X"). Rules trigger on file path ("the agent is editing Y"). Different
+  matching mechanism, different use case.
+- Location in Claude Code: .claude/rules/<name>.md (or wherever your tool
+  expects them - see the cross-tool note below). Each rule file declares
+  the file globs it applies to in its frontmatter.
+
+--------------------------------------------------------------------------------
+skills  (on-demand, modular instructions)
+--------------------------------------------------------------------------------
+
+- Markdown files with frontmatter (name + description) that Claude loads ONLY
+  when the description matches the current task.
+- Best for: workflows that apply to a specific kind of work - TDD, debugging,
+  writing-plans, code review, building a frontend component, writing a new
+  skill. Anything that does not need to be in context 100% of the time.
+- Locations:
+    Personal      ~/.claude/skills/<name>/SKILL.md
+    Project       .claude/skills/<name>/SKILL.md
+    Plugin        installed automatically by the plugin
+- Invocation: Claude calls the Skill tool with the skill name. Never use Read
+  on a skill file - that bypasses the loading contract.
+- Authoring: use the skill-creator plugin/skill. The description field is what
+  the matcher reads, so write it as a clear "use when..." trigger sentence.
+
+Rule of thumb:
+  Applies to every turn in this repo     -> CLAUDE.md
+  Applies only when editing certain files -> rule (file-scoped)
+  Applies only to certain kinds of work   -> skill (task-scoped)
+  Reference docs / how-tos                -> regular markdown in /docs
+
+--------------------------------------------------------------------------------
+Using a different AI agent? File names and structure change.
+--------------------------------------------------------------------------------
+
+The three mechanisms above (always-on memory, file-scoped rules, on-demand
+skills) exist in most modern coding agents, but each tool reads different
+filenames and directory layouts. If you switch tools, you have to rename
+or move the files - the content is mostly portable, the wiring is not.
+
+  Tool                Always-on memory      File-scoped rules         Skills / commands
+  ------------------  --------------------  ------------------------  -----------------------
+  Claude Code         CLAUDE.md             .claude/rules/*.md        .claude/skills/<name>/SKILL.md
+  Cursor              .cursorrules (legacy) .cursor/rules/*.mdc       custom commands in .cursor/
+                      or .cursor/rules/
+  GitHub Copilot      .github/copilot-      .github/instructions/     prompt files in
+  (VS Code)           instructions.md       *.instructions.md         .github/prompts/
+  OpenAI Codex /      AGENTS.md             (nested AGENTS.md in      n/a
+  Codex CLI                                 subdirectories)
+  Gemini CLI          GEMINI.md             (nested GEMINI.md)        n/a
+
+Practical implications:
+
+- The same project may need multiple files (CLAUDE.md + AGENTS.md +
+  .cursorrules) if your team uses several tools. Pick one canonical
+  source and symlink or generate the others.
+- File-scoped rules are a Cursor / Copilot / Claude Code concept. Codex
+  and Gemini emulate it by letting you drop AGENTS.md / GEMINI.md inside
+  subdirectories instead of using glob frontmatter.
+- Skills (on-demand, triggered by task description) are mostly a
+  Claude Code / Copilot idea. Cursor has "custom commands" that fill a
+  similar role. Codex and Gemini do not have a direct equivalent yet.
+- Always check the tool's current docs before assuming a filename - this
+  area changes fast.
+
+
+================================================================================
+2. Subagents
+================================================================================
+
+Subagents are separate Claude instances the main agent can dispatch to do work
+in their own isolated context. The main agent already knows how to use them -
+you do not need to learn the mechanics.
+
+What you need to know:
+
+- Long-running or large-surface tasks (security review, code review, broad
+  research, exploring an unfamiliar codebase) pollute the main context with
+  hundreds of file reads. Once the context is full of noise, answer quality
+  drops fast.
+- The fix is to push that work into a subagent so only the summary comes back.
+- The agent does not always do this on its own. Tell it to.
+
+Practical phrasing to use in your prompts:
+
+    "Use a subagent for the security review."
+    "Spawn a subagent to explore the codebase and report back."
+    "Run the code review in a subagent so the main context stays clean."
+
+Rule of thumb: if a task involves reading lots of files or producing a
+report rather than editing code, ask for a subagent.
+
+
+================================================================================
+3. Handoff — when to start a fresh session and how to do it
+================================================================================
+
+AI agents degrade as the conversation grows. The context window fills up with
+old tool output, wrong turns, and abandoned drafts. Past a certain point, the
+agent starts ignoring rules it followed earlier, contradicts decisions from an
+hour ago, or produces generic output that doesn't fit the project.
+
+This is not a bug in the agent. It is the nature of how these systems work.
+The fix is a handoff: preserve what matters, throw away the noise, start clean.
+
+--------------------------------------------------------------------------------
+Signs you need a handoff
+--------------------------------------------------------------------------------
+
+Any of these is a signal to stop and hand off instead of continuing:
+
+- The agent repeats a mistake you already corrected in this session.
+- It ignores a rule from CLAUDE.md that it was following earlier.
+- It produces an answer that contradicts something it decided 30 minutes ago,
+  without flagging the contradiction.
+- Output is getting vaguer and more generic (lots of "you could consider..." and
+  "it depends...") instead of specific and grounded in the actual project.
+- You are spending more effort re-explaining context than getting new work done.
+- The session has been running for more than a few hours on a complex task.
+
+--------------------------------------------------------------------------------
+How to do the handoff
+--------------------------------------------------------------------------------
+
+Step 1 — Ask the current agent to write a handoff document before the session
+ends. Give it a prompt like:
+
+    "Write a handoff document for this session. Cover: what we built or changed
+    and why, every significant decision made and the reasoning behind it, the
+    current state of the work (what's done, what's in progress, what's next),
+    any open questions or unresolved tradeoffs, and anything a fresh agent
+    would need to pick up without asking me to re-explain the whole session."
+
+Save the output as a file (e.g. handoff-YYYY-MM-DD.md) in the project.
+
+Step 2 — Open a new Claude Code session (close the old conversation window or
+start a new chat). Do NOT continue in the same thread.
+
+Step 3 — In the first message of the new session, reference the handoff file:
+
+    "Read handoff-YYYY-MM-DD.md. That is the context from the previous session.
+    Continue from the 'what's next' section."
+
+The CLAUDE.md in the project root loads automatically. The handoff file gives
+the agent the session-specific decisions CLAUDE.md doesn't cover.
+
+
+--------------------------------------------------------------------------------
+When NOT to do a handoff (just keep going)
+--------------------------------------------------------------------------------
+
+- The session is short (under an hour) and output quality is still high.
+- You are near the end of a task — finish it first, then handoff for the
+  next task.
+- The agent is in the middle of writing a file. Let it finish before breaking
+  context.
+
+
+================================================================================
+4. When and how to tailor the process for your project
+================================================================================
+
+The team ships two process kits: website_process/ (web products, Playwright-
+based validation) and general_process/ (CLI, library, service, script, data-
+pipeline, Rust/Go/Python/Node validation). Most projects fit one of those two
+without changes — the interview at the start of each kit handles the variation
+within each domain.
+
+But some projects don't fit. Here is how to tell which situation you are in
+and what to do about it.
+
+--------------------------------------------------------------------------------
+Level 1 — No tailoring needed (just answer the interview honestly)
+--------------------------------------------------------------------------------
+
+Your project fits an existing kit if:
+
+- It is a web product, CLI tool, library, service, script, or data pipeline.
+- The language is Python, Node/TS, Go, Rust, or anything adaptable via the
+  adapt template (Ruby, Java, .NET, Elixir, PHP, etc.).
+- You can describe "did it work?" as: "I ran a command and the output contained
+  X" or "the function returned Y" or "the HTTP endpoint responded with Z."
+
+In this case: just run the interview. The interview's scope-and-concerns
+questions let you opt out concerns that don't apply and opt in concerns that do.
+No files need to be created or modified.
+
+--------------------------------------------------------------------------------
+Level 2 — Light tailoring: a concern is missing or doesn't fit
+--------------------------------------------------------------------------------
+
+You need this when the project has a real risk area that none of the 10
+concerns covers, or when one concern's "How to apply" section gives wrong
+advice for your stack.
+
+How to do it:
+
+1. Copy any existing concern file (e.g. general_process/programming-concerns/
+   error-handling-and-logging.md) as a starting point.
+2. Fill in the six fields: Rule, Use when, How to apply, Skip if, Project kinds
+   applicable, Language-specific addendum.
+3. Add the new concern to the interview's scope-and-concerns question list
+   (general_process/interview/03-scope-and-concerns.md, question 1).
+4. When the agent generates CLAUDE.md for the project, tell it to inline the
+   new concern alongside the standard ones.
+
+To modify an existing concern: edit its "How to apply" section directly in the
+kit file. The change will take effect for all future projects bootstrapped from
+that kit. Add a note explaining why the default advice was wrong for your stack.
+
+Time estimate: 30-60 minutes per concern.
+
+--------------------------------------------------------------------------------
+Level 3 — Heavy tailoring: the project domain is fundamentally different
+--------------------------------------------------------------------------------
+
+You need a new process kit when:
+
+- "Did it work?" cannot be expressed as "run a command, check the output." For
+  example: ML model accuracy, visual regression scores, accessibility audits,
+  data quality metrics. The validator pattern the kits use breaks here.
+- More than 3-4 of the 10 concerns would need to be replaced entirely, not
+  just tweaked.
+- The truth surface concept (what you check to know the feature works) needs
+  a different definition — one that involves thresholds, statistical assertions,
+  or human evaluation rather than a string match.
+
+Known domains that need a new kit: ML/data science, LLM/AI products, mobile
+native (iOS/Android), embedded/firmware, data platform (warehouses, pipelines
+at scale).
+
+How to do it:
+
+1. Read general_process/README.md first. It documents what changed from
+   website_process → general_process and the decisions behind those changes.
+   That is the pattern to follow.
+2. Fork general_process/ into a new directory (e.g. ml_process/).
+3. Identify which concerns need replacement and which carry over. Write a
+   decision_log entry for each replacement explaining why the original didn't
+   fit.
+4. Rewrite the validator starters to match the domain's truth surface — this
+   is the hardest part and where the most design work lives.
+5. Update the interview scripts to ask domain-specific questions (e.g. for ML:
+   experiment tracking tool, eval harness, dataset versioning strategy).
+6. Run the two-auditor verifier pass (completeness + correctness subagents)
+   before using the new kit on real projects. See general_process/ENTRYPOINT.md
+   step 8 for how to dispatch them.
+
+--------------------------------------------------------------------------------
+Rule of thumb
+--------------------------------------------------------------------------------
+
+  Project fits website_process or general_process  ->  just run the interview
+  One or two concerns are wrong or missing          ->  Level 2, edit the kit
+  Truth surface is fundamentally different          ->  Level 3, fork the kit
+  Not sure                                          ->  try Level 1 first; if
+                                                        the interview produces
+                                                        a validator that can't
+                                                        be run, step up to Level 2
+
+
+================================================================================
+5. Installing plugins
+================================================================================
+
+Plugins are installable bundles that add skills, slash commands, subagents,
+hooks, and MCP servers in one package. They are managed via the /plugin
+command inside Claude Code.
+
+--------------------------------------------------------------------------------
+Adding the official Anthropic marketplace
+--------------------------------------------------------------------------------
+
+Run inside Claude Code:
+
+    /plugin marketplace add anthropics/claude-plugins-official
+
+Source: https://github.com/anthropics/claude-plugins-official
+
+Then browse and install with:
+
+    /plugin
+
+You will get an interactive menu showing every plugin in the marketplace.
+Install the ones you want; they activate immediately and persist across
+sessions.
+
+--------------------------------------------------------------------------------
+Recommended starting set (from the official marketplace)
+--------------------------------------------------------------------------------
+
+frontend-design
+    Generates distinctive, production-grade frontend code that avoids the
+    generic "AI default" aesthetic. Install if you build any web UI.
+
+superpowers
+    The big one. Ships ~20 workflow skills covering brainstorming, planning,
+    TDD, debugging, code review, git worktrees, verification-before-completion,
+    finishing-a-branch, parallel subagent dispatch, and more. This is the
+    backbone of disciplined Claude Code usage. Install it first.
+
+security-guidance
+    Adds security-review tooling and guidance for finding vulnerabilities
+    in the current diff. Install for anything that handles user input,
+    auth, or external data.
+
+claude-md-management
+    Audits, improves, and maintains CLAUDE.md files. Useful once your repo
+    has accumulated enough conventions that the CLAUDE.md is drifting from
+    reality.
+
+skill-creator
+    Creates new skills, edits existing ones, and runs evals to measure
+    skill triggering accuracy. Install when you want to author your own
+    skills for repo-specific workflows.
+
+code-review
+    Adds the /review and PR review workflows. Install if you use GitHub PRs
+    or want structured review of completed work before merging.
+
+code-simplifier
+    Refactors recently-changed code for clarity, consistency, and reuse
+    without changing behavior. Good as a cleanup pass after a feature lands.
+
+github
+    GitHub integration - issues, PRs, releases, checks. Install if your
+    workflow touches GitHub at all (most projects).
+
+--------------------------------------------------------------------------------
+Finding more
+--------------------------------------------------------------------------------
+
+The official marketplace is not the only one. Search for additional
+marketplaces by:
+
+- Browsing GitHub for "claude-plugins" or "claude-code-plugins" repos.
+- Checking the Anthropic docs for community marketplaces.
+- Asking inside Claude Code: "what plugins exist for <use case>?" - the
+  claude-code-guide agent can search docs and the web.
+
+Add a third-party marketplace the same way:
+
+    /plugin marketplace add <github-org>/<repo>
+
+Then /plugin to browse and install.
+
+

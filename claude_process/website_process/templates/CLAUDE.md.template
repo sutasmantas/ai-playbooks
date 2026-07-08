@@ -1,0 +1,127 @@
+<!--
+TEMPLATE METADATA — REMOVE THIS BLOCK WHEN GENERATING
+Target: <new-project-root>/CLAUDE.md
+Always generated.
+Placeholders:
+  {{PROJECT_NAME}}            — from interview 01.1
+  {{PROJECT_DESCRIPTION}}     — from interview 01.1
+  {{STACK}}                   — from interview 01.2 (e.g., "Next.js + Postgres")
+  {{DOMAIN}}                  — inferred from selected concerns + project description (e.g., "marketing site", "SaaS dashboard", "internal admin tool"); not a direct interview answer
+  {{TRUTH_SURFACE}}           — from interview 02.1 (e.g., "the rendered page in a browser")
+  {{TRUTH_SURFACE_TOOL}}      — derived from the validator-starter pick in ENTRYPOINT step 6 ("Playwright" for the TS starter, "curl + headless chromium" for the bash starter), not a direct interview answer
+  {{TRUTH_SURFACE_URL}}       — from interview 02.4 (the concrete URL the validator hits, e.g., "http://localhost:3000/" or "https://staging.example.com/")
+  {{STATE_LOCATION}}          — from interview 03.2, or literally "none — no persistent state"
+  {{CATASTROPHIC_STATE}}      — from interview 03.2, or "(N/A — no persistent state)"
+  {{DRIFT_SURFACES}}          — from interview 03.3 (comma-separated, e.g., "cached responses, feature flags")
+  {{DEV_SERVER_CMD}}          — ask user explicitly if not covered (e.g., "npm run dev")
+  {{VALIDATOR_CMD}}           — the first command the validator skeleton will be invokable as
+  {{SELECTED_CONCERNS}}       — comma-separated list of concerns that apply (e.g., "accessibility, performance, SEO, security, deployment")
+  {{PKG_MANAGER}}             — from interview 01.3: "npm", "pnpm", "yarn", "bun", "pip", "poetry", "uv", "cargo", etc. Used so VALIDATOR_CMD doesn't have to guess.
+  {{CI_PROVIDER}}             — from interview 01.4: "GitHub Actions", "GitLab CI", "CircleCI", "Vercel", "Cloudflare Pages", "none yet", etc.
+  {{CRITICALITY}}             — from interview 03.5: "Throwaway/experiment", "Internal tool", "External product", or "Safety/regulated"
+  {{LIFESPAN}}                — from interview 03.6: "Hackathon/days", "Short-lived/weeks", or "Long-lived/months+"
+  {{KIT_VERSION}}             — the date of the bootstrap kit version used at generation time (use today's date in ISO format, e.g. 2026-05-19)
+  {{CONCERNS_BLOCK}}          — for each selected concern, INLINE the FULL text of website-concerns/<name>.md (rule + why + how-to-apply + skip-if). Do NOT reference the kit by path — the generated file must be self-contained after the kit is deleted.
+  {{SKIP_NOTES}}              — list of templates + concerns skipped, with reason; "(none)" if all generated
+-->
+
+# {{PROJECT_NAME}} — Agent Instructions
+
+{{PROJECT_DESCRIPTION}}
+
+**Stack:** {{STACK}}
+**Domain:** {{DOMAIN}}
+**Truth surface:** {{TRUTH_SURFACE}} (verify via {{TRUTH_SURFACE_TOOL}})
+**Persistent state:** {{STATE_LOCATION}}
+**Concerns in scope:** {{SELECTED_CONCERNS}}
+**Package manager:** {{PKG_MANAGER}}
+**CI provider:** {{CI_PROVIDER}}
+**Criticality:** {{CRITICALITY}} (Throwaway / Internal / External / Safety — drives auditor count and artifact generation)
+**Lifespan:** {{LIFESPAN}} (Hackathon / Short-lived / Long-lived)
+**Bootstrap kit version:** {{KIT_VERSION}} (record at bootstrap; EXCEPTIONS entries carry this for cross-version tracking)
+
+## Validation tiers (inlined here so this file is self-contained)
+
+The kit defines three validation tiers; references to them throughout this file mean:
+
+- **Tier 1 — Automated diagnostics.** The validator script (`{{VALIDATOR_CMD}}`). Cheap, run constantly. Catches what static checks can catch.
+- **Tier 2 — Independent verifier.** A fresh subagent with zero producer context dispatched via `scripts/verify_prompt.md`. The actual gate. Catches what the producer's frame excludes.
+- **Tier 3 — Scenario tests.** End-to-end tests that simulate a real user session. Catches what tier 1 and 2 cannot see.
+
+Tier 1 alone is never sufficient. A feature is done when Tier 1 is clean AND Tier 2 has signed off.
+
+## Hard rules
+
+These are the non-negotiables. Every iteration follows them.
+
+1. **Behavior, not counts.** Validator assertions describe what the feature DOES. Counts are diagnostic only.
+2. **Expected before change.** Acceptance criteria written BEFORE the change. Never back-fill validators from outputs.
+3. **Open the truth surface.** No iteration is done until {{TRUTH_SURFACE}} has been opened (via {{TRUTH_SURFACE_TOOL}}) and described in one sentence. API-200 doesn't count.
+4. **Verifier-as-gate.** "Done" is decided by an independent reviewer (subagent or human) with zero context of what was just built and a "find problems" prompt. Self-review doesn't decide done.
+5. **Feature-gap rule.** If verification is blocked by missing tooling, **build the tool first**. "Couldn't verify because X, marking done" is forbidden.
+6. **Iteration starts with validation.** Every iteration begins by running the validator and opening the truth surface. If they're not green, that's the work — no new feature on top of a broken floor.
+7. **Destructive operations require explicit user authorization at execution time.** `DROP TABLE`, force-push to a protected branch, `rm -rf` on a real directory, delete production records, drop a database, mass-revoke credentials, run a migration on a real environment — every one of these is gated by a fresh "yes, do this now" from the user, NOT by the plan saying "will run migration." The plan plans; the user authorizes. The Replit incident (July 2025) showed agents will fabricate cover-up when stuck and given destructive capability without a gate. No agent self-authorization on destructive ops, regardless of plan, schedule, or apparent urgency.
+
+## Size caps (empirical — past these, agents start ignoring rules)
+
+Hard caps applied to this CLAUDE.md and adjacent rule files. When a cap is breached, run a rule-retirement pass: for each rule, ask "would removing this line cause a real mistake within a month?" Keep if yes-with-evidence, demote to pitfall watch-item if not. Audit at fixed cadence (quarterly is a reasonable default).
+
+- This file's rule content: ≤ 350 words (preamble + structural sections excluded from the count)
+- Principles directory: ≤ 7 files (each addition requires a removal — the kit ships at the cap)
+- `pitfall_register.md` active entries: ≤ 200 lines (retired entries below the line are unbounded)
+- `EXCEPTIONS.md`: reviewed monthly; no permanent waivers (every entry has a `Revisit by:` date or condition)
+
+Background: empirical research on AGENTS.md and CLAUDE.md effectiveness (Tianpan 2026; rams901 dev.to 2026) found median high-performing files are 300-350 words; diminishing returns past 500; *negative* correlation past 1000 words / 200 lines. Past the cliff, the agent silently ignores rules — the kit's discipline becomes noise.
+
+## Priority when rules conflict
+
+When two rules or concerns disagree on the same change, follow this order (Priority 1 wins):
+
+1. **Security** — both deployed-artifact security AND AI-authoring security
+2. **Behavior correctness** — does the feature actually do its job
+3. **Accessibility** — WCAG 2.2 AA minimum
+4. **Performance** — Core Web Vitals budgets
+5. **Cross-browser compatibility**
+6. **Code quality / aesthetics**
+
+If two concerns of equal priority disagree (e.g., performance cost of an accessibility feature), surface the tradeoff in `decision_log.md` (or the PR description if decision_log is not generated) and ask the user — do not silently resolve.
+
+## Concerns in scope
+
+The following concerns apply to this project. The full text of each — rule, why, how to apply, skip-if — is inlined below so this file remains self-contained even after the bootstrap kit is removed.
+
+{{CONCERNS_BLOCK}}
+
+## Self-validation protocol
+
+Before marking any task done:
+
+1. Run `{{VALIDATOR_CMD}}`. Tier 1 (diagnostics) must be clean.
+2. Open {{TRUTH_SURFACE}}. Write one sentence about what it looks like now.
+3. Verify each in-scope concern. (Lighthouse for performance/a11y; viewport screenshots for responsive; etc.)
+4. Dispatch the verifier subagent (see `scripts/verify_prompt.md`). Tier 2 (independent eyes) must sign off.
+5. Log the outcome in your iteration notes (or `decision_log.md` if the change was non-trivial).
+
+## Session start
+
+1. Open `PROJECT_PLAN.md` — the master checklist. Confirm the active workstream item; if none is active, picking the next item with the user IS the first task. All work this session must map to an item there (add it first if missing).
+2. Run the dev server:
+```
+{{DEV_SERVER_CMD}}
+```
+3. Verify state: `{{STATE_LOCATION}}` exists and isn't corrupted. Drift surfaces to spot-check: {{DRIFT_SURFACES}}.
+
+## State and isolation
+
+<!-- AGENT: if the project has no persistent state, DELETE this entire section
+     (h2 heading + body paragraphs) AND the "Then verify state:" sentence in the Session
+     start section above, AND the "Persistent state:" line in the preamble. -->
+
+Persistent state lives at: {{STATE_LOCATION}}.
+Catastrophic-if-corrupted state: {{CATASTROPHIC_STATE}}.
+
+Tests must NEVER write to the live state path. State paths come from env var at module load; tests inject an ephemeral path. (This project has persistent state, so test-isolation discipline is in force here.)
+
+## What was skipped at bootstrap and why
+
+{{SKIP_NOTES}}

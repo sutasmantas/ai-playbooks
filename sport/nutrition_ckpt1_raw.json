@@ -1,0 +1,248 @@
+[
+  {
+    "topicKey": "fats",
+    "topicName": "Dietary Fats",
+    "claims": [
+      {
+        "claim": "A low-fat diet (~25% of energy from fat vs. ~40%) reduces total serum testosterone in healthy men by approximately 15% (from 22.7 to 19.3 nmol/L, p<0.001). A 2021 systematic review and meta-analysis of 6 RCTs (N=206) confirmed this, finding a standardized mean difference (SMD) of -0.38 (95% CI -0.75 to -0.01, p=0.04) for total testosterone on low-fat vs. high-fat diets, with a stronger effect (SMD -0.52, 95% CI -0.75 to -0.30) in men of European ancestry.",
+        "effect_size": "Hamalainen 1984: -15% total testosterone (-3.4 nmol/L, ~-98 ng/dL). Whittaker 2021 meta-analysis: SMD -0.38 (95% CI -0.75 to -0.01) for total testosterone; DHT SMD -0.30 (95% CI -0.56 to -0.03).",
+        "source_id": "PMID 6538617 (Hamalainen 1984); PMID 33741447 (Whittaker & Wu 2021)",
+        "study_desc": "Hamalainen 1984: crossover dietary intervention, N=30 healthy men, 6 weeks, 40% fat vs. 25% fat diet (J Steroid Biochem). Whittaker & Wu 2021: systematic review and meta-analysis of 6 RCTs, N=206, low-fat (~19% energy) vs. higher-fat (~39% energy) diets (J Steroid Biochem Mol Biol).",
+        "confidence": "high"
+      },
+      {
+        "claim": "Dietary fat intake below approximately 20-25% of total energy is associated with suppressed testosterone and DHT in male athletes and the general male population. A 2021 narrative review recommends a minimum of 25% of daily energy from fat for both general and athletic populations to avoid hormonal suppression. In resistance-trained athletes specifically, a significant correlation (r=0.72) has been observed between resting testosterone and dietary fat consumption. A practical floor of 0.5 g/kg body weight/day fat is also cited in athlete-specific fat-loss guidelines.",
+        "effect_size": "Fat intake threshold: ≤20% of energy associated with testosterone suppression. Correlation with testosterone: r=0.72 in resistance-trained men. Ketogenic (75% fat) vs. Western diet (25% fat) in 25 resistance-trained men: effect size ES=0.65 increase in total testosterone on higher-fat arm.",
+        "source_id": "PMID 34684376 (Whittaker 2021 narrative review); PMID 34684120 (fat-loss phase review, Barakat et al. 2021, PMC8471721)",
+        "study_desc": "Whittaker 2021 narrative review: synthesizes RCT and observational evidence on dietary fat and androgen status in athletes; PMID 34684376. Barakat et al. 2021: narrative review of fat-loss strategies for resistance-trained athletes, recommends ≥20-30% fat or ≥0.5 g/kg/day minimum; PMC8471721.",
+        "confidence": "medium"
+      },
+      {
+        "claim": "Omega-3 fatty acid (EPA+DHA) supplementation significantly reduces serum C-reactive protein (CRP) with a pooled effect size of ES=-0.40 (95% CI -0.56 to -0.24, p<0.001), TNF-alpha by ES=-0.23, and IL-6 by ES=-0.22, based on an umbrella meta-analysis of 32 meta-analyses across populations. In physically active adults specifically, doses of approximately 2.1-2.7 g/day EPA+DHA over 4-12 weeks consistently reduced CRP and IL-6, while TNF-alpha showed no significant difference.",
+        "effect_size": "CRP: ES=-0.40 (95% CI -0.56 to -0.24, p<0.001). IL-6: ES=-0.22. TNF-alpha: ES=-0.23. In exercise context: CRP and IL-6 reduced at 2.1-2.7 g/day; TNF-alpha showed no differences.",
+        "source_id": "PMID 35914448 (umbrella meta-analysis, DOI 10.1016/j.intimp.2022.109104); PMID 38999792 (Fernandez-Lazaro et al. 2024, DOI 10.3390/nu16132044)",
+        "study_desc": "Umbrella meta-analysis (2022): 32 meta-analyses of RCTs on n-3 PUFA supplementation and inflammatory biomarkers across diverse adult populations (Int Immunopharmacol, PMID 35914448). Fernandez-Lazaro et al. 2024: systematic review of 13 RCTs in physically active adults, doses 1.22-2.7 g/day EPA+DHA, 4-12 weeks (Nutrients, PMID 38999792).",
+        "confidence": "high"
+      },
+      {
+        "claim": "The 2020 Cochrane review by Hooper et al. (PMID 32428300) found that reducing saturated fat intake reduced combined cardiovascular events by 21% (RR 0.79, 95% CI 0.66-0.93) across 11 trials (N=53,300 participants). The absolute risk reduction translates to an NNT of 56 in primary prevention (56 people reduce saturated fat for ~4 years to prevent 1 CVD event), corresponding to approximately 1.8% ARR over ~4 years. Benefits were observed regardless of whether saturated fat was replaced with polyunsaturated fat or carbohydrate, with no significant difference between replacement strategies in subgroup analysis.",
+        "effect_size": "RR 0.79 (95% CI 0.66-0.93) for combined CVD events. ARR approximately 1.8% over ~4 years. NNT=56 (primary prevention), NNT=53 (secondary prevention).",
+        "source_id": "PMID 32428300 (Hooper et al. 2020, Cochrane Database Syst Rev 2020;5:CD011737)",
+        "study_desc": "Cochrane systematic review and meta-analysis; 15 RCTs (16 comparisons), ~59,000 participants total; interventions aimed at reducing saturated fat with or without specific replacement macronutrient; evidence to October 2019 (Cochrane Database Syst Rev, 2020).",
+        "confidence": "consensus"
+      },
+      {
+        "claim": "There is no evidence that dietary fat intake above the minimum required for hormone function directly enhances muscle protein synthesis (MPS) or lean mass retention when protein is adequate. A 2024 meta-analysis of 8 RCTs (N=188) found that omega-3 PUFA supplementation (2.0-4.8 g/day, 4 weeks to 6 months) had no effect on fractional synthetic rate (FSR)-measured MPS (SMD 0.03, 95% CI -0.35 to 0.40, p=0.89). The evidence base for lean mass retention during caloric deficit in resistance-trained males consistently identifies protein quantity and resistance training volume as the dominant drivers, with dietary fat source not independently examined as a variable controlling for total energy and protein.",
+        "effect_size": "Null result for direct fat effect on MPS: SMD 0.03 (95% CI -0.35 to 0.40, p=0.89) for FSR-measured MPS with omega-3 supplementation. No RCT has isolated dietary fat (beyond hormone-minimum threshold) as an independent variable for lean mass in protein-matched, energy-matched conditions.",
+        "source_id": "PMID 38777807 (systematic review and meta-analysis, DOI: available via PMC11723138)",
+        "study_desc": "Systematic review and meta-analysis (2024): 8 RCTs, N=188, omega-3 supplementation 2.0-4.8 g/day vs. control, outcomes: FSR-measured muscle protein synthesis and whole-body protein synthesis; PMID 38777807 (PMC11723138).",
+        "confidence": "medium"
+      }
+    ]
+  },
+  {
+    "topicKey": "carbs",
+    "topicName": "Carbohydrates and Fiber",
+    "claims": [
+      {
+        "claim": "Low-glycemic-index (low-GI) diets are associated with greater body weight reduction compared to higher-GI control diets, but the effect is substantially confounded by spontaneous calorie reduction rather than GI per se; in ≥24-week RCTs with reduced heterogeneity (I² = 0%), the mean difference is −2.02 kg body weight. Calorie and protein matching was not systematically enforced across the 24 included trials.",
+        "effect_size": "MD = −2.02 kg body weight (95% CI: −3.05, −0.98) in interventions ≥24 weeks (I² = 0%); overall pooled MD = −2.65 kg (95% CI: −4.35, −0.95), I² = 87% across 11–24 RCTs",
+        "source_id": "PMID 35057488 (Nutrients 2022; PMC8778967)",
+        "study_desc": "Systematic review and meta-analysis of 24 RCTs examining low-GI diets as an intervention in metabolic diseases; subgroup analysis by intervention duration; published in Nutrients 2022.",
+        "confidence": "medium"
+      },
+      {
+        "claim": "Increasing dietary fiber intake by 14 g/day under ad libitum eating conditions is associated with a 10% decrease in energy intake. This spontaneous calorie reduction is the primary mechanism linking higher fiber consumption to reduced body weight, not any direct thermogenic or hormonal effect.",
+        "effect_size": "10% reduction in ad libitum energy intake per additional 14 g/day of dietary fiber; effect observed over periods of more than 2 days",
+        "source_id": "PMID 11396693 (Nutrition Reviews 2001)",
+        "study_desc": "Howarth, Saltzman, and Roberts 2001 systematic review in Nutrition Reviews (Vol. 59, No. 5, pp. 129–139) summarizing published studies on dietary fiber, hunger, satiety, energy intake, and body composition in healthy individuals.",
+        "confidence": "high"
+      },
+      {
+        "claim": "Increasing dietary fiber intake by 14 g/day is associated with body weight loss of 1.9 kg over approximately 3.8 months under ad libitum conditions. The effect is larger in overweight and obese individuals (2.4 kg) than in lean individuals (0.8 kg), suggesting that higher adiposity amplifies fiber-driven satiety.",
+        "effect_size": "1.9 kg body weight loss over 3.8 months from +14 g/day dietary fiber; 2.4 kg in overweight/obese vs 0.8 kg in lean individuals",
+        "source_id": "PMID 11396693 (Nutrition Reviews 2001)",
+        "study_desc": "Howarth et al. 2001 systematic review in Nutrition Reviews aggregating published fiber intervention studies; also corroborated by POUNDS Lost observational analysis (PMC6768815) which found +3.7 g/day fiber associated with 1.4 kg greater weight loss at 6 months.",
+        "confidence": "high"
+      },
+      {
+        "claim": "In a tightly controlled metabolic ward study, isocaloric dietary fat restriction produced significantly more body fat loss per day than isocaloric carbohydrate restriction (89 vs 53 g/day), despite identical total energy deficits. However, in a 2-year free-living RCT with n=811, all macronutrient compositions produced statistically equivalent long-term weight loss (~3.3 kg), suggesting the short-term fat-loss advantage of low-fat diets does not persist at scale under free-living conditions when protein is equated.",
+        "effect_size": "Hall 2015 (PMID 26278052): low-fat diet = 89 ± 6 g/day body fat lost vs low-carb = 53 ± 6 g/day (difference of 36 g/day, p = 0.002) over 6 days in n=19. Sacks 2009 (PMID 19246357): all diet groups lost 3.3 kg over 2 years with no statistically significant differences (p > 0.20) across carbohydrate levels (35% vs 65%) in n=811.",
+        "source_id": "PMID 26278052 (Cell Metabolism 2015); PMID 19246357 (NEJM 2009)",
+        "study_desc": "Hall et al. 2015 randomized crossover metabolic ward study (n=19 adults with obesity, 6-day diet phases, 30% energy deficit) and Sacks et al. 2009 NEJM 2-year multicenter RCT (n=811 overweight adults, four diet groups varying fat/protein/carbohydrate targets).",
+        "confidence": "high"
+      },
+      {
+        "claim": "EFSA's 2010 Scientific Opinion establishes 25 g/day as the Adequate Intake (AI) of dietary fiber for normal laxation in adults. Evidence from observational studies indicates that intakes above 25 g/day are further associated with reduced risk of coronary heart disease, reduced risk of type 2 diabetes, and improved weight maintenance, though the EFSA opinion does not specify a separate Dietary Reference Value for these disease-risk outcomes.",
+        "effect_size": "Adequate Intake = 25 g/day for normal bowel function; higher intakes linked to reduced CVD and T2D risk (no single quantified RR reported in the EFSA AI document; the recommendation is threshold-based, not dose-response modeled)",
+        "source_id": "EFSA Scientific Opinion DOI: 10.2903/j.efsa.2010.1462 (EFSA Journal 2010, No. 1462)",
+        "study_desc": "EFSA Panel on Dietetic Products, Nutrition, and Allergies (NDA) 2010 Scientific Opinion on Dietary Reference Values for carbohydrates and dietary fiber; the basis for the European Adequate Intake standard of 25 g/day dietary fiber for adults.",
+        "confidence": "consensus"
+      }
+    ]
+  },
+  {
+    "topicKey": "micronutrients",
+    "topicName": "Micronutrients for Athletes",
+    "claims": [
+      {
+        "claim": "Approximately 73% of adults in northern European countries at ~59°N latitude have serum 25(OH)D below 50 nmol/L (20 ng/mL) in winter; vitamin D supplementation (3,332 IU/day for 12 months) in deficient males increased total testosterone by approximately 2.7 nmol/L (~78 ng/dL), a 25% rise from baseline of 10.7 nmol/L to 13.4 nmol/L.",
+        "effect_size": "+2.7 nmol/L total testosterone (~78 ng/dL, +25%) in vitamin D-deficient men after 3,332 IU/day for 12 months (Pilz et al., 2011, PMID 21154195); 73% winter insufficiency prevalence at 59°N (Estonia, PMC2632995)",
+        "source_id": "PMID 21154195; PMC2632995",
+        "study_desc": "Pilz S et al. (2011) 'Effect of vitamin D supplementation on testosterone levels in men,' Horm Metab Res 43(3):223–225. RCT, 54 overweight men, 3,332 IU/day vitamin D3 vs placebo for 12 months. Estonia winter population study (Antson et al.) measuring seasonal 25(OH)D in general adults at 59°N, PMC2632995.",
+        "confidence": "high"
+      },
+      {
+        "claim": "Athletes lose approximately 0.5–1 mg of magnesium per liter of sweat; over 42% of young competitive athletes have been found below the magnesium RDA. Magnesium supplementation improves sleep quality: in a meta-analysis of RCTs, the Pittsburgh Sleep Quality Index (PSQI) improved by a mean of −2.8 points (28% improvement, p<0.001) and sleep onset latency decreased by 17.36 minutes versus placebo.",
+        "effect_size": "PSQI reduction of −2.8 points (28% improvement, p<0.001); sleep onset latency −17.36 min (95% CI −27.27 to −7.44); sweat Mg loss 0.5–1 mg/L",
+        "source_id": "PMID 33865376; PMID 17172008",
+        "study_desc": "Abbasi B et al. (2012) RCT of 500 mg/day magnesium in elderly insomnia patients (PMID 23853635). Meta-analysis: Mah J & Pitre T (2021) 'Oral magnesium supplementation for insomnia in older adults: a Systematic Review & Meta-Analysis,' BMC Complement Med Ther (PMID 33865376), 3 RCTs, 151 older adults. Sweat loss from: Golf SW et al. (1993) update on magnesium and exercise, Eur J Clin Nutr (PMID 17172008).",
+        "confidence": "medium"
+      },
+      {
+        "claim": "Elite male wrestlers supplemented with oral zinc sulfate (3 mg/kg/day) for 4 weeks showed significantly higher resting and post-exhaustion testosterone levels compared to pre-supplementation baseline; zinc supplementation prevented exercise-induced testosterone suppression. Zinc is lost in sweat at approximately 0.5–0.9 mg per liter, meaning athletes sweating 2+ liters per session can lose >1 mg zinc per workout.",
+        "effect_size": "Significant increase in resting and exhaustion free and total testosterone (p<0.05) in wrestlers after 4-week zinc supplementation at 3 mg/kg/day; sweat zinc loss ~0.5–0.9 mg/L (PMID 12500986)",
+        "source_id": "PMID 20087379; PMID 12500986",
+        "study_desc": "Kilic M (2010) 'Effect of fatiguing bicycle exercise on thyroid hormone and testosterone levels in sedentary males supplemented with oral zinc,' Neuro Endocrinol Lett 31(3):361–6 (PMID 20087379). 10 male elite wrestlers, 3 mg/kg/day zinc sulfate for 4 weeks. Sweat zinc from: DeRuisseau KC et al. (2002) 'Sweat iron and zinc losses during prolonged exercise,' Int J Sport Nutr Exerc Metab (PMID 12500986).",
+        "confidence": "medium"
+      },
+      {
+        "claim": "Iron deficiency without anemia (low serum ferritin, normal hemoglobin) significantly impairs aerobic capacity in endurance athletes. A systematic review and meta-analysis found iron supplementation in iron-deficient non-anaemic (IDNA) endurance athletes produced a moderate effect on VO2max improvement (Hedges' g = 0.61, 95% CI 0.40–0.82, p<0.001), equivalent to a clinically meaningful aerobic capacity gain of 2–20%. Male endurance athletes are at elevated risk via sweat loss, hepcidin-mediated absorption suppression, and foot-strike hemolysis.",
+        "effect_size": "Hedges' g = 0.61 (95% CI 0.40–0.82, p<0.001) for VO2max improvement with iron supplementation in IDNA athletes; endurance performance improvement range 2–20%",
+        "source_id": "PMID 25361786",
+        "study_desc": "Burden RJ, Morton K, Richards T, Whyte GP, Pedlar CR (2015) 'Is iron treatment beneficial in iron-deficient but non-anaemic (IDNA) endurance athletes? A systematic review and meta-analysis,' Br J Sports Med 49(21):1389–1397 (PMID 25361786). Systematic review and meta-analysis of RCTs examining iron supplementation vs control in IDNA endurance athletes defined by low ferritin and normal hemoglobin.",
+        "confidence": "high"
+      },
+      {
+        "claim": "Vitamin D supplementation improves lower-limb muscle strength in athletes with baseline 25(OH)D below 75 nmol/L. A 2019 meta-analysis of 8 RCTs (284 athletes) found a significant effect on lower-limb muscle strength (SMD 0.55, 95% CI 0.12–0.98) but no significant effect on upper-limb strength or explosive power. A 2023 meta-analysis of 11 RCTs in athletes with baseline 25(OH)D <75 nmol/L found SMD 0.25–0.26 for both upper and lower body strength, confirming a small but directionally consistent benefit in deficient individuals.",
+        "effect_size": "Lower-limb strength SMD = 0.55 (95% CI 0.12–0.98) per 2019 meta-analysis (PMID 31022289); SMD 0.25–0.26 for upper and lower body strength per 2023 meta-analysis (PMC10570740) in athletes with 25(OH)D <75 nmol/L",
+        "source_id": "PMID 31022289; PMC10570740",
+        "study_desc": "Han Q et al. (2019) 'Effect of vitamin D supplementation on upper and lower limb muscle strength and muscle power in athletes: A meta-analysis,' PLOS ONE (PMID 31022289), 8 RCTs, 284 athletes. Chiang CM et al. (2023) 'Effects of vitamin D supplementation on maximal strength and power in athletes: a systematic review and meta-analysis of randomized controlled trials,' Frontiers in Nutrition (PMC10570740), 11 RCTs, 436 athletes.",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "topicKey": "meal_patterns",
+    "topicName": "Meal Timing and Frequency",
+    "claims": [
+      {
+        "claim": "Meal frequency (5-6 vs 2-3 meals/day) has no meaningful effect on fat mass or lean mass when total calories and protein are equated; a positive signal appeared in the meta-analysis but was attributable to a single study in sensitivity analysis, effectively reducing the finding to noise.",
+        "effect_size": "SMD for fat mass and lean mass not distinguishable from zero after sensitivity analysis removing the single influential study; the pooled positive association was driven by one outlier study among 15 included RCTs",
+        "source_id": "PMID 26024494",
+        "study_desc": "Schoenfeld BJ, Aragon AA, Krieger JW. 'Effects of meal frequency on weight loss and body composition: a meta-analysis.' Nutrition Reviews, 73(2):69-82, 2015. Meta-analysis of 15 RCTs; sensitivity analysis showed the overall positive result was driven by a single study.",
+        "confidence": "consensus"
+      },
+      {
+        "claim": "20 g of whey protein per meal maximally stimulates myofibrillar muscle protein synthesis (MPS) in ~80-kg resistance-trained young men at rest and after exercise; doses above 20 g do not further increase MPS and instead result in excess amino acid oxidation and ureagenesis.",
+        "effect_size": "Plateau in MPS rate at 20 g whey; 40 g produced no additional MPS increase but significantly elevated amino acid oxidation, indicating a diminishing-returns threshold at ~0.25 g/kg body mass per meal for this population",
+        "source_id": "PMID 24257722",
+        "study_desc": "Witard OC et al. 'Myofibrillar muscle protein synthesis rates subsequent to a meal in response to increasing doses of whey protein at rest and after resistance exercise.' American Journal of Clinical Nutrition, January 2014. n=48; doses tested: 0, 10, 20, 40 g whey isolate post-exercise.",
+        "confidence": "high"
+      },
+      {
+        "claim": "Precise post-workout protein timing confers no additional hypertrophy benefit when total daily protein intake is equated; the anabolic window is at least 5-6 hours wide (bracketed by pre- and post-exercise meals), not the commonly claimed 30-60 minute window.",
+        "effect_size": "Small positive effect of protein timing on hypertrophy (ES ~0.24) in the companion 2013 meta-analysis was fully explained by higher total protein intake in timed groups, not timing per se; after controlling for total protein, timing effect was non-significant",
+        "source_id": "PMID 23360586",
+        "study_desc": "Aragon AA, Schoenfeld BJ. 'Nutrient timing revisited: is there a post-exercise anabolic window?' Journal of the International Society of Sports Nutrition, 10:5, 2013. Narrative review concluding the post-exercise anabolic window spans 3-6 hours depending on pre-workout meal timing. Companion meta-analysis: Schoenfeld et al. PMID 24299050.",
+        "confidence": "high"
+      },
+      {
+        "claim": "Time-restricted eating (16:8 protocol) produced no statistically significant reduction in fat mass compared to unrestricted eating over 12 weeks; unexpectedly, the TRE group lost significantly more lean mass, accounting for ~65% of total weight lost.",
+        "effect_size": "Fat mass: TRE -0.51 kg (p=0.13, NS) vs control -0.03 kg; lean mass: TRE -1.10 kg (p<0.001) vs control -0.35 kg; 65% of TRE weight loss was lean mass, not fat",
+        "source_id": "PMID 32986097",
+        "study_desc": "Lowe DA et al. 'Effects of Time-Restricted Eating on Weight Loss and Other Metabolic Parameters in Women and Men With Overweight and Obesity: The TREAT Randomized Clinical Trial.' JAMA Internal Medicine, 180(11):1491-1499, November 2020. 12-week RCT, n=116; 16:8 TRE (eating 12pm-8pm) vs three structured meals; body composition by DXA.",
+        "confidence": "high"
+      },
+      {
+        "claim": "Prescribing breakfast eating or skipping does not significantly affect 16-week weight loss in overweight and obese adults; the long-observed association between breakfast consumption and lower body weight in observational studies is a confound, not a causal relationship.",
+        "effect_size": "No significant difference in weight loss between breakfast and no-breakfast groups after 16 weeks of free-living intervention (treatment assignment p-value non-significant); no interaction between baseline breakfast habit and assigned treatment on weight outcome in n=283 completers",
+        "source_id": "PMID 24898233",
+        "study_desc": "Dhurandhar EJ et al. 'The effectiveness of breakfast recommendations on weight loss: a randomized controlled trial.' American Journal of Clinical Nutrition, 100(2):507-513, 2014. Multisite 16-week 3-arm RCT (eat breakfast / skip breakfast / control) in overweight/obese adults BMI 25-40, aged 20-65; n=309 randomized, 283 completed.",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "topicKey": "gut_health",
+    "topicName": "Gut Health",
+    "claims": [
+      {
+        "claim": "A 10-week high-fermented-food diet (yogurt, kefir, fermented vegetables; ~6 servings/day) significantly increased gut microbiome alpha diversity (Shannon index) in healthy adults, while a high-fiber diet (>45g/day) produced no significant alpha diversity change despite increasing microbial carbohydrate-active enzyme (CAZyme) capacity.",
+        "effect_size": "Fermented food group: statistically significant increase in Shannon diversity over 10 weeks (p<0.05, within-person trajectory); high-fiber group: no significant alpha diversity change. Fermented food group also showed decreased levels of 19 inflammatory proteins including IL-6 and IL-12b.",
+        "source_id": "PMID 34256014",
+        "study_desc": "Wastyk et al. 2021, Cell. RCT, n=36 (18 per arm), 17-week study (3-week baseline, 10-week dietary intervention, 4-week washout). Healthy adults randomized to high-fermented-food or high-fiber diet. Microbiome profiled by 16S rRNA sequencing (Shannon diversity). Stanford University.",
+        "confidence": "high"
+      },
+      {
+        "claim": "Increasing dietary fiber intake from approximately 15g/day (US average) to 40-50g/day over 2 weeks induces compositional shifts in gut microbiota, specifically increasing the abundance of MAC-degrading bacteria (Bifidobacterium and Lactobacillus species), but does not consistently increase alpha diversity. Bifidobacterium is the most consistently induced beneficial taxon across fiber intervention studies.",
+        "effect_size": "A 0.30% median increase in SCFA-producing bacteria per additional 10g of fiber per 72-hour period. In a 2-week high-fiber RCT (40-50g/day target), increases in Bifidobacterium and Lactobacillus were detected by 16S sequencing, but fecal SCFA concentrations did not significantly change despite microbiome compositional shifts.",
+        "source_id": "PMID 34676559",
+        "study_desc": "Dahl et al. 2021, mSystems (PMC8546969). High-fiber whole-food dietary intervention RCT, n=49 adults. Participants increased fiber from ~15g to 40-50g/day. 16S rRNA and shotgun metagenomic sequencing; fecal SCFA quantification by GC-MS. Also supported by PMC9107176 (Deehan et al. 2020 review) and PMC9787832 (Zhao et al. 2022).",
+        "confidence": "high"
+      },
+      {
+        "claim": "Greek yogurt starter bacteria (Lactobacillus delbrueckii subsp. bulgaricus and Streptococcus thermophilus) survive transit through the human gastrointestinal tract and are detectable in stool in the majority of yogurt consumers, but do not persistently colonize the gut; measurable shifts in overall microbiome composition (community-level changes in 16S profiles) occur within 42 days of high-dose yogurt consumption, though effect magnitude is modest and method-dependent.",
+        "effect_size": "L. bulgaricus detected in 73% of fecal samples from fermented milk consumers (Orrhage & Nord 2000, Br J Nutr). After 42 days of yogurt consumption, statistically detectable change in community composition by Illumina MiSeq 16S amplicon sequencing and T-RFLP fingerprinting in healthy adults; S. thermophilus recovered in only 1 of 10 volunteers at day 7, indicating poor survival vs. L. bulgaricus.",
+        "source_id": "PMID 28245085",
+        "study_desc": "Fernandez et al. 2017, Nutrients (PMC5374383). Observational study with daily yogurt consumption in healthy adults over 42 days. 16S rRNA amplicon sequencing (Illumina MiSeq), T-RFLP, Sanger analysis. Survival data supported by Mater et al. 2005 (AEM, PMID 16269718) and Orrhage & Nord 2000 (Br J Nutr PMID 17217568).",
+        "confidence": "medium"
+      },
+      {
+        "claim": "There is currently no causal evidence from RCTs that deliberately altering gut microbiome composition via fecal microbiota transplantation (FMT) produces meaningful reductions in fat mass in humans with obesity. The best-powered intervention to date (FMT-TRIM) found a null effect on fat mass.",
+        "effect_size": "FMT-TRIM trial (n=24, 12-week double-blind RCT, weekly FMT capsules vs. placebo): mean fat mass difference FMT vs. placebo = 1.2 kg (95% CI -0.6 to 3.0 kg, p=0.18). No significant difference in body weight, fat mass, lean mass, fasting lipids, or insulin resistance. Despite confirmed microbiome engraftment of donor taxa in all FMT recipients.",
+        "source_id": "PMID 32150549",
+        "study_desc": "Yu et al. 2020 (FMT-TRIM), PLOS Medicine (PMC7062239). Double-blind RCT, n=24 adults with obesity and mild-to-moderate insulin resistance. Weekly FMT vs. placebo capsules for 6 weeks; 12-week follow-up. Fat mass by DXA. Massachusetts General Hospital / Harvard Medical School. Finding is consistent with a 2019 systematic review (PMC6835402) finding no significant weight change across FMT obesity RCTs.",
+        "confidence": "high"
+      },
+      {
+        "claim": "Among US adults with metabolic syndrome, those in the highest tertile of dietary fiber intake have significantly lower all-cause and cardiovascular mortality than those in the lowest tertile. Below a threshold of approximately 21.7 g/day, each additional 5g of dietary fiber per day is associated with a 7% reduction in all-cause mortality risk. Among heart failure survivors, the lowest fiber quartile (<8.8g/day) is associated with 32% higher all-cause mortality and 40% higher CVD mortality compared to the highest quartile (>=19.1g/day).",
+        "effect_size": "Metabolic syndrome adults (NHANES 1999-2018): HR for all-cause mortality, highest vs. lowest tertile = 0.80 (95% CI 0.72-0.89); HR for CVD mortality = 0.61 (95% CI 0.51-0.73). Dose-response: HR 0.93 per 5g/day increase below 21.7g/day threshold. Heart failure survivors: lowest quartile <8.8g vs. highest >=19.1g: all-cause mortality HR 0.68 (95% CI 0.51-0.90), CVD mortality HR 0.60 (95% CI 0.40-0.88).",
+        "source_id": "PMID 40351183",
+        "study_desc": "Liang et al. 2025, Frontiers in Nutrition (PMC12460082). NHANES 1999-2018 prospective cohort, n=6,809 US adults with metabolic syndrome. Dietary fiber from 24-hour recall. Mortality from NDI linkage. Cox proportional hazards models. Also supported by heart failure cohort: PMC12018438 (NHANES, n=1,288 heart failure survivors).",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "topicKey": "contradictions",
+    "topicName": "Major Reversals and Bias",
+    "claims": [
+      {
+        "claim": "The US 300 mg/day dietary cholesterol limit, in place since 1977, was removed in the 2015-2020 Dietary Guidelines for Americans. The 2015 DGAC concluded 'cholesterol is not considered a nutrient of concern for overconsumption.' However, the effect on LDL is not zero: a 2019 meta-regression of 55 RCTs (n=2,652) found dietary cholesterol raises LDL by approximately 1.9 mg/dL per 100 mg/day increase (linear model), with nonlinear models estimating 4.5 mg/dL per 100 mg/day at lower baseline intakes. The AHA (2019 Science Advisory) maintains a cautious stance, noting that dietary cholesterol still raises LDL in a dose-dependent manner, particularly in hyper-responders. The policy reversal was justified by average US intake already being below 300 mg/day, not by evidence that dietary cholesterol is inert.",
+        "effect_size": "~1.9 mg/dL LDL increase per 100 mg/day dietary cholesterol (linear model); ~4.5 mg/dL per 100 mg/day at lower baseline intakes (nonlinear Michaelis-Menten model). Source: PMID 30596814 meta-regression, 55 RCTs, n=2,652.",
+        "source_id": "PMID 26341187 (DGAC editorial, 2015); PMID 30596814 (meta-regression, Am J Clin Nutr, 2019); AHA Science Advisory DOI 10.1161/CIR.0000000000000743",
+        "study_desc": "2015 DGAC Scientific Report removed dietary cholesterol as a 'nutrient of concern.' Mozzafarian et al. 2015 PMID 26341187 editorial critique. Soliman 2018 meta-regression PMID 30596814: 55 cholesterol-feeding RCTs. AHA 2019 Science Advisory on dietary cholesterol and cardiovascular risk.",
+        "confidence": "consensus"
+      },
+      {
+        "claim": "The 2022 USPSTF systematic review (PMID 35727271) found that multivitamin supplementation has little to no benefit for preventing cardiovascular disease or cancer mortality. For cancer incidence, a pooled analysis of 4 RCTs (n=48,859) found OR=0.93 (95% CI 0.87-0.99) — a 7% relative reduction, but driven primarily by the Physicians' Health Study II (HR=0.92, 95% CI 0.86-1.00, barely significant at 11.2 years). No significant reduction in CVD mortality was found. The USPSTF issued an 'I' grade (insufficient evidence) for multivitamins, meaning they cannot recommend for or against them for general primary prevention. The finding explicitly contradicts the widespread consumer belief that multivitamins meaningfully reduce cancer or heart disease risk.",
+        "effect_size": "Cancer incidence OR=0.93 (95% CI 0.87-0.99) across 4 RCTs (n=48,859); Physicians' Health Study II HR=0.92 (95% CI 0.86-1.00); no significant CVD mortality benefit. Absolute risk reduction is negligible.",
+        "source_id": "PMID 35727271 (USPSTF Recommendation Statement, JAMA 2022); USPSTF Final Evidence Summary at uspreventiveservicestaskforce.org",
+        "study_desc": "USPSTF 2022 systematic review and recommendation statement on vitamin, mineral, and multivitamin supplementation for primary prevention of CVD and cancer. Pooled analysis of 4 RCTs including Physicians' Health Study II (11.2 years follow-up, n=14,641 male physicians).",
+        "confidence": "consensus"
+      },
+      {
+        "claim": "Kearns et al. 2016 (PMID 27564919, JAMA Internal Medicine) documented that the Sugar Research Foundation (SRF) secretly paid Harvard researchers $6,500 (~$49,000 in 2016 dollars) in 1965-1967 to conduct a literature review, Project 226, published in the New England Journal of Medicine in 1967. The SRF set the review's objectives, selected articles for inclusion, reviewed drafts before publication, and funded the work — none of which was disclosed. The funded review, authored by D. Mark Hegsted, Robert McGandy, and Fredrick Stare, concluded there was 'no doubt' that reducing dietary fat and cholesterol — not sugar — was the only necessary intervention against coronary heart disease. Evidence linking sucrose to elevated serum triglycerides and cholesterol was systematically dismissed. This bias shaped US dietary guidelines for decades by directing blame toward fat and away from sugar.",
+        "effect_size": "Not a traditional effect size. Documented industry bias: SRF paid $6,500 (~$49,000 in 2016 USD) for a literature review that exonerated sugar and blamed saturated fat. The 1967 NEJM review suppressed evidence that sucrose raised serum cholesterol and triglycerides.",
+        "source_id": "PMID 27564919 (Kearns et al., JAMA Intern Med, 2016); PMC5099084",
+        "study_desc": "Historical analysis of internal Sugar Research Foundation documents by Kearns, Schmidt, and Glantz at UCSF. Published JAMA Internal Medicine September 2016. Analyzed SRF correspondence and payment records from 1959-1971.",
+        "confidence": "high"
+      },
+      {
+        "claim": "RCTs show that replacing caloric sugars with non-nutritive artificial sweeteners (NAS) produces modest or null weight loss. A 2023 umbrella meta-analysis found a non-significant weighted mean difference of -0.45 kg (95% CI -1.15 to 0.24, p=0.20) in RCTs, though a standardized mean difference approach showed a significant but small benefit (SMD=-0.38, 95% CI -0.56 to -0.20). In stark contrast, observational prospective cohort studies associate NAS consumption with a 61% increased risk of obesity/overweight (ES=1.61, 95% CI 1.36-1.87). The WHO issued a conditional recommendation in May 2023 against using NAS for weight control, citing the overall absence of long-term benefit in reducing body fat and potential increased risk of type 2 diabetes and CVD with long-term use. The RCT vs. observational discrepancy is likely explained by reverse causation in observational studies (people switch to diet drinks after gaining weight).",
+        "effect_size": "RCTs: WMD -0.45 kg (95% CI -1.15 to 0.24, p=0.20, non-significant); observational studies: 61% increased obesity risk (ES=1.61). WHO 2023 conditional recommendation against NAS for weight control.",
+        "source_id": "Biosocial Health Journal umbrella meta-analysis (2023, biosocialhealthjournal.com/FullHtml/bshj-22); WHO 2023 guideline (who.int/publications/i/item/9789240073616)",
+        "study_desc": "Umbrella meta-analysis of meta-analyses on artificial sweetener effects on body weight, BMI, and body fat; searched through March 2023. WHO 2023 guideline on non-sugar sweeteners based on systematic review of RCTs and prospective cohort studies.",
+        "confidence": "contested"
+      },
+      {
+        "claim": "Hall et al. 2019 (PMID 31105044, Cell Metabolism) conducted a randomized crossover inpatient trial (n=20) in which participants consumed either an ultra-processed (UPF) or unprocessed diet ad libitum for 2 weeks each. Both diets were matched for presented calories, energy density, macronutrients, fiber, sugar, and sodium. Participants ate 508 ± 106 kcal/day more on the UPF diet (p=0.0001), gained 0.9 kg on the UPF diet, and lost 0.9 kg on the unprocessed diet. Because nutritional composition was held constant, the excess calorie intake is attributable to food processing per se — not to differences in sugar, sodium, fiber, or macronutrients. This is the first randomized controlled evidence that ultra-processed foods drive excess caloric intake independently of nutritional content, supporting a causal role for food processing in obesity.",
+        "effect_size": "+508 kcal/day excess intake on UPF vs unprocessed diet (p=0.0001); +0.9 kg weight gained on UPF vs -0.9 kg lost on unprocessed over 2 weeks. Diets were matched for macronutrients, fiber, sugar, sodium.",
+        "source_id": "PMID 31105044 (Hall et al., Cell Metabolism, 2019; Vol. 30, pp. 67-77.e3)",
+        "study_desc": "Inpatient randomized controlled crossover trial. NIH Clinical Center. n=20 weight-stable adults (mean age 31.2 years, mean BMI 27). 2 weeks UPF diet then 2 weeks unprocessed diet (or vice versa), both ad libitum. Published May 16, 2019.",
+        "confidence": "high"
+      }
+    ]
+  }
+]

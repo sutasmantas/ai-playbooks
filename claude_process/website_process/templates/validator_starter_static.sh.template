@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+# TEMPLATE METADATA — REMOVE THIS BLOCK WHEN GENERATING
+# Target: <new-project-root>/scripts/validate_state.sh
+# Generated when the project is a static site with no Node toolchain (Hugo, Eleventy without npm, raw HTML, etc.).
+# Placeholders the agent fills in from interview answers:
+#   {{TRUTH_SURFACE_URL}}  — e.g., "http://localhost:8080/" or "https://staging.example.com/"
+#   {{EXAMPLE_BEHAVIOR_1}} — concrete user-facing fact from interview 02.3
+#   {{ASSERT_GREP}}        — literal string derived from EXAMPLE_BEHAVIOR_1 (e.g., "Spring sale")
+#
+# ESCAPING (important): the template uses single-quoted bash strings, so single
+# quotes inside {{ASSERT_GREP}} must be encoded as `'\''` (standard bash trick).
+# Example: user fact "Don't miss it" → fill as `Don'\''t miss it`.
+#
+# Dependencies: curl, grep, sed. Optional: chromium (or google-chrome) for screenshots.
+# Run with: bash scripts/validate_state.sh
+
+set -euo pipefail
+
+URL="${VALIDATE_URL:-{{TRUTH_SURFACE_URL}}}"
+ARTIFACT_DIR="diagnostics"
+mkdir -p "$ARTIFACT_DIR"
+
+failed=0
+
+# 1. Open truth surface — fetch rendered HTML
+echo "[truth-surface] fetching $URL"
+if ! curl -sSL --max-time 10 "$URL" -o "$ARTIFACT_DIR/last.html"; then
+  echo "[truth-surface] FAIL: could not fetch $URL"
+  exit 1
+fi
+echo "[truth-surface] saved $ARTIFACT_DIR/last.html"
+
+# 2. Assert behavior — derived from interview 02.3: {{EXAMPLE_BEHAVIOR_1}}
+if grep -qF '{{ASSERT_GREP}}' "$ARTIFACT_DIR/last.html"; then
+  echo "[behavior] OK: '{{ASSERT_GREP}}' present in rendered HTML"
+else
+  echo "[behavior] FAIL: '{{ASSERT_GREP}}' not found in rendered HTML"
+  failed=1
+fi
+
+# 3. Visual truth surface — screenshot via headless chromium if available
+CHROME=""
+if command -v chromium >/dev/null 2>&1; then CHROME=$(command -v chromium); fi
+if [ -z "$CHROME" ] && command -v google-chrome >/dev/null 2>&1; then CHROME=$(command -v google-chrome); fi
+if [ -z "$CHROME" ] && command -v chrome >/dev/null 2>&1; then CHROME=$(command -v chrome); fi
+
+if [ -n "$CHROME" ]; then
+  "$CHROME" --headless --disable-gpu --no-sandbox --hide-scrollbars \
+    --screenshot="$ARTIFACT_DIR/desktop.png" --window-size=1280,800 "$URL" >/dev/null 2>&1
+  echo "[truth-surface] saved $ARTIFACT_DIR/desktop.png"
+  "$CHROME" --headless --disable-gpu --no-sandbox --hide-scrollbars \
+    --screenshot="$ARTIFACT_DIR/mobile.png" --window-size=375,812 "$URL" >/dev/null 2>&1
+  echo "[responsive] saved $ARTIFACT_DIR/mobile.png"
+else
+  echo "[truth-surface] WARN: no headless chromium found; skipping screenshot"
+fi
+
+# 4. Diagnostics — title + meta description. NEVER pass/fail.
+title=$(sed -n 's/.*<title[^>]*>\(.*\)<\/title>.*/\1/p' "$ARTIFACT_DIR/last.html" | head -1)
+desc=$(grep -i 'name="description"' "$ARTIFACT_DIR/last.html" | sed 's/.*content="\([^"]*\)".*/\1/' | head -1)
+echo "[diag] title=\"${title:-(none)}\""
+echo "[diag] description=\"${desc:-(none)}\""
+
+# 5. Tier-1-does-the-work: capture git diff summary so the tier-2 auditor
+#    (Read/Grep/Glob only) can read it instead of running git itself.
+if git rev-parse --git-dir >/dev/null 2>&1; then
+  # `grep -c` and `grep -v` exit non-zero on no match — `|| true` keeps `set -e -o pipefail` happy.
+  files=$(git diff --name-only HEAD)
+  file_count=$(printf '%s\n' "$files" | grep -c . || true)
+  : "${file_count:=0}"
+  total_loc=$(git diff --numstat HEAD | awk '{sum += $1 + $2} END {print sum+0}')
+  non_md_count=$(printf '%s\n' "$files" | grep -cv '\.md$' || true)
+  : "${non_md_count:=0}"
+  only_md="false"
+  if [ "$file_count" -gt 0 ] && [ "$non_md_count" -eq 0 ]; then only_md="true"; fi
+  cat > "$ARTIFACT_DIR/diff_summary.json" <<EOF
+{
+  "available": true,
+  "total_loc": $total_loc,
+  "file_count": $file_count,
+  "files": [$(echo "$files" | sed 's/.*/"&"/' | paste -sd,)],
+  "only_markdown": $only_md
+}
+EOF
+  echo "[diff] saved $ARTIFACT_DIR/diff_summary.json ($total_loc LoC across $file_count files)"
+else
+  echo '{"available": false, "reason": "not a git repo"}' > "$ARTIFACT_DIR/diff_summary.json"
+fi
+
+exit $failed

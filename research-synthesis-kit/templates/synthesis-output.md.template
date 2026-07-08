@@ -1,0 +1,250 @@
+# Synthesis: [Cluster Name]
+
+**Date:** [YYYY-MM-DD]
+**Cluster files:** [list all angle files in scope, one per line]
+**Total claims:** [N]
+**Synthesizer:** [model/agent identifier]
+
+---
+
+## Scope record
+
+<!-- FILL IN: Copy directly from Preamble record in procedures/synthesis.md -->
+<!-- Required fields: -->
+<!-- - Priority design decisions this synthesis must drive -->
+<!-- - Success criteria from session brief or plan.md -->
+<!-- - Scale gate status: "Not fired (N files, M claims)" OR "Fired: top 5 groups at depth, N remaining at summary" -->
+
+**Priority decisions to drive:**
+- [decision 1]
+- [decision 2]
+
+**Success criteria:**
+- [criterion]
+
+**Scale gate status:** Not fired ([N] files, [M] claims) / Fired: [describe scope decision]
+
+**Skeleton (tier predictions before evidence examination):**
+
+<!-- Fill 'Expected tier' at session start BEFORE reading any archive file. Fill 'Actual tier' LAST — after the confidence map (Step 3) is complete. Leave 'Actual tier' blank during synthesis. -->
+
+| Group | Expected tier | Actual tier | Deviation noted |
+|-------|--------------|-------------|-----------------|
+| [group] | [expected] | [fill after Step 3] | [none / reason for deviation] |
+
+---
+
+## Step 1 — Grouped claims table
+
+<!-- FILL IN: One row per group, sorted by claim count highest first -->
+<!-- Evidence breakdown: how many empirical / consensus / anecdote -->
+<!-- Groups with <4 claims merged to misc unless judgment exception documented below -->
+
+| Group | Claim count | Empirical | Consensus | Anecdote | Verify coverage |
+|-------|-------------|-----------|-----------|----------|-----------------|
+| [group name] | [N] | [N] | [N] | [N] | [N/N verified] |
+| misc | [N] | [N] | [N] | [N] | — |
+
+**Merge decisions (document any judgment exceptions to the 4-claim minimum):**
+- [group]: standalone at [N] claims because [reason]
+
+---
+
+## Step 2 — Contradiction log
+
+<!-- FILL IN: Every contradicting pair found during scan -->
+<!-- If no contradictions found: state "No contradictions found in [group list]" — do not leave blank -->
+<!-- Use the repeated-pattern format when same conflict appears across multiple groups -->
+
+### Contradiction [1]: [group name or "cross-group: group A / group B"]
+
+- **Type:** Direct factual conflict / Implication-level conflict
+- **Claim A:** [key] — [confidence level] — "[one-sentence statement]"
+- **Claim B:** [key] — [confidence level] — "[one-sentence statement]"
+- **Scope explanation attempt:** "[If these don't actually contradict, one sentence why]" / [No scope explanation passes]
+- **Resolution:** CONTESTED / Resolved — scope condition [stated]
+
+### Contradiction [2]: ...
+
+**Repeated-pattern format (use when same conflict appears across multiple groups):**
+
+> **Pattern:** [conflict type description — e.g., "assertive-correction claims consistently conflict with approval-optimization claims across N groups"]
+> **Groups affected:** [list]
+> **Instance count:** [N contradicting pairs with this pattern]
+> **Resolution:** CONTESTED across all instances — see each group's confidence map entry
+
+**If no contradictions found:**
+> No direct factual or implication-level contradictions found across [N groups] including cross-group scan. Scan ran per Step 2 methodology; each group examined for both conflict types.
+
+---
+
+## Step 2.5 — Evidence tier adjustments
+
+<!-- FILL IN: List every low-verify empirical claim and its downgraded tier -->
+<!-- If none: state "No low-verify empirical claims found — no adjustments" -->
+
+| Claim key | Original classification | Adjusted to | Reason |
+|-----------|------------------------|-------------|--------|
+| [key] | empirical, low | consensus tier | verify confidence: low (source unverifiable / methodology unclear) |
+
+---
+
+## Step 2.6 — Evidence-type scope note
+
+<!-- FILL IN: One sentence on the fraction of controlled experiment vs. observational/benchmark evidence -->
+<!-- Required only when >60% observational — but always state the fraction -->
+
+Evidence type distribution: [N]% controlled experiment, [N]% observational/benchmark.
+[If >60% observational: "HIGH tier groups include observational-majority caveat — see individual entries."]
+
+---
+
+## Step 3 — Confidence map
+
+<!-- FILL IN: One row per group, with evidence basis and conflicts columns populated -->
+<!-- Evidence basis column is REQUIRED for HIGH and CONTESTED groups -->
+<!-- Pre-specified threshold: was stated in Preamble before examining any file -->
+<!-- Action column: write the NEXT REQUIRED ACTION for this group — this IS the output text, not a meta-note. -->
+<!--   HIGH: "derive from (Step 3.7)" — means proceed to principles extraction -->
+<!--   CONTESTED: "surface to user; derive from both sides (Step 3.7 CONTESTED variant)" — means the user question AND the two-sided principles extraction both required -->
+<!--   CONSENSUS: "derive from (Step 3.7)" — principles extraction required even for consensus groups -->
+<!--   GAP: "derive from adjacent principles (Step 3.7 GAP variant)" — means GAP-variant principles extraction -->
+
+**Pre-specified threshold (stated in Preamble):**
+> "I will assign HIGH if ≥2 claims are independently empirical at medium+ verify confidence (after Step 2.5 adjustments)."
+
+| Group | Tier | Medium+verify claims | Evidence basis + scope | Conflicts | Action |
+|-------|------|---------------------|----------------------|-----------|--------|
+| [group] | HIGH | [N]: [key1], [key2] | [evidence type, what it applies to]. NOT directly applicable to: [out-of-scope] | none | derive from (Step 3.7) |
+| [group] | CONTESTED | [key A vs key B] | [evidence for each side] | [nature: factual / implication-level] | surface to user; derive from both sides (Step 3.7 CONTESTED variant) |
+| [group] | CONSENSUS | [N]: [key1], [key2] | — | none | derive from (Step 3.7) |
+| [group] | GAP | — | — | — | derive from adjacent principles (Step 3.7 GAP variant) |
+
+---
+
+## Step 3.6 — Counter-prior entries
+
+<!-- FILL IN: One entry per HIGH group — MANDATORY -->
+<!-- Observable violation: the number of counter-prior entries must equal the number of HIGH groups in the confidence map — partial coverage (some HIGH groups missing entries) is the same failure mode as no coverage -->
+<!-- If there are zero HIGH groups: state "No HIGH groups — counter-prior pass not required. Strongest group: [name] at [tier]." -->
+
+### Counter-prior — [group name]
+
+**Main conclusion:** [one sentence: what this HIGH group finds]
+
+**Counter-hypothesis:** [what would have to be true for this conclusion to be wrong — specific and falsifiable]
+
+**Archive evidence supporting counter:** [claim key(s) found, with brief explanation] / [None found — conclusion survives adversarial check]
+
+**Verdict:** Conclusion survives / Reconsidered → CONTESTED (see contradiction log update)
+
+### Counter-prior — [next HIGH group] ...
+
+---
+
+## Step 3.7 — Principles and extensions
+
+<!-- FILL IN: One sub-step-A/B/C paragraph block per group, every tier (EXCEPT summary-level groups in scale-gated syntheses) -->
+<!-- CONTESTED groups get TWO blocks (one per side of contradiction) — see CONTESTED variant example below -->
+<!-- GAP groups use the GAP variant — see GAP variant example below -->
+<!-- Failure mode: if Sub-step A restates the finding rather than extracting a principle — retry -->
+
+### [Group name] — [Tier: HIGH or CONSENSUS] (standard variant)
+
+**A — Principle extracted:**
+[The underlying principle, more general and abstract than the finding itself. Must apply to contexts the finding didn't test.]
+
+**B — Fit to our setup:**
+Tested in: [setup]. Our setup differs in: [specific differences]. Principle still applies because: [mechanism]. Principle may not apply if: [specific condition].
+
+**C — Derivation beyond the finding:**
+The principle implies that [X] would also [work / fail], even though the research didn't test it, because [mechanism]. Confidence in this derivation: [low/medium/high — reason].
+
+### [Group name] — CONTESTED (CONTESTED variant — use this when Tier = CONTESTED)
+
+**Side A — [label the side, e.g., "assertive-correction side"]**
+
+**A — Principle extracted (Side A):**
+[What principle holds true if Side A is correct? More general than the finding.]
+
+**B — Fit to our setup (Side A):**
+Side A would dominate our context if: [specific condition that would make Side A the right model]. Tested in: [Side A's research setup].
+
+**C — Derivation (Side A):**
+If Side A holds, then [X] would also follow, because [mechanism]. Confidence: [low/medium/high].
+
+**Side B — [label the side, e.g., "approval-paradox side"]**
+
+**A — Principle extracted (Side B):**
+[What principle holds true if Side B is correct?]
+
+**B — Fit to our setup (Side B):**
+Side B would dominate our context if: [specific condition]. Tested in: [Side B's research setup].
+
+**C — Derivation (Side B):**
+If Side B holds, then [Y] would also follow. Confidence: [low/medium/high].
+
+**Design signal:** The CONTESTED pair names a real tension to navigate: [what decision the user must make to resolve which side applies].
+
+### [Group name] — GAP (GAP variant — use this when Tier = GAP)
+
+**A — Principle from adjacent evidence:**
+If evidence on [gap topic] existed, the principle WOULD likely be: [derived from adjacent findings or first principles]. Basis: [adjacent claims or first-principles reasoning].
+
+**B — What the absence tells us:**
+The gap is [expected / surprising given adjacent evidence]. This tells us: [what the field has or hasn't studied].
+
+**C — Is the gap researchable?**
+Yes — the angle would be: [specific research question]. OR: No — because [reason the gap may not be empirically accessible].
+
+### [Next group] ...
+
+---
+
+## Step 4 — User assumptions check
+
+<!-- FILL IN: One entry per user assumption from session brief -->
+<!-- If session brief states no explicit assumptions: add a row for each IMPLICIT assumption derived from the cluster topic -->
+<!--   Use this row format for derived implicit assumptions: -->
+<!--   | "Implicit: [assumption]" | [claim key(s)] | Supported / Contradicted / GAP | ... | -->
+
+| Assumption | Research bearing on it | Finding | Action |
+|-----------|----------------------|---------|--------|
+| "[assumption from brief]" | [claim key(s)] | Supported / Contradicted / GAP | [surface if contradicted / note if GAP] |
+| "Implicit: [derived assumption not stated in brief]" | [claim key(s)] | Supported / Contradicted / GAP | [surface if contradicted / note if GAP] |
+
+---
+
+## Step 5 — User questions
+
+<!-- FILL IN: One question per CONTESTED or GAP group — required for every CONTESTED and GAP group, no exceptions -->
+<!-- HIGH and unambiguous CONSENSUS groups: do not ask -->
+<!-- If no CONTESTED or GAP groups exist: state "No contested or gap groups — user questions not required." Do not leave blank. -->
+<!-- Format: "Research on [topic] is [contested / absent]. My default would be [X]. Override or proceed?" -->
+
+1. **[Topic — CONTESTED]:** Research on [topic] is contested — [Claim A in one phrase] vs. [Claim B in one phrase], [confidence levels]. My default would be [stated default]. Do you want to override, or proceed with that?
+
+2. **[Topic — GAP]:** No research found on [topic]. My default would be [stated default based on adjacent principles]. Do you want to provide guidance, or proceed?
+
+<!-- If no CONTESTED or GAP groups: -->
+<!-- No contested or gap groups — user questions not required. -->
+
+---
+
+## New angles surfaced
+
+<!-- FILL IN: Any gap or contradiction that suggests a missing research angle -->
+<!-- If none: state "No new angles surfaced" — do not leave blank -->
+
+- [angle description] — triggered by: [contradiction pair or gap found during synthesis]
+
+---
+
+**Synthesis completed:** [date/time]
+**Groups synthesized at depth:** [list]
+**Groups at summary level:** [list] / None — scale gate not fired
+**Open items for user decision:** [list question numbers from Step 5]
+
+---
+
+**Trace:** Template structure derived from procedures/synthesis.md Steps 1-6 output requirements. Section ordering follows procedure step order to allow partial-completion checkpointing (grouped table and contradiction log written before confidence map, per Step 2 checkpoint rule). Counter-prior section (Step 3.6) positioned before principles section (Step 3.7) to force counter-hypothesis generation before conclusions are locked in. Each section has instructional comments explaining what to fill in and what constitutes an incomplete entry (e.g., blank contradiction section with no "no contradictions found" statement). Observable-violation conditions from CLAUDE.md domain failure modes are embedded as comments in the relevant sections. Round 1 correctness audit fixes (2026-07-04): changed counter-prior observable violation from ≥2 to ≥1; removed Step 5 "that requires a design decision" qualifier; added Action column clarifying comment distinguishing status-tracking text from result text. Round 1 completeness audit fixes: added CONTESTED and GAP variant blocks to Step 3.7 section; added Step 5 empty-state instruction; added repeated-pattern format example; added skeleton timing instruction (Expected tier first, Actual tier last); fixed footer to handle both scale-gate states; added Step 4 implicit assumption row format. All Round 2 audits GREEN (2026-07-04). Phase 7 cross-file audit fixes (2026-07-04): added "empirical" to pre-specified threshold statement (previously omitted — inconsistent with synthesis.md Step 3 formal definition and CLAUDE.md); strengthened counter-prior observable violation from "empty section" to "count of entries fewer than count of HIGH groups" to catch partial-coverage failures.

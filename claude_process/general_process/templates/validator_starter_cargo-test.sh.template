@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+# TEMPLATE METADATA — REMOVE THIS BLOCK WHEN GENERATING
+# Target: <new-project-root>/scripts/validate_state.sh
+# Generated when the project has a Rust toolchain (Cargo.toml present).
+# Placeholders the agent fills in from interview answers:
+#   {{BEHAVIOR_INVOCATION}}  — concrete command that exercises the truth surface, e.g.,
+#                              `./target/release/mybin --list`  OR  `cargo run --release -- --list`
+#   {{BEHAVIOR_ASSERTION}}    — what the output must contain (used by grep -F below)
+#
+# ESCAPING: single quotes inside placeholders must be encoded as `'\''`.
+# Run with: bash scripts/validate_state.sh
+
+set -uo pipefail
+
+ARTIFACT_DIR="diagnostics"
+mkdir -p "$ARTIFACT_DIR"
+
+failed=0
+
+# 1. Behavior assertion — derived from interview 02.4.
+behavior_out=$({{BEHAVIOR_INVOCATION}} 2>&1)
+behavior_exit=$?
+if [ "$behavior_exit" -ne 0 ]; then
+  echo "[behavior] FAIL: invocation exited $behavior_exit"
+  failed=1
+elif echo "$behavior_out" | grep -qF '{{BEHAVIOR_ASSERTION}}'; then
+  echo "[behavior] OK"
+else
+  echo "[behavior] FAIL: expected substring '{{BEHAVIOR_ASSERTION}}' not in output"
+  failed=1
+fi
+echo "$behavior_out" > "$ARTIFACT_DIR/behavior.log"
+
+# 2. Run the test suite.
+# Note: cargo test has no stable JSON reporter as of 2026, so this starter produces tests.log only
+# (no tests.json). The tier-2 auditor's input list marks tests.json as "if your framework produced
+# one" — its absence is expected for Cargo projects and not a finding.
+if [ -f Cargo.toml ]; then
+  if cargo test --quiet > "$ARTIFACT_DIR/tests.log" 2>&1; then
+    echo "[tests] OK"
+  else
+    echo "[tests] FAIL: see $ARTIFACT_DIR/tests.log"
+    failed=1
+  fi
+else
+  echo "[tests] skipped: no Cargo.toml"
+  echo "(skipped: no Cargo.toml)" > "$ARTIFACT_DIR/tests.log"
+fi
+
+# 3. Typecheck — `cargo check` catches missing/wrong imports (check #13). Faster than full build.
+if [ -f Cargo.toml ]; then
+  if cargo check --all-targets > "$ARTIFACT_DIR/typecheck.log" 2>&1; then
+    echo "[typecheck] OK"
+  else
+    echo "[typecheck] FAIL: see $ARTIFACT_DIR/typecheck.log"
+    failed=1
+  fi
+else
+  echo "(skipped: no Cargo.toml)" > "$ARTIFACT_DIR/typecheck.log"
+fi
+
+# 4. Git diff summary.
+if git rev-parse --git-dir >/dev/null 2>&1; then
+  files=$(git diff --name-only HEAD)
+  file_count=$(printf '%s\n' "$files" | grep -c . || true)
+  : "${file_count:=0}"
+  total_loc=$(git diff --numstat HEAD | awk '{sum += $1 + $2} END {print sum+0}')
+  non_md_count=$(printf '%s\n' "$files" | grep -cv '\.md$' || true)
+  : "${non_md_count:=0}"
+  only_md="false"
+  if [ "$file_count" -gt 0 ] && [ "$non_md_count" -eq 0 ]; then only_md="true"; fi
+  cat > "$ARTIFACT_DIR/diff_summary.json" <<EOF
+{
+  "available": true,
+  "total_loc": $total_loc,
+  "file_count": $file_count,
+  "files": [$(echo "$files" | sed 's/.*/"&"/' | paste -sd,)],
+  "only_markdown": $only_md
+}
+EOF
+  echo "[diff] saved $ARTIFACT_DIR/diff_summary.json ($total_loc LoC across $file_count files)"
+else
+  echo '{"available": false, "reason": "not a git repo"}' > "$ARTIFACT_DIR/diff_summary.json"
+fi
+
+# 5. Dep check — Cargo.lock presence + `cargo verify-project` for manifest validity.
+if [ -f Cargo.toml ]; then
+  if [ ! -f Cargo.lock ]; then
+    echo '{"available": true, "lockfile_present": false}' > "$ARTIFACT_DIR/dep_check.json"
+    echo "[deps] FAIL: Cargo.lock missing"
+    failed=1
+  elif cargo verify-project > "$ARTIFACT_DIR/dep_check.log" 2>&1; then
+    echo '{"available": true, "lockfile_present": true, "manifest_valid": true}' > "$ARTIFACT_DIR/dep_check.json"
+    echo "[deps] OK: Cargo.lock present, manifest valid"
+  else
+    echo '{"available": true, "lockfile_present": true, "manifest_valid": false}' > "$ARTIFACT_DIR/dep_check.json"
+    echo "[deps] FAIL: cargo verify-project failed; see $ARTIFACT_DIR/dep_check.log"
+    failed=1
+  fi
+else
+  echo '{"available": false, "reason": "no Cargo.toml"}' > "$ARTIFACT_DIR/dep_check.json"
+fi
+
+# 6. Secret-pattern scan over source files. Output: diagnostics/secrets.json (JSON array of strings).
+PATTERNS=(
+  'AKIA[0-9A-Z]{16}'
+  'sk_live_[0-9a-zA-Z]{24,}'
+  'sk-(proj-)?[A-Za-z0-9_-]{40,}'
+  'gh[pousr]_[A-Za-z0-9]{36,}'
+  'xox[abprs]-[A-Za-z0-9-]{10,}'
+  '-----BEGIN (RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----'
+  'AIza[0-9A-Za-z_-]{35}'
+)
+mapfile -t scan_files < <(find . -type f \
+  \( -name '*.rs' -o -name '*.toml' -o -name '*.lock' -o -name '*.yml' -o -name '*.yaml' -o -name '*.json' -o -name '*.md' -o -name '*.env' -o -name '*.txt' \) \
+  ! -path './.git/*' ! -path './target/*' ! -path "./$ARTIFACT_DIR/*")
+# Build a JSON array of findings. File paths in well-behaved repos don't contain quotes/backslashes;
+# this is a calibration tool, not user-data ingest — escape if your repo has unusual paths.
+secrets_json="["
+first=1
+SECRET_FOUND=0
+for f in "${scan_files[@]}"; do
+  for pat in "${PATTERNS[@]}"; do
+    if grep -E -l "$pat" "$f" >/dev/null 2>&1; then
+      if [ "$first" -eq 1 ]; then first=0; else secrets_json+=","; fi
+      secrets_json+="\"match in $f: pattern matched\""
+      SECRET_FOUND=1
+    fi
+  done
+done
+secrets_json+="]"
+echo "$secrets_json" > "$ARTIFACT_DIR/secrets.json"
+if [ "$SECRET_FOUND" -eq 0 ]; then
+  echo "[secrets] OK: no known patterns in source files"
+else
+  echo "[secrets] FAIL: see $ARTIFACT_DIR/secrets.json"
+  failed=1
+fi
+
+exit $failed

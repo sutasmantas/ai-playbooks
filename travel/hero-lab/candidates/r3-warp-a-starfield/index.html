@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Lab · R3 · Warp A · Real 3D Starfield Dive (meditative)</title>
+<!--
+  CANDIDATE: r3-warp-a-starfield  (FRESH ATTEMPT — REAL 3D STARFIELD DIVE)
+  WHAT IT IS: NOT a fractal raymarch. This is thousands of genuine 3D star POINTS
+              distributed in a deep volume. A PerspectiveCamera drifts slowly FORWARD
+              through them: near stars sweep past with soft velocity-stretched trails,
+              far stars barely move (true parallax depth). Stars that pass the camera
+              recycle to the far plane, so the dive is endless.
+  CRAFT:      custom Points shader — round soft sprites with a radial core, per-star
+              colour (mostly cream, a minority warm terracotta + cool blue, biased
+              warm->cool with depth), gentle per-star twinkle, and a VELOCITY-STRETCH
+              that elongates near/bright stars along the screen-space travel vector so
+              they read as soft streaks ONLY when moving. UnrealBloom on the bright
+              cores + ACES tone-map + CSS vignette/grain. Pointer subtly steers heading
+              & parallax; hover/scroll lifts dive speed, then eases back to baseline.
+  SPEED:      RESTING motion is ~HALF of r2-warp's resting drift — a barely-moving,
+              meditative, premium glide. r2 rested ~vel 0.12 / fwd base 0.03; here the
+              resting forward rate is ~0.015 equivalent. Speed only rises on
+              hover/scroll, then eases back to the very-calm baseline.
+  SHELL:      reuses r2-warp's headline markup + copy, brand palette + Google Fonts,
+              left scrim, badge, bottom hint, CSS vignette + grain, GSAP word-stagger
+              reveal, Three.js 0.160 ESM importmap + GSAP 3.13 CDN. One self-contained file.
+  PERF:       capped DPR 1.5; ~6000 points, single draw call, modest fragment cost;
+              no multi-sample raymarch. Targets smooth 60fps on Intel integrated GPUs.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: oklch(0.974 0.006 80);
+    --terra: oklch(0.66 0.13 48);
+    --display: 'Bricolage Grotesque', system-ui, sans-serif;
+    --sans: 'Hanken Grotesk', system-ui, sans-serif;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{
+    font-family:var(--sans); color:var(--paper);
+    background:#05080a; overflow:hidden;
+  }
+  .stage{ position:fixed; inset:0; }
+
+  canvas.webgl{ position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; }
+
+  /* left readability scrim so the headline never competes with the warp */
+  .scrim{ position:absolute; inset:0; z-index:2; pointer-events:none;
+    background:
+      linear-gradient(90deg, rgba(3,6,8,.82) 0%, rgba(3,6,8,.55) 32%, rgba(3,6,8,.10) 58%, transparent 74%),
+      linear-gradient(0deg, rgba(3,6,8,.55) 0%, transparent 30%); }
+
+  /* vignette + grain */
+  .vignette{ position:absolute; inset:0; z-index:3; pointer-events:none;
+    background:radial-gradient(120% 120% at 50% 50%, transparent 48%, rgba(2,4,6,.78) 100%); }
+  .grain{ position:absolute; inset:0; z-index:4; pointer-events:none; opacity:.42; mix-blend-mode:overlay; }
+  .grain svg{ width:100%; height:100%; }
+
+  /* headline */
+  .hero{ position:absolute; inset:0; z-index:5; display:flex; align-items:center; pointer-events:none; }
+  .wrap{ width:100%; max-width:1180px; margin:0 auto; padding:0 clamp(24px,5vw,72px); }
+  .inner{ max-width:60ch; pointer-events:auto; }
+  .eyebrow{ font-family:var(--sans); font-weight:600; font-size:.72rem; letter-spacing:.2em;
+    text-transform:uppercase; color:rgba(231,168,119,.92); margin-bottom:22px; }
+  h1{ font-family:var(--display); font-weight:800; letter-spacing:-0.03em; line-height:0.98;
+    font-size:clamp(2.6rem,6.2vw,5.2rem); text-shadow:0 2px 40px rgba(0,0,0,.6); max-width:15ch; }
+  h1 .w{ display:inline-block; }
+  .sub{ margin-top:26px; max-width:46ch; font-size:clamp(1rem,1.5vw,1.22rem); line-height:1.5; color:rgba(243,237,225,.86); }
+  .row{ display:flex; gap:14px; flex-wrap:wrap; margin-top:36px; }
+  .btn{ font-family:var(--sans); font-weight:600; font-size:.95rem; text-decoration:none;
+    padding:.85em 1.4em; border-radius:100px; border:1.5px solid rgba(243,237,225,.35); color:var(--paper); }
+  .btn--solid{ background:var(--terra); border-color:var(--terra); color:#1a120c; }
+
+  .badge{ position:absolute; z-index:6; left:18px; top:18px; font-family:ui-monospace,Menlo,monospace;
+    font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; color:rgba(243,237,225,.5); }
+  .hint{ position:absolute; z-index:6; left:50%; bottom:16px; transform:translateX(-50%);
+    font-family:ui-monospace,Menlo,monospace; font-size:.62rem; letter-spacing:.12em; color:rgba(243,237,225,.42);
+    text-align:center; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <canvas class="webgl"></canvas>
+    <div class="scrim"></div>
+    <div class="vignette"></div>
+    <div class="grain" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg>
+    </div>
+
+    <div class="hero">
+      <div class="wrap">
+        <div class="inner">
+          <p class="eyebrow">Friends-only trip planning · Kaunas → Kulionys · One fall night</p>
+          <h1 id="h1">One night, one telescope, one clear-sky call.</h1>
+          <p class="sub">A one-day fall run from Kaunas to the Lithuanian Museum of Ethnocosmology — pick a stop on the way, wait for the 14:00 weather call, then finish under the 80&nbsp;cm telescope. Same crew, same drawn line — after dark.</p>
+          <div class="row">
+            <a class="btn btn--solid" href="#">Follow the sky route ↓</a>
+            <a class="btn" href="#">Join the Observatory run</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="badge">R3 · warp a · starfield dive</div>
+    <div class="hint">move the mouse to steer · hover or scroll to glide faster</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+    const canvas = document.querySelector('canvas.webgl');
+    const sizes = { w: innerWidth, h: innerHeight };
+    const DPR = Math.min(1.5, devicePixelRatio);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+    renderer.setSize(sizes.w, sizes.h);
+    renderer.setPixelRatio(DPR);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
+    renderer.setClearColor(0x05080a, 1);
+
+    const scene = new THREE.Scene();
+    // a faint cosmic fog so the far plane fades into the near-black background,
+    // giving the volume real depth (distant stars dim out instead of popping).
+    scene.fog = new THREE.FogExp2(0x05080a, 0.0);
+
+    const camera = new THREE.PerspectiveCamera(62, sizes.w / sizes.h, 0.1, 1000);
+    camera.position.set(0, 0, 0);
+
+    // -----------------------------------------------------------------------
+    //  THE STARFIELD — a deep volume of real 3D points.
+    //  The camera does not actually translate; instead we sweep every star's z
+    //  TOWARD the camera each frame (z -= speed*dt). When a star passes behind the
+    //  camera (z < zNear) it recycles to the far plane (z += DEPTH) at a fresh
+    //  random x/y. This is mathematically identical to flying forward forever, and
+    //  keeps all coordinates bounded for precision. Near stars sweep fast across the
+    //  screen (big parallax), far stars crawl (small parallax) — genuine depth.
+    // -----------------------------------------------------------------------
+    const STAR_COUNT = 6000;
+    const DEPTH   = 220;   // length of the volume along z (far plane distance)
+    const Z_NEAR  = 0.6;   // recycle threshold just in front of the camera
+    const SPREAD  = 120;   // half-width of the x/y spawn box at the far plane
+
+    const positions = new Float32Array(STAR_COUNT * 3);
+    const colors    = new Float32Array(STAR_COUNT * 3);
+    const aSize     = new Float32Array(STAR_COUNT);   // base size
+    const aBright   = new Float32Array(STAR_COUNT);   // base brightness
+    const aTwinkle  = new Float32Array(STAR_COUNT);   // twinkle phase + rate packed
+    const aSeed     = new Float32Array(STAR_COUNT);   // per-star random
+
+    // brand-biased star palette. Most stars are cream/white; a minority are warm
+    // terracotta or cool blue. Warmth is biased by depth elsewhere in the shader.
+    const C_CREAM = new THREE.Color(0xeef2f4);
+    const C_WARM  = new THREE.Color(0xffd9a0);
+    const C_TERRA = new THREE.Color(0xe0894c);
+    const C_COOL  = new THREE.Color(0x6f9fd6);
+
+    function placeStar(i, freshFar){
+      const x = (Math.random() * 2 - 1) * SPREAD;
+      const y = (Math.random() * 2 - 1) * SPREAD;
+      // freshFar => spawn near the far plane; initial => spread across whole depth
+      const z = freshFar ? (DEPTH - Math.random() * 8) : (Z_NEAR + Math.random() * (DEPTH - Z_NEAR));
+      positions[i*3+0] = x;
+      positions[i*3+1] = y;
+      positions[i*3+2] = z;
+    }
+
+    for (let i = 0; i < STAR_COUNT; i++){
+      placeStar(i, false);
+
+      // colour: weighted pick — cream dominant, warm/terra/cool as accents
+      const r = Math.random();
+      let c;
+      if (r < 0.66)      c = C_CREAM;
+      else if (r < 0.80) c = C_WARM;
+      else if (r < 0.90) c = C_TERRA;
+      else               c = C_COOL;
+      // slight per-star desaturation toward cream so accents stay tasteful
+      const mixC = c.clone().lerp(C_CREAM, 0.30 + Math.random() * 0.25);
+      colors[i*3+0] = mixC.r;
+      colors[i*3+1] = mixC.g;
+      colors[i*3+2] = mixC.b;
+
+      // a few "hero" stars are notably bigger & brighter (they get the best trails)
+      const hero = Math.random() < 0.06;
+      aSize[i]   = hero ? (2.6 + Math.random() * 1.8) : (0.7 + Math.random() * 1.3);
+      aBright[i] = hero ? (0.9 + Math.random() * 0.5) : (0.30 + Math.random() * 0.55);
+      aTwinkle[i]= Math.random() * 6.2831853;            // twinkle phase
+      aSeed[i]   = Math.random();
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
+    geo.setAttribute('aSize',    new THREE.BufferAttribute(aSize, 1));
+    geo.setAttribute('aBright',  new THREE.BufferAttribute(aBright, 1));
+    geo.setAttribute('aTwinkle', new THREE.BufferAttribute(aTwinkle, 1));
+    geo.setAttribute('aSeed',    new THREE.BufferAttribute(aSeed, 1));
+
+    const starUniforms = {
+      uTime:    { value: 0 },
+      uVel:     { value: 0 },          // 0..1 current dive velocity (drives stretch + brightness)
+      uPixel:   { value: DPR },        // device pixel ratio for size in px
+      uHeight:  { value: sizes.h * DPR },
+      uStretch: { value: 0 },          // px-space elongation amount along travel
+      uCenter:  { value: new THREE.Vector2(0.0, 0.0) }, // steer offset in clip-ish space
+      uWarm:    { value: 1 }           // 1 = warm road-trip grade, 0 = cool night arrival
+    };
+
+    // --- POINTS SHADER -----------------------------------------------------
+    //  Vertex: project the star, then ELONGATE its point size and nudge its
+    //  screen position so bright/near stars draw as soft streaks pointing back
+    //  toward the vanishing point (the screen-space radial direction). We encode
+    //  the stretch direction + amount and pass them to the fragment, which shapes
+    //  a soft anisotropic blob (round at rest, streak when moving).
+    const starVert = /* glsl */`
+      uniform float uTime;
+      uniform float uVel;
+      uniform float uPixel;
+      uniform float uHeight;
+      uniform float uStretch;
+      uniform vec2  uCenter;
+      attribute float aSize;
+      attribute float aBright;
+      attribute float aTwinkle;
+      attribute float aSeed;
+      varying vec3  vColor;
+      varying float vBright;
+      varying float vStretch;     // streak amount for this star (0 = round)
+      varying vec2  vDir;         // screen-space streak direction (unit)
+      varying float vDepthFade;   // 0 far -> 1 near
+
+      void main(){
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        // depth fade: near stars bright, far stars dim (real atmospheric depth)
+        float dist = -mv.z;
+        vDepthFade = clamp(1.0 - dist / 220.0, 0.0, 1.0);
+
+        vec4 clip = projectionMatrix * mv;
+
+        // screen-space position (NDC). The vanishing point sits at uCenter (steered).
+        vec2 ndc = clip.xy / clip.w;
+        vec2 fromCenter = ndc - uCenter;
+        float radial = length(fromCenter) + 1e-4;
+        vDir = fromCenter / radial;     // points outward from the vanishing point
+
+        // twinkle: slow per-star brightness shimmer (very gentle)
+        float tw = 0.82 + 0.18 * sin(uTime * (0.5 + aSeed * 0.9) + aTwinkle);
+
+        // nearness factor: closer stars stretch & brighten more under speed
+        float near = smoothstep(0.0, 1.0, vDepthFade);
+        // streak amount in PX: grows with velocity, nearness, and the star's own size
+        vStretch = uStretch * near * (0.5 + aBright) * (0.6 + radial * 0.8);
+
+        // perspective point size (px), with a gentle hero boost; clamp for perf
+        float size = aSize * uPixel * (uHeight * 0.0016) / max(0.4, dist) * 60.0;
+        size *= (0.85 + 0.15 * uVel);   // a touch larger under speed (energy)
+        size = clamp(size, 0.0, 64.0);
+        // elongate the sprite footprint so the streak has room to draw
+        gl_PointSize = size * (1.0 + vStretch * 0.06);
+
+        vColor  = color;
+        vBright = aBright * tw;
+
+        gl_Position = clip;
+      }
+    `;
+
+    //  Fragment: soft round star core; when vStretch>0 we measure distance to a
+    //  short LINE SEGMENT (along vDir) instead of a point, producing a tapered
+    //  comet-like streak. Additive blending makes overlaps glow into the bloom.
+    const starFrag = /* glsl */`
+      precision highp float;
+      uniform float uWarm;
+      varying vec3  vColor;
+      varying float vBright;
+      varying float vStretch;
+      varying vec2  vDir;
+      varying float vDepthFade;
+
+      void main(){
+        // gl_PointCoord is 0..1 across the sprite; center it to -0.5..0.5
+        vec2 p = gl_PointCoord - 0.5;
+
+        // streak length in sprite-UV space (capped so it never fills the quad)
+        float L = clamp(vStretch * 0.012, 0.0, 0.42);
+        // project p onto the streak axis (vDir) and the perpendicular
+        float along = dot(p, vDir);
+        float perp  = dot(p, vec2(-vDir.y, vDir.x));
+        // distance to a segment from 0 toward -vDir*L (trail points back toward center)
+        float a = clamp(-along, 0.0, L);              // only trail on the inward side
+        vec2  d = vec2(along + a, perp);
+        float dist = length(d);
+
+        // soft falloff: tight bright core + wide soft glow
+        float core = smoothstep(0.30, 0.0, dist);
+        float glow = smoothstep(0.50, 0.0, dist);
+        float alpha = core * 0.85 + glow * 0.35;
+        if (alpha < 0.004) discard;
+
+        // depth-biased grade: far stars lean cool/blue (night sky), near stars warm.
+        // uWarm shifts the whole field warm->cool across the intro choreography.
+        float warmth = clamp(vDepthFade * 0.6 + uWarm * 0.6, 0.0, 1.0);
+        vec3 warmTint = vec3(1.06, 0.96, 0.86);
+        vec3 coolTint = vec3(0.86, 0.95, 1.10);
+        vec3 tint = mix(coolTint, warmTint, warmth);
+
+        vec3 col = vColor * tint * vBright * (0.45 + vDepthFade * 0.9);
+        gl_FragColor = vec4(col * alpha, alpha);
+      }
+    `;
+
+    const starMat = new THREE.ShaderMaterial({
+      uniforms: starUniforms,
+      vertexShader: starVert,
+      fragmentShader: starFrag,
+      vertexColors: true,
+      transparent: true,
+      depthWrite: false,
+      depthTest: false,
+      blending: THREE.AdditiveBlending
+    });
+
+    const stars = new THREE.Points(geo, starMat);
+    stars.frustumCulled = false;
+    scene.add(stars);
+
+    // -----------------------------------------------------------------------
+    //  POST — RenderPass -> UnrealBloom. Bloom blooms the bright cores / streaks.
+    //  CSS vignette + grain stack on top in the DOM. Kept restrained (no white-out).
+    // -----------------------------------------------------------------------
+    const composer = new EffectComposer(renderer);
+    composer.setPixelRatio(DPR);
+    composer.setSize(sizes.w, sizes.h);
+    composer.addPass(new RenderPass(scene, camera));
+    const bloom = new UnrealBloomPass(new THREE.Vector2(sizes.w, sizes.h), 0.55, 0.7, 0.0);
+    composer.addPass(bloom);
+
+    // -----------------------------------------------------------------------
+    //  INTERACTION — pointer steers heading + parallax; hover/scroll boost speed.
+    // -----------------------------------------------------------------------
+    let steerTX = 0, steerTY = 0, steerX = 0, steerY = 0;  // steer target / current
+    let hoverBoost = 0, scrollBoost = 0;
+
+    addEventListener('pointermove', e => {
+      steerTX = e.clientX / innerWidth  - 0.5;
+      steerTY = e.clientY / innerHeight - 0.5;
+      hoverBoost = Math.max(hoverBoost, 0.26);   // gentle throttle lift on movement
+    }, { passive: true });
+
+    addEventListener('wheel', e => {
+      scrollBoost = Math.min(0.85, scrollBoost + Math.min(0.32, Math.abs(e.deltaY) * 0.0011));
+    }, { passive: true });
+
+    // -----------------------------------------------------------------------
+    //  CHOREOGRAPHY — a gentle approach into the meditative drift, then the
+    //  headline rides in. Grade cools warm->night as we "arrive".
+    //  RESTING velocity is intentionally ~half of r2's resting drift.
+    // -----------------------------------------------------------------------
+    const REST_VEL = 0.06;   // ~half of r2-warp's resting 0.12
+    const intro = { vel: 0.0, warm: 1.0, exposure: 1.0 };
+    function reveal(){
+      const h1 = document.getElementById('h1');
+      const words = h1.textContent.trim().split(' ');
+      h1.innerHTML = words.map(w => `<span class="w">${w}</span>`).join(' ');
+      gsap.set('.eyebrow,.sub,.row', { opacity: 0, y: 18 });
+      gsap.set('.w', { opacity: 0, yPercent: 120 });
+
+      const tl = gsap.timeline();
+      // a soft, brief acceleration into the field (smaller than r2's), then a long
+      // settle to the very-calm resting drift.
+      tl.to(intro, { vel: 0.46, duration: 1.7, ease: 'power2.inOut' }, 0)
+        .to(intro, { exposure: 1.10, duration: 0.8, ease: 'power2.in' }, 0.5)
+        .to(intro, { vel: REST_VEL, duration: 4.2, ease: 'power2.out' }, 1.7)
+        .to(intro, { exposure: 1.0, duration: 3.4, ease: 'power2.out' }, 1.9)
+        .to(intro, { warm: 0.30, duration: 4.2, ease: 'sine.inOut' }, 2.0);
+
+      const tlx = gsap.timeline({ delay: 1.6 });
+      tlx.to('.eyebrow', { opacity: 1, y: 0, duration: .7, ease: 'power3.out' })
+         .to('.w', { opacity: 1, yPercent: 0, duration: .9, ease: 'power4.out', stagger: 0.06 }, '-=0.3')
+         .to('.sub', { opacity: 1, y: 0, duration: .7, ease: 'power3.out' }, '-=0.4')
+         .to('.row', { opacity: 1, y: 0, duration: .7, ease: 'power3.out' }, '-=0.45');
+    }
+    reveal();
+
+    // -----------------------------------------------------------------------
+    //  LOOP
+    // -----------------------------------------------------------------------
+    const clock = new THREE.Clock();
+    let vel = REST_VEL;
+    const posAttr = geo.attributes.position;
+
+    function tick(){
+      const dt = Math.min(0.05, clock.getDelta());
+      const t = clock.elapsedTime;
+
+      // --- steering ease (heading) ---
+      steerX += (steerTX - steerX) * 0.045;
+      steerY += (steerTY - steerY) * 0.045;
+      // subtle heading: gently rotate the whole field & drift the camera so the
+      // vanishing point shifts toward the pointer (parallax: near stars react more).
+      camera.position.x += ((steerX * 14) - camera.position.x) * 0.04;
+      camera.position.y += ((-steerY * 9) - camera.position.y) * 0.04;
+      camera.lookAt(steerX * 6, -steerY * 4, -60);
+
+      // --- velocity: rest baseline + decaying hover/scroll boosts ---
+      hoverBoost  *= 0.962;
+      scrollBoost *= 0.965;
+      const velTarget = Math.min(1.0, intro.vel + hoverBoost + scrollBoost);
+      vel += (velTarget - vel) * 0.05;
+
+      // --- forward dive: sweep every star toward the camera, recycle past ones ---
+      // resting flow ~ half of r2. Base creep + velocity term, scaled to depth units.
+      const flow = (0.9 + vel * 26.0);   // world units/sec swept toward camera
+      const dz = flow * dt;
+      const arr = posAttr.array;
+      for (let i = 0; i < STAR_COUNT; i++){
+        const zi = i*3 + 2;
+        let z = arr[zi] - dz;
+        if (z < Z_NEAR){
+          // recycle to the far plane with a fresh x/y
+          z += DEPTH;
+          arr[i*3+0] = (Math.random() * 2 - 1) * SPREAD;
+          arr[i*3+1] = (Math.random() * 2 - 1) * SPREAD;
+        }
+        arr[zi] = z;
+      }
+      posAttr.needsUpdate = true;
+
+      // --- feed uniforms ---
+      starUniforms.uTime.value    = t;
+      starUniforms.uVel.value     = vel;
+      starUniforms.uWarm.value    = intro.warm;
+      // streak px grows strongly with velocity (round at rest, comet-like under speed)
+      starUniforms.uStretch.value = (vel * vel) * 130.0 + vel * 8.0;
+      // vanishing point in NDC follows the steer (so streaks point sensibly)
+      starUniforms.uCenter.value.set(steerX * 0.5, -steerY * 0.5);
+
+      // bloom + exposure breathe gently with speed
+      bloom.strength = 0.38 + vel * 0.55;
+      renderer.toneMappingExposure = intro.exposure;
+
+      composer.render();
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    // -----------------------------------------------------------------------
+    //  RESIZE
+    // -----------------------------------------------------------------------
+    addEventListener('resize', () => {
+      sizes.w = innerWidth; sizes.h = innerHeight;
+      camera.aspect = sizes.w / sizes.h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(sizes.w, sizes.h);
+      renderer.setPixelRatio(DPR);
+      composer.setSize(sizes.w, sizes.h);
+      composer.setPixelRatio(DPR);
+      bloom.setSize(sizes.w, sizes.h);
+      starUniforms.uHeight.value = sizes.h * DPR;
+    });
+  </script>
+</body>
+</html>

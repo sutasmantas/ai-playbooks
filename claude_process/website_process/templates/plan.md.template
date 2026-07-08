@@ -1,0 +1,129 @@
+<!--
+TEMPLATE METADATA — REMOVE THIS BLOCK WHEN GENERATING
+Target: <new-project-root>/plans/YYYY-MM-DD-<slug>/plan.md
+Generated when the user explicitly invokes procedures/task-decomposition.md.
+NOT auto-generated at bootstrap — created on demand when a huge task is starting.
+Placeholders:
+  {{TASK_SLUG}}     — short kebab-case slug describing the task (e.g., "oauth-migration", "admin-dashboard")
+  {{START_DATE}}    — ISO date when the task starts, e.g. 2026-05-19
+-->
+
+# Plan: {{TASK_SLUG}}
+
+**Parent item:** PROJECT_PLAN.md → <workstream / item this plan serves — every plan has exactly one>
+**Start date:** {{START_DATE}}
+**Status:** active
+**Last updated:** {{START_DATE}}
+
+## Goal
+
+<One paragraph. What user-visible thing exists at the end that doesn't exist now? If you can't describe it from a user's perspective, you don't have a goal yet.>
+
+## What this plan is NOT
+
+Explicit scope-out — what work the user might confuse for this plan but is deliberately not included. Listing the boundary at planning time is cheaper than re-fighting it mid-execution.
+
+- <Not this, because: ...>
+- <Not this either, because: ...>
+
+## Done-criteria
+
+Testable. Not vibes. If you can't write a check for it, it's not a criterion.
+
+- [ ] <Concrete observable condition, e.g., "POST /auth/oauth/callback returns 200 with valid token for a real Google account">
+- [ ] <Another condition>
+- [ ] ...
+
+## Strongest unsupported assumption
+
+Name the weakest link in this plan. What are you assuming that you haven't actually verified? Writing it here forces an honest weakness-naming pass, and surfaces a candidate first sub-task ("validate the assumption before building on it").
+
+- **Assumption:** <e.g., "the OAuth provider's redirect_uri allowlist accepts wildcard patterns">
+- **Why it might be wrong:** <e.g., "haven't read the provider's docs, only Stack Overflow">
+- **What would falsify it:** <a concrete observation, e.g., "a test redirect to a wildcard URL is rejected">
+- **If falsified:** <how the plan changes>
+
+## Vertical slices (riskiest first)
+
+Each slice is ONE PR-sized deliverable that ships user-visible value, even if behind a flag. Slices are ordered riskiest-first so the verifier catches structural problems before later slices depend on them.
+
+For each slice, write the four-field stage schema explicitly. If a field doesn't apply, write "N/A" — never leave it silently missing.
+
+### Slice 1 — <name>
+
+- **Output:** <the artifact this slice produces — a working endpoint, a rendered page, a migration applied>
+- **Decision:** <the verdict that closes this slice — `merged`, `reverted`, `parked`, `superseded`>
+- **Evidence to close:** <what must be true for this slice to be done — typically a verifier GREEN/YELLOW + the integration check>
+- **Files touched:** <list, helps avoid slice collisions>
+- **Risk:** <what could go wrong; why it's first>
+- **Verifier focus:** <which of the 14 checks matter most here>
+- **Status:** in progress | done | blocked
+
+### Slice 2 — <name>
+
+(same structure)
+
+### Slice 3 — <name>
+
+(same structure)
+
+## Damage-prevention vs value-preservation gates
+
+At milestone time (after each slice merges), check BOTH axes:
+
+- **Damage prevention:** what could this slice have broken? Specifically: the existing truth surface still works; existing concerns still pass; no regression in features the slice didn't touch.
+- **Value preservation:** what value did the existing system have that this slice might have destroyed even if it "worked"? E.g., a refactor that "succeeds" but removes a useful side-effect; a migration that completes but loses a feature the old path supported.
+
+Both axes must be cleared at each milestone. A slice that passes damage-prevention but destroys preserved value is still a failure.
+
+## Decision links
+
+Non-trivial choices made during planning. Each one links to a `decision_log.md` entry that explains the reasoning.
+
+- <Choice 1>: see `decision_log.md` entry {{START_DATE}}-<title>
+- <Choice 2>: see ...
+
+## Discovered work (append-only)
+
+Items found DURING execution that aren't in the slices above. Do NOT insert them into the current slice. At slice boundaries, decide whether each item promotes into a next slice, becomes a separate task, or is dropped.
+
+<!-- Format: - [YYYY-MM-DD] [discovering slice N] <what needs doing> — <why it can't wait until slice X / why it can wait> -->
+
+## Milestone log
+
+Append at each slice boundary.
+
+<!-- Format:
+### Slice N merged YYYY-MM-DD
+- Verifier verdict on slice: GREEN / YELLOW / RED
+- Damage-prevention check: pass / fail / caveats
+- Value-preservation check: pass / fail / caveats
+- Integration check (end-to-end path still works): pass / fail / caveats
+- Notes:
+-->
+
+## Replan history (only if you replan — hard bar from procedure)
+
+<!-- Format:
+### Replan YYYY-MM-DD
+- Why replanned: <which Phase-6 trigger fired>
+- What changed: <which slices were re-ordered, added, removed>
+- Decision log link: <entry id>
+-->
+
+## Plan quality audit
+
+Before treating this plan as ready, ask explicitly. Each "no" is a candidate gap to fix before starting execution.
+
+- [ ] Did I compare against the strongest similar existing plan in this codebase (or a previous project), not just start from memory?
+- [ ] Are later slices at least as well-specified as earlier slices? (Common failure: late slices are vague placeholders.)
+- [ ] Does the plan force alternative-search, not just execution? (Did I consider 2+ approaches per slice?)
+- [ ] Does it force adversarial review at slice boundaries? (Milestone gates do this — confirm they're real, not pro-forma.)
+- [ ] Does each slice have a frozen `Output`, `Decision`, and `Evidence to close` — or are any silently missing?
+- [ ] Are the damage-prevention AND value-preservation gates BOTH specified, not just one?
+- [ ] Are runtime / monitoring expectations stated as an exact contract, or only in spirit?
+- [ ] Are output artifacts NAMED, not implied?
+- [ ] Are blocked same-time changes explicitly listed? (i.e., what work CANNOT happen during this plan to avoid interference.)
+- [ ] Does the plan still match actual project state, or has it drifted? (Re-check at each session start per the task-decomposition procedure's Phase 3.)
+
+If any answer is "no" or "I don't know," the plan is probably still too thin. Fix before treating execution as authorized.

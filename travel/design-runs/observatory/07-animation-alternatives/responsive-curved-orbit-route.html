@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alternative - Responsive Curved Orbit Route</title>
+<style>
+  :root{--bg:#06101d;--panel:#0d1a2c;--text:#f8f1e7;--muted:rgba(248,241,231,.65);--line:rgba(248,241,231,.18);--sky:#8fd7ff}
+  *{box-sizing:border-box} body{margin:0;min-height:180svh;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
+  .stage{position:sticky;top:0;height:100svh;overflow:hidden;padding:clamp(24px,5vw,72px);display:grid;align-items:center}
+  h1{font-size:clamp(42px,7vw,96px);line-height:.9;letter-spacing:0;max-width:9ch;margin:0}.copy{position:relative;z-index:2;max-width:420px}.copy p{color:var(--muted);line-height:1.6}
+  .target{position:absolute;width:140px;height:86px;border:1px solid var(--line);border-radius:14px;background:var(--panel);display:grid;place-items:center;text-align:center;color:var(--muted)}
+  .a{left:7%;bottom:14%}.b{left:48%;top:18%;transform:translateX(-50%)}.c{right:7%;bottom:20%}
+  svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.curve{fill:none;stroke:var(--line);stroke-width:2}.active{fill:none;stroke:var(--sky);stroke-width:4;stroke-linecap:round;filter:drop-shadow(0 0 14px rgba(143,215,255,.5))}
+  .marker{position:absolute;width:26px;height:26px;border-radius:50%;border:3px solid var(--sky);box-shadow:0 0 20px rgba(143,215,255,.65);translate:-50% -50%}
+  @media(max-width:700px){.target{width:118px;height:70px;font-size:13px}.b{top:22%}}
+  @media(prefers-reduced-motion:reduce){body{min-height:100svh}.stage{position:relative}.active{stroke-dashoffset:0!important}.marker{display:none}}
+</style>
+</head>
+<body>
+<section class="stage" id="stage">
+  <div class="copy"><h1>Responsive orbit route.</h1><p>Alternative to fixed SVG coordinates: measure real elements and rebuild the route curve on resize.</p></div>
+  <div class="target a" data-node>Kaunas<br>depart</div>
+  <div class="target b" data-node>Moletai<br>warm-up</div>
+  <div class="target c" data-node>Observatory<br>anchor</div>
+  <svg><path class="curve" id="ghost"/><path class="active" id="active"/></svg>
+  <i class="marker" id="marker"></i>
+</section>
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ghost = document.getElementById('ghost'), active = document.getElementById('active'), marker = document.getElementById('marker');
+  let length = 1;
+  function center(el){ const r=el.getBoundingClientRect(); return {x:r.left+r.width/2, y:r.top+r.height/2}; }
+  function pathString(){
+    const [a,b,c]=[...document.querySelectorAll('[data-node]')].map(center);
+    return `M${a.x},${a.y} C${a.x+160},${a.y-220} ${b.x-210},${b.y+140} ${b.x},${b.y} C${b.x+220},${b.y-140} ${c.x-190},${c.y-230} ${c.x},${c.y}`;
+  }
+  function rebuild(){ const d=pathString(); ghost.setAttribute('d',d); active.setAttribute('d',d); length=active.getTotalLength(); active.style.strokeDasharray=length; update(); }
+  function update(){
+    const max=document.documentElement.scrollHeight-innerHeight;
+    const p=reduce ? 1 : Math.min(1,Math.max(0,scrollY/max));
+    active.style.strokeDashoffset=length*(1-p);
+    const point=active.getPointAtLength(length*p);
+    marker.style.left=point.x+'px'; marker.style.top=point.y+'px';
+  }
+  addEventListener('resize', rebuild); addEventListener('scroll', update, {passive:true}); rebuild();
+</script>
+</body>
+</html>

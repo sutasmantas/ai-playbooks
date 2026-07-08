@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Lab · R1 · Gargantua (lensed black hole)</title>
+<!--
+  CANDIDATE: r1-blackhole
+  BASE EFFECT: raymarched Schwarzschild black hole with a swirling accretion disk and
+               gravitationally-lensed starfield. Adapted from the well-known Shadertoy
+               "Black hole with accretion disk" lineage (kuvkar, tsBXW3) + the dotcrossdot /
+               celticspwn raymarching tutorials. The proven geodesic step is reproduced
+               faithfully: each step bends the ray velocity by
+                   acc = -1.5 * h2 * pos / pow(r2, 2.5)     (h2 = |cross(pos,vel)|^2)
+               i.e. the photon-orbit deflection used across those shaders. Then art-directed.
+  CRAFT PASS:  warm->cosmos brand grade (terracotta disk core, cool-blue lensed sky),
+               UnrealBloom post, ACES tone-map, vignette + film grain, Doppler-style
+               brightness asymmetry, slow cinematic camera drift + pointer parallax,
+               drag-to-orbit interaction, choreographed GSAP reveal + left-side scrim.
+  STACK:       Three.js 0.160 (ESM CDN) + GSAP 3.13 (CDN) — matches the live site.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: oklch(0.974 0.006 80);
+    --paper-soft: oklch(0.90 0.010 76 / 0.82);
+    --terra: oklch(0.66 0.13 48);
+    --terra-deep: oklch(0.605 0.118 45);
+    --display: 'Bricolage Grotesque', system-ui, sans-serif;
+    --sans: 'Hanken Grotesk', system-ui, sans-serif;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{
+    font-family:var(--sans); color:var(--paper);
+    background:#05080a; overflow:hidden;
+  }
+  .stage{ position:fixed; inset:0; }
+
+  canvas.webgl{ position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; cursor:grab; }
+  canvas.webgl.grabbing{ cursor:grabbing; }
+
+  /* left readability scrim — keeps headline zone calm over the lensing */
+  .scrim{ position:absolute; inset:0; z-index:2; pointer-events:none;
+    background:
+      linear-gradient(90deg, rgba(3,6,8,.86) 0%, rgba(3,6,8,.62) 26%, rgba(3,6,8,.18) 50%, transparent 66%),
+      linear-gradient(0deg, rgba(3,6,8,.55) 0%, transparent 30%); }
+
+  /* vignette + grain */
+  .vignette{ position:absolute; inset:0; z-index:3; pointer-events:none;
+    background:radial-gradient(125% 120% at 62% 48%, transparent 50%, rgba(2,4,5,.78) 100%); }
+  .grain{ position:absolute; inset:0; z-index:4; pointer-events:none; opacity:.42; mix-blend-mode:overlay; }
+  .grain svg{ width:100%; height:100%; }
+
+  /* headline */
+  .hero{ position:absolute; inset:0; z-index:5; display:flex; align-items:center; pointer-events:none; }
+  .wrap{ width:100%; max-width:1180px; margin:0 auto; padding:0 clamp(24px,5vw,72px); }
+  .inner{ max-width:60ch; pointer-events:auto; }
+  .eyebrow{ font-family:var(--sans); font-weight:600; font-size:.72rem; letter-spacing:.2em;
+    text-transform:uppercase; color:rgba(231,168,119,.92); margin-bottom:22px; }
+  h1{ font-family:var(--display); font-weight:800; letter-spacing:-0.03em; line-height:0.98;
+    font-size:clamp(2.6rem,6.2vw,5.2rem); text-shadow:0 2px 40px rgba(0,0,0,.5); max-width:15ch; }
+  h1 .w{ display:inline-block; }
+  .sub{ margin-top:26px; max-width:46ch; font-size:clamp(1rem,1.5vw,1.22rem); line-height:1.5; color:rgba(243,237,225,.86); }
+  .row{ display:flex; gap:14px; flex-wrap:wrap; margin-top:36px; }
+  .btn{ font-family:var(--sans); font-weight:600; font-size:.95rem; text-decoration:none;
+    padding:.85em 1.4em; border-radius:100px; border:1.5px solid rgba(243,237,225,.35); color:var(--paper); }
+  .btn--solid{ background:var(--terra); border-color:var(--terra); color:#1a120c; }
+
+  .badge{ position:absolute; z-index:6; left:18px; top:18px; font-family:ui-monospace,Menlo,monospace;
+    font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; color:rgba(243,237,225,.5); }
+  .hint{ position:absolute; z-index:6; left:50%; bottom:16px; transform:translateX(-50%);
+    font-family:ui-monospace,Menlo,monospace; font-size:.62rem; letter-spacing:.12em; color:rgba(243,237,225,.42); }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <canvas class="webgl"></canvas>
+    <div class="scrim"></div>
+    <div class="vignette"></div>
+    <div class="grain" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg>
+    </div>
+
+    <div class="hero">
+      <div class="wrap">
+        <div class="inner">
+          <p class="eyebrow">Friends-only trip planning · Kaunas → Kulionys · One fall night</p>
+          <h1 id="h1">One night, one telescope, one clear-sky call.</h1>
+          <p class="sub">A one-day fall run from Kaunas to the Lithuanian Museum of Ethnocosmology — pick a stop on the way, wait for the 14:00 weather call, then finish under the 80&nbsp;cm telescope. Same crew, same drawn line — after dark.</p>
+          <div class="row">
+            <a class="btn btn--solid" href="#">Follow the sky route ↓</a>
+            <a class="btn" href="#">Join the Observatory run</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="badge">R1 · the night's deep-sky target</div>
+    <div class="hint">drag to orbit the black hole · move the mouse to parallax</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+    const canvas = document.querySelector('canvas.webgl');
+    const sizes = { w: innerWidth, h: innerHeight };
+
+    const scene = new THREE.Scene();
+    // full-screen shader quad with an orthographic camera (ideal for raymarching)
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+    renderer.setSize(sizes.w, sizes.h);
+    const DPR = Math.min(1.8, devicePixelRatio);
+    renderer.setPixelRatio(DPR);
+
+    // ----------------------------------------------------------------------
+    //  RAYMARCHED BLACK HOLE FRAGMENT SHADER
+    //  Faithful to the Shadertoy "black hole / accretion disk" lineage:
+    //  leapfrog integration of a photon, deflected each step by
+    //      acc = -1.5 * h2 * pos / pow(r2, 2.5)
+    //  (h2 = |cross(pos,vel)|^2). Disk sampled in the equatorial plane with
+    //  fbm noise; the escaping ray direction samples a procedural starfield
+    //  (=> the background is gravitationally lensed). Then art-directed.
+    // ----------------------------------------------------------------------
+    const frag = /* glsl */`
+      precision highp float;
+      uniform vec2  uRes;
+      uniform float uTime;
+      uniform vec3  uCamPos;      // camera position in world space
+      uniform mat3  uCamBasis;    // [right, up, forward]
+      uniform vec2  uParallax;    // subtle pointer parallax
+
+      // ---- brand palette -------------------------------------------------
+      const vec3 WARM_CORE = vec3(1.000, 0.851, 0.627); // #ffd9a0
+      const vec3 TERRA     = vec3(0.878, 0.537, 0.298); // #e0894c
+      const vec3 COOLBLUE  = vec3(0.435, 0.624, 0.839); // #6f9fd6
+      const vec3 CREAM     = vec3(0.933, 0.949, 0.957); // #eef2f4
+
+      // ---- hash / noise (Inigo Quilez style value-noise + fbm) ----------
+      float hash(vec3 p){
+        p = fract(p*0.3183099 + 0.1);
+        p *= 17.0;
+        return fract(p.x*p.y*p.z*(p.x+p.y+p.z));
+      }
+      float vnoise(vec3 x){
+        vec3 i = floor(x); vec3 f = fract(x);
+        f = f*f*(3.0-2.0*f);
+        return mix(mix(mix(hash(i+vec3(0,0,0)), hash(i+vec3(1,0,0)), f.x),
+                       mix(hash(i+vec3(0,1,0)), hash(i+vec3(1,1,0)), f.x), f.y),
+                   mix(mix(hash(i+vec3(0,0,1)), hash(i+vec3(1,0,1)), f.x),
+                       mix(hash(i+vec3(0,1,1)), hash(i+vec3(1,1,1)), f.x), f.y), f.z);
+      }
+      float fbm(vec3 p){
+        float a = 0.5, s = 0.0;
+        for(int i=0;i<5;i++){ s += a*vnoise(p); p *= 2.02; a *= 0.5; }
+        return s;
+      }
+
+      // procedural deep-sky background sampled by a (lensed) direction ----
+      vec3 starField(vec3 dir){
+        // soft cosmos gradient (cool blue, near-black green) + nebula haze
+        vec3 sky = mix(vec3(0.012,0.020,0.028), vec3(0.018,0.036,0.060), dir.y*0.5+0.5);
+        float neb = fbm(dir*4.0 + vec3(0.0, uTime*0.01, 0.0));
+        sky += COOLBLUE * 0.05 * smoothstep(0.45,0.95,neb);
+        sky += TERRA    * 0.025 * smoothstep(0.55,0.95,fbm(dir*3.0+11.3));
+        // crisp stars: high-frequency cellular threshold
+        vec3 g = dir*240.0;
+        vec3 id = floor(g);
+        float st = hash(id);
+        float bright = step(0.9965, st);                  // sparse
+        float tw = 0.6 + 0.4*sin(uTime*2.0 + st*60.0);    // twinkle
+        // point falloff inside the cell
+        vec3 fp = fract(g)-0.5;
+        float d = 1.0 - smoothstep(0.0, 0.08, length(fp));
+        vec3 starCol = mix(CREAM, mix(WARM_CORE, COOLBLUE, st), 0.5);
+        sky += starCol * bright * d * tw * 1.6;
+        return sky;
+      }
+
+      // accretion disk emission at world position p (equatorial plane y~0)
+      vec3 diskColor(vec3 p, float r){
+        // swirl: rotate sampling coords by angle that grows toward center
+        float ang = atan(p.z, p.x);
+        float swirl = ang + uTime*0.55 + 6.0/(r+0.4);     // inner edge spins faster
+        vec2 q = vec2(cos(swirl), sin(swirl)) * r;
+        float n = fbm(vec3(q*1.5, r*1.2 - uTime*0.25));
+        n = pow(n, 1.4);
+        // radial temperature: hot inner -> cool outer (brand warm->terra)
+        float t = smoothstep(2.0, 9.0, r);
+        vec3 col = mix(WARM_CORE*1.4, TERRA, t);
+        col = mix(col, COOLBLUE*0.6, smoothstep(7.0, 11.0, r));
+        // brightness profile across the disk band + filaments
+        float band = smoothstep(11.0, 8.5, r) * smoothstep(2.6, 4.2, r);
+        float emit = band * (0.35 + n*1.4);
+        // relativistic Doppler-style asymmetry: one side beamed brighter
+        float doppler = 0.55 + 0.85*clamp(sin(ang + 1.2), 0.0, 1.0);
+        return col * emit * doppler;
+      }
+
+      void main(){
+        vec2 uv = (gl_FragCoord.xy - 0.5*uRes) / uRes.y;
+        uv += uParallax * 0.06;
+
+        // primary ray from orthographic-quad uv through the camera basis
+        vec3 ro = uCamPos;
+        vec3 rd = normalize(uCamBasis * vec3(uv, 1.6));   // 1.6 ~ focal length
+
+        // ---- geodesic leapfrog integration -----------------------------
+        vec3 pos = ro;
+        vec3 vel = rd;
+        // angular momentum^2 of the photon about the hole (impact parameter)
+        vec3 h   = cross(pos, vel);
+        float h2 = dot(h, h);
+
+        vec3 acc  = vec3(0.0);
+        vec3 color = vec3(0.0);
+        float alpha = 0.0;
+        bool captured = false;
+
+        const float DT = 0.18;
+        const float HORIZON = 1.0;      // event horizon radius (Schwarzschild units)
+
+        for(int i=0;i<260;i++){
+          float r2 = dot(pos,pos);
+          float r  = sqrt(r2);
+
+          // captured by the event horizon -> pure shadow
+          if(r < HORIZON){ captured = true; break; }
+          // escaped far away -> stop, sample lensed sky with current dir
+          if(r > 28.0 && dot(pos,vel) > 0.0) break;
+
+          // PROVEN deflection: pull velocity toward singularity (photon orbit)
+          acc = -1.5 * h2 * pos / pow(r2, 2.5);
+
+          vec3 prevPos = pos;
+          vel += acc * DT;
+          pos += vel * DT;
+
+          // accretion disk: thin slab near y=0, ring 2.6..11 units.
+          // detect a crossing of the equatorial plane between steps.
+          if(prevPos.y * pos.y < 0.0){
+            float tcross = prevPos.y / (prevPos.y - pos.y);
+            vec3 hit = mix(prevPos, pos, tcross);
+            float rr = length(hit.xz);
+            if(rr > 2.6 && rr < 11.5){
+              vec3 dc = diskColor(hit, rr);
+              float a = clamp(length(dc)*0.9, 0.0, 1.0) * (1.0 - alpha);
+              color += dc * a;
+              alpha += a;
+            }
+          }
+        }
+
+        if(captured){
+          // event horizon: black, but keep a faint photon-ring rim glow that
+          // bloom will pick up (the bright Einstein ring of light grazing the hole)
+          color += WARM_CORE * 0.0;
+        } else {
+          // remaining light = the lensed background sky along the bent ray
+          vec3 sky = starField(normalize(vel));
+          color += sky * (1.0 - alpha);
+        }
+
+        // photon-ring accent: brighten the thin annulus just outside horizon
+        // (approx via screen-space distance to hole center projection is costly;
+        //  instead bias by how close the ray's perihelion came — captured-adjacent
+        //  rays naturally bunch here and bloom blooms them.)
+
+        // ---- tone / grade (post bloom also applies ACES in three) -------
+        color = pow(color, vec3(0.92));            // gentle gamma lift
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `;
+
+    const vert = /* glsl */`
+      void main(){ gl_Position = vec4(position.xy, 0.0, 1.0); }
+    `;
+
+    const uniforms = {
+      uRes:      { value: new THREE.Vector2(sizes.w*DPR, sizes.h*DPR) },
+      uTime:     { value: 0 },
+      uCamPos:   { value: new THREE.Vector3() },
+      uCamBasis: { value: new THREE.Matrix3() },
+      uParallax: { value: new THREE.Vector2() },
+    };
+
+    const quad = new THREE.Mesh(
+      new THREE.PlaneGeometry(2, 2),
+      new THREE.ShaderMaterial({ vertexShader: vert, fragmentShader: frag, uniforms, depthTest:false, depthWrite:false })
+    );
+    scene.add(quad);
+
+    // ---- post: bloom for the disk + lensed ring glow --------------------
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    const bloom = new UnrealBloomPass(new THREE.Vector2(sizes.w, sizes.h), 0.95, 0.55, 0.05);
+    composer.addPass(bloom);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.18;
+
+    // ---- camera orbit state (drag) + parallax ---------------------------
+    // The disk is composed to the RIGHT: bias camera azimuth so the hole sits
+    // on the right half of the frame, headline zone (left) stays clean.
+    const orbit = { az: -0.95, el: 0.22, dist: 9.5 };  // low el => near-edge-on Gargantua look
+    let dragAz = orbit.az, dragEl = orbit.el;
+    let mx = 0, my = 0, cmx = 0, cmy = 0;
+    let dragging = false, px = 0, py = 0;
+
+    canvas.addEventListener('pointerdown', e => {
+      dragging = true; px = e.clientX; py = e.clientY;
+      canvas.classList.add('grabbing'); canvas.setPointerCapture(e.pointerId);
+    });
+    addEventListener('pointerup',   () => { dragging = false; canvas.classList.remove('grabbing'); });
+    addEventListener('pointermove', e => {
+      mx = e.clientX/innerWidth - 0.5; my = e.clientY/innerHeight - 0.5;
+      if(dragging){
+        dragAz -= (e.clientX - px) * 0.005;
+        dragEl += (e.clientY - py) * 0.004;
+        dragEl = Math.max(-0.5, Math.min(0.9, dragEl));
+        px = e.clientX; py = e.clientY;
+      }
+    }, { passive:true });
+
+    const camPos = new THREE.Vector3();
+    const fwd = new THREE.Vector3(), right = new THREE.Vector3(), up = new THREE.Vector3();
+    const worldUp = new THREE.Vector3(0,1,0);
+    const basis = new THREE.Matrix3();
+
+    function updateCamera(t){
+      // slow cinematic auto-drift on top of drag target
+      const az = dragAz + Math.sin(t*0.06) * 0.10;
+      const el = dragEl + Math.sin(t*0.045) * 0.03;
+      const d  = orbit.dist;
+      camPos.set(
+        d * Math.cos(el) * Math.cos(az),
+        d * Math.sin(el),
+        d * Math.cos(el) * Math.sin(az)
+      );
+      fwd.copy(camPos).multiplyScalar(-1).normalize();      // look at origin (the hole)
+      right.crossVectors(fwd, worldUp).normalize();
+      up.crossVectors(right, fwd).normalize();
+      // column-major Matrix3: columns are right, up, forward
+      basis.set(
+        right.x, up.x, fwd.x,
+        right.y, up.y, fwd.y,
+        right.z, up.z, fwd.z
+      );
+      uniforms.uCamPos.value.copy(camPos);
+      uniforms.uCamBasis.value.copy(basis);
+    }
+
+    // ---- choreographed entrance -----------------------------------------
+    function reveal(){
+      const h1 = document.getElementById('h1');
+      const words = h1.textContent.trim().split(' ');
+      h1.innerHTML = words.map(w=>`<span class="w">${w}</span>`).join(' ');
+      gsap.set('.eyebrow,.sub,.row', {opacity:0, y:18});
+      gsap.set('.w', {opacity:0, yPercent:120});
+      // exposure + camera pull-in for the reveal
+      gsap.fromTo(renderer, {toneMappingExposure:0.0}, {toneMappingExposure:1.18, duration:2.2, ease:'power2.out'});
+      gsap.fromTo(orbit, {dist:15.5}, {dist:9.5, duration:2.8, ease:'power3.out'});
+      const tl = gsap.timeline({ delay:0.3 });
+      tl.to('.eyebrow', {opacity:1,y:0,duration:.7,ease:'power3.out'})
+        .to('.w', {opacity:1,yPercent:0,duration:.9,ease:'power4.out',stagger:0.06}, '-=0.3')
+        .to('.sub', {opacity:1,y:0,duration:.7,ease:'power3.out'}, '-=0.4')
+        .to('.row', {opacity:1,y:0,duration:.7,ease:'power3.out'}, '-=0.45');
+    }
+    reveal();
+
+    // ---- loop ------------------------------------------------------------
+    const clock = new THREE.Clock();
+    function tick(){
+      const t = clock.getElapsedTime();
+      uniforms.uTime.value = t;
+      cmx += (mx - cmx)*0.05; cmy += (my - cmy)*0.05;
+      uniforms.uParallax.value.set(cmx, -cmy);
+      updateCamera(t);
+      composer.render();
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    // ---- resize ----------------------------------------------------------
+    addEventListener('resize', ()=>{
+      sizes.w = innerWidth; sizes.h = innerHeight;
+      renderer.setSize(sizes.w, sizes.h);
+      composer.setSize(sizes.w, sizes.h);
+      uniforms.uRes.value.set(sizes.w*DPR, sizes.h*DPR);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!--
+TEMPLATE METADATA — REMOVE THIS BLOCK WHEN GENERATING
+Target:
+  - For single-task work: <new-project-root>/next_action.md
+  - For huge tasks: <new-project-root>/plans/<slug>/next_action.md (one per plan)
+Lifecycle:
+  - Written at session end by the producer (procedures/session-handoff.md).
+  - Read at session start by the producer.
+  - Overwritten each session — this file holds only the latest state.
+  - NOT version-controlled in a stack; if you need history, that's what decision_log.md is for.
+Placeholders:
+  {{LAST_UPDATED}} — ISO datetime, e.g. 2026-05-19T17:42
+  {{SLICE_ID}}     — slice id from plan.md, or "N/A" if not in a huge task
+-->
+
+# Next action
+
+**Last updated:** {{LAST_UPDATED}}
+**Slice:** {{SLICE_ID}}
+
+## Resume here
+
+- **Verb:** <one of: run | edit | verify | re-plan | escalate>
+- **First command:** <the exact shell command, file:line cursor, or PR URL to start with>
+- **Expected result:** <one concrete observable signal — "tests pass", "function returns expected value for input X", "CLI exits 0 with expected stdout", "service returns 200 from /healthz">
+- **If that fails:** <the immediate fallback — usually "revert to commit ABCD and try Y", "ask user about Z", or "halt and re-plan">
+
+## Rejected this session (do not re-try without new information)
+
+Approaches the producer considered and decided against this session. Listed so the next session doesn't re-litigate them. If you want to revisit one, name the new information that justifies the revisit.
+
+- <Option A> — <why rejected this session>
+- <Option B> — <why rejected this session>
+
+## Open questions for the user
+
+If a clarifying question would change the next action, name it here and the next session stops at the start of the ritual until answered. List the default assumption you'd use if no answer arrives.
+
+- <Question 1>
+  - **Default if unanswered:** <what you'd do>
+- <Question 2>
+  - **Default if unanswered:** <what you'd do>
+
+## Files touched this session
+
+So the next session's staleness check has a concrete list to verify. The session-start ritual checks each of these against its current state.
+
+- <path/to/file1>
+- <path/to/file2>
+- ...
+
+## Halt-condition notes (only if a halt fired this session)
+
+If any halt-condition rule fired this session (same tool call repeated 3 times, same error 3 times in a row, 5 modifying actions with no closeable artifact, slice budget overrun, 3 RED verdicts, coordination-cost cap, or same-mental-model halt with alternative search), note it here so the next session understands the state:
+
+- **Rule fired:** <1-7 from halt-conditions.md, or N/A>
+- **What was happening:** <the loop or plateau pattern>
+- **Decision taken:** <alternative approach / revert / escalate>

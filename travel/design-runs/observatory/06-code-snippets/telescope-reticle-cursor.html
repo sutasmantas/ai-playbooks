@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Telescope Reticle Cursor</title>
+<style>
+  :root{--bg:#07111f;--text:#f8f1e7;--muted:rgba(248,241,231,.65);--sky:#8fd7ff;--line:rgba(248,241,231,.16)}
+  *{box-sizing:border-box} body{margin:0;min-height:100svh;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;padding:40px;cursor:none}
+  h1{font-size:clamp(44px,8vw,110px);line-height:.9;letter-spacing:0;max-width:9ch}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:34px}
+  .target{min-height:210px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.05);padding:18px;color:var(--text);text-decoration:none;display:flex;flex-direction:column;justify-content:end}
+  .target:hover{border-color:var(--sky);box-shadow:0 0 0 1px var(--sky),0 0 48px rgba(143,215,255,.12)}
+  .target span{color:var(--muted);line-height:1.5}.reticle{position:fixed;left:0;top:0;width:42px;height:42px;pointer-events:none;border:1px solid var(--sky);border-radius:50%;z-index:20;transform:translate(-50%,-50%);mix-blend-mode:screen}
+  .reticle:before,.reticle:after{content:"";position:absolute;background:var(--sky);opacity:.85}.reticle:before{left:50%;top:-10px;width:1px;height:60px}.reticle:after{top:50%;left:-10px;height:1px;width:60px}
+  .reticle.locked{width:70px;height:70px;box-shadow:0 0 22px rgba(143,215,255,.45)}.tag{position:fixed;pointer-events:none;color:var(--sky);font-size:12px;letter-spacing:.12em;text-transform:uppercase;transform:translate(18px,18px);opacity:0}
+  .tag.show{opacity:1}@media (hover:none),(prefers-reduced-motion:reduce){body{cursor:auto}.reticle,.tag{display:none}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<h1>Telescope target cursor</h1>
+<p>Use only on pointer-fine devices. Touch and reduced-motion fall back to normal hover styles.</p>
+<div class="grid">
+  <a class="target" href="#" data-label="Choose route"><strong>Nature route</strong><span>Mindunai and Labanoras before the telescope.</span></a>
+  <a class="target" href="#" data-label="Check sky"><strong>Weather call</strong><span>Same-day museum confirmation by 14:00.</span></a>
+  <a class="target" href="#" data-label="Book telescope"><strong>80 cm telescope</strong><span>The mandatory night anchor.</span></a>
+</div>
+<div class="reticle" aria-hidden="true"></div><div class="tag" aria-hidden="true"></div>
+<script>
+  const fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
+  if (fine && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const reticle = document.querySelector('.reticle'), tag = document.querySelector('.tag');
+    addEventListener('pointermove', e => {
+      reticle.style.transform = `translate(${e.clientX}px,${e.clientY}px) translate(-50%,-50%)`;
+      tag.style.left = `${e.clientX}px`; tag.style.top = `${e.clientY}px`;
+    });
+    document.querySelectorAll('[data-label]').forEach(el => {
+      el.addEventListener('pointerenter', () => { reticle.classList.add('locked'); tag.textContent = el.dataset.label; tag.classList.add('show'); });
+      el.addEventListener('pointerleave', () => { reticle.classList.remove('locked'); tag.classList.remove('show'); });
+    });
+  }
+</script>
+</body>
+</html>

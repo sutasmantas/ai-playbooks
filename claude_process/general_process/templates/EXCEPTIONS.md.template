@@ -1,0 +1,63 @@
+<!--
+TEMPLATE METADATA — REMOVE THIS BLOCK WHEN GENERATING
+Target: <new-project-root>/EXCEPTIONS.md
+Generated when criticality (interview 03.5) is Internal / External / Safety. SKIPPED for Throwaway/experiment OR Hackathon/days. Starts empty (one example entry, removed by user).
+Placeholders:
+  {{PROJECT_NAME}} — from interview 01.1
+
+This file is READ BY THE VERIFIER on every audit run. Open exceptions are honored
+(findings matching them surface as "Known exceptions," not blockers). Expired or
+closed exceptions cause the matching finding to surface as a normal blocker.
+-->
+
+# {{PROJECT_NAME}} — Exceptions Registry
+
+A registry of verifier findings the team has consciously accepted as "we know about this, not fixing now." Read by the two auditors (Completeness, Correctness) on every run.
+
+## How this changes verifier behavior
+
+- **Open exception, revisit-by not passed:** matching findings appear under `## Known exceptions` (informational) in the auditor report, not `## Findings` (blocking).
+- **Expired exception** (revisit-by date is in the past): the matching finding appears in `## Findings` with `note: exception EX-NNN expired on YYYY-MM-DD`.
+- **Closed exception:** the matching finding appears in `## Findings` normally.
+
+## Entry format
+
+```markdown
+## EX-NNN — <short title>
+
+- **Finding pattern:** <the verifier finding being waived; quote verbatim or pattern-match>
+- **Why accepted:** <the engineering tradeoff or constraint>
+- **Revisit by:** <YYYY-MM-DD OR concrete condition that should re-open this>
+- **Owner:** <person responsible for the revisit>
+- **Created:** YYYY-MM-DD
+- **Status:** open | closed-YYYY-MM-DD
+```
+
+## Style guidelines — hard rules
+
+1. **Every entry MUST have a `Revisit by:`** — a concrete date or condition. "Indefinitely accepted" is not allowed; that's permanent technical debt, not an exception.
+2. **`Revisit by:` conditions must be observable.** "When we have time" is not a condition. "When user count > 10k" or "before EU launch" is.
+3. **Closed exceptions stay in the file** with a `Status: closed-YYYY-MM-DD` line. They are institutional memory — future engineers benefit from seeing why an old waiver was retired.
+4. **No nested waivers.** An exception cannot waive another exception. If you find yourself needing this, the underlying rule is wrong — fix the rule.
+5. **Verifier feedback loop:** if an exception is invoked > 3 times in 30 days, that signals the underlying rule needs revision, not the waiver renewed. Promote to a decision_log entry and a rule change.
+
+## How to use
+
+- Before adding an exception, ask: "is this a real engineering tradeoff, or am I just avoiding the work?" If the latter, fix it instead.
+- Reference the exception ID in the commit message that introduces it (e.g., `EX-007: accept dev-mode CSP loosening`).
+- During code review, exceptions are a discussion item, not a checkbox.
+
+## Project exceptions
+
+<!--
+Example entry (delete after first real entry):
+
+## EX-001 — Example: accept `pytest` ResourceWarning on `test_db_pool_exhaustion`
+
+- **Finding pattern:** `tests.log` shows `ResourceWarning: unclosed database connection` on `test_db_pool_exhaustion`
+- **Why accepted:** This test deliberately exhausts the connection pool to verify graceful-fail behavior; the warning IS the documented test outcome, not a regression
+- **Revisit by:** 2026-09-15 (when the pool-exhaustion test is rewritten to use a context manager that suppresses the warning explicitly)
+- **Owner:** sarah@example.com
+- **Created:** 2026-05-15
+- **Status:** open
+-->

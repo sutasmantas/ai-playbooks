@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alternative - Sci-Fi Loader</title>
+<style>
+  :root{--bg:#06101d;--text:#f8f1e7;--sky:#8fd7ff}
+  body{margin:0;min-height:100svh;display:grid;place-items:center;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
+  .loader{text-align:center}.tri{position:relative;width:150px;height:150px;margin:auto;transform-style:preserve-3d}
+  .edge{position:absolute;left:50%;top:50%;width:130px;height:3px;background:linear-gradient(90deg,transparent,var(--sky),transparent);transform-origin:left center;filter:drop-shadow(0 0 10px var(--sky))}
+  .e1{transform:translate(-50%,-50%) rotate(0deg)}.e2{transform:translate(-50%,-50%) rotate(120deg)}.e3{transform:translate(-50%,-50%) rotate(240deg)}
+  .dot{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--sky);box-shadow:0 0 18px var(--sky);left:50%;top:50%;margin:-7px}
+  h1{font-size:24px;letter-spacing:.08em;text-transform:uppercase;margin-top:28px}.loader p{color:rgba(248,241,231,.65)}
+  @media(prefers-reduced-motion:no-preference){.tri{animation:spin 3s linear infinite}.dot{animation:corner 1.5s ease-in-out infinite}}@keyframes spin{to{transform:rotateX(50deg) rotateZ(1turn)}}@keyframes corner{0%{transform:translate(65px,0)}33%{transform:translate(-33px,56px)}66%{transform:translate(-33px,-56px)}100%{transform:translate(65px,0)}}
+</style>
+</head>
+<body><main class="loader"><div class="tri" aria-hidden="true"><i class="edge e1"></i><i class="edge e2"></i><i class="edge e3"></i><i class="dot"></i></div><h1>Opening sky gate</h1><p>Sharper loader alternative if planetary orbit is too soft.</p></main></body>
+</html>

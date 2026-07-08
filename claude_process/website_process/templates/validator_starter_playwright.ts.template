@@ -1,0 +1,351 @@
+/*
+TEMPLATE METADATA — REMOVE THIS BLOCK WHEN GENERATING
+Target: <new-project-root>/scripts/validate_state.ts
+Generated when the project has a Node/TypeScript toolchain.
+Placeholders the agent fills in from interview answers:
+  {{TRUTH_SURFACE_URL}}    — e.g., "http://localhost:3000/" or "https://staging.example.com/"
+  {{EXAMPLE_BEHAVIOR_1}}   — concrete user-facing behavior from interview 02.3
+  {{ASSERT_SELECTOR}}      — CSS selector or text locator derived from EXAMPLE_BEHAVIOR_1
+  {{ASSERT_EXPECTED}}      — expected substring derived from EXAMPLE_BEHAVIOR_1
+
+ESCAPING (important): when the agent fills these placeholders, single quotes
+inside the value MUST be backslash-escaped (`'` → `\'`). The template uses
+single-quoted string literals; an unescaped quote in {{ASSERT_EXPECTED}} or
+{{ASSERT_SELECTOR}} breaks the TypeScript source. Same for double quotes if
+the value would land inside a double-quoted context. Example: user behavior
+"Today's deals on display" → fill as `Today\'s deals on display`.
+
+Dependencies: `pnpm add -D playwright axe-playwright`
+Then: `pnpm exec playwright install --with-deps chromium`
+Run with: `pnpm tsx scripts/validate_state.ts`
+
+IMPORTANT — production build, not dev:
+  This script must be pointed at a production build (`pnpm build && pnpm start`), not the dev server.
+  React, Vue, and Svelte all SUPPRESS hydration warnings in dev mode. Running this against `pnpm dev`
+  will produce a green validator while shipping hydration bugs to production. Either:
+    - Run a prod build locally before invoking, or
+    - Set VALIDATE_URL to your staging URL, or
+    - Add a `pnpm validate` script that does the build + start + run combo.
+*/
+
+import { chromium, type Page } from 'playwright';
+import { injectAxe } from 'axe-playwright';
+import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
+import { execSync } from 'node:child_process';
+
+const URL = process.env.VALIDATE_URL ?? '{{TRUTH_SURFACE_URL}}';
+const ARTIFACT_DIR = 'diagnostics';
+
+async function assertBehavior(page: Page): Promise<boolean> {
+  // Derived from interview 02.3: {{EXAMPLE_BEHAVIOR_1}}
+  try {
+    const locator = page.locator('{{ASSERT_SELECTOR}}');
+    await locator.waitFor({ timeout: 5000 });
+    const text = (await locator.textContent()) ?? '';
+    if (!text.includes('{{ASSERT_EXPECTED}}')) {
+      console.error(`[behavior] FAIL: expected "{{ASSERT_EXPECTED}}", got "${text.trim()}"`);
+      return false;
+    }
+    console.log(`[behavior] OK: "${text.trim()}"`);
+    return true;
+  } catch (e) {
+    console.error(`[behavior] FAIL: ${(e as Error).message}`);
+    return false;
+  }
+}
+
+async function openTruthSurface(page: Page, viewport: { width: number; height: number }, label: string) {
+  await page.setViewportSize(viewport);
+  await page.goto(URL, { waitUntil: 'domcontentloaded' });
+  const path = `${ARTIFACT_DIR}/${label}.png`;
+  await page.screenshot({ path, fullPage: false });
+  console.log(`[truth-surface:${label}] saved ${path}`);
+}
+
+async function checkAccessibility(page: Page): Promise<boolean> {
+  await injectAxe(page);
+  // Run axe and capture the full JSON result so the Completeness Auditor can
+  // cross-reference structural findings against the rendered screenshot and DOM
+  // (catches keyboard-trap UX, focus affordance, contrast-in-gradient context —
+  // failure modes axe's rule-based engine can't see).
+  const axeResult = await page.evaluate(async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return await (window as any).axe.run({ runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] } });
+  });
+  writeFileSync(`${ARTIFACT_DIR}/axe.json`, JSON.stringify(axeResult, null, 2));
+  console.log(`[a11y] saved ${ARTIFACT_DIR}/axe.json (violations: ${axeResult.violations.length})`);
+
+  // Behavior check (not a count-as-proxy violation per check #1): the question
+  // being asked is "did any a11y violations occur?" — emptiness IS the correct success
+  // condition for that question. See verifier_prompt.md check #1's carve-out.
+  const a11yPassed = axeResult.violations.length === 0;
+  if (a11yPassed) {
+    console.log('[a11y] OK: no violations');
+    return true;
+  }
+  for (const v of axeResult.violations) {
+    console.error(`[a11y] FAIL: ${v.id} (${v.impact}) — ${v.help}`);
+  }
+  return false;
+}
+
+function printDiagnostics(title: string, linkCount: number) {
+  // Diagnostic only — NEVER pass/fail.
+  console.log(`[diag] title="${title}" links=${linkCount}`);
+}
+
+// Tier-1-does-the-work artifacts: the validator has full tool scope, so it runs
+// git/tsc/registry-checks here and writes structured output. The tier-2 auditors
+// (Read/Grep/Glob only) read these files to make judgments — they can't run
+// git/tsc themselves. This separation honors the auditor's restricted tool scope
+// while making all kit rules enforceable.
+
+function captureGitDiffSummary() {
+  // Auditor reads this for trivial-diff threshold (≤20 LoC, ≤2 files, etc.).
+  try {
+    const filesRaw = execSync('git diff --name-only HEAD', { encoding: 'utf8' });
+    const files = filesRaw.split('\n').filter(Boolean);
+    const numstatRaw = execSync('git diff --numstat HEAD', { encoding: 'utf8' });
+    const numstat = numstatRaw.split('\n').filter(Boolean);
+    const totalLoC = numstat.reduce((sum, line) => {
+      const [add, del] = line.split('\t').map((n) => parseInt(n, 10) || 0);
+      return sum + add + del;
+    }, 0);
+    const summary = {
+      available: true,
+      total_loc: totalLoC,
+      file_count: files.length,
+      files,
+      raw_numstat: numstatRaw,
+      only_markdown: files.length > 0 && files.every((f) => f.endsWith('.md')),
+    };
+    writeFileSync(`${ARTIFACT_DIR}/diff_summary.json`, JSON.stringify(summary, null, 2));
+    console.log(`[diff] saved ${ARTIFACT_DIR}/diff_summary.json (${totalLoC} LoC across ${files.length} files)`);
+  } catch {
+    writeFileSync(`${ARTIFACT_DIR}/diff_summary.json`, JSON.stringify({ available: false, reason: 'not a git repo or no diff vs HEAD' }, null, 2));
+    console.log(`[diff] WARN: no git diff available; saved empty summary`);
+  }
+}
+
+function captureTypecheckLog() {
+  // Auditor reads this for check #13 (library/API existence — hallucinated imports).
+  // tsc --noEmit catches every unresolved import in one pass.
+  if (!existsSync('tsconfig.json')) {
+    writeFileSync(`${ARTIFACT_DIR}/typecheck.log`, '(skipped: no tsconfig.json)');
+    console.log(`[typecheck] skipped: no tsconfig.json`);
+    return;
+  }
+  try {
+    execSync('npx tsc --noEmit', { encoding: 'utf8', stdio: 'pipe' });
+    writeFileSync(`${ARTIFACT_DIR}/typecheck.log`, '(clean: no type errors)');
+    console.log(`[typecheck] OK`);
+  } catch (e: unknown) {
+    const err = e as { stdout?: Buffer; stderr?: Buffer; message?: string };
+    const output = (err.stdout?.toString() || '') + (err.stderr?.toString() || '') || err.message || '';
+    writeFileSync(`${ARTIFACT_DIR}/typecheck.log`, output);
+    console.error(`[typecheck] FAIL: see ${ARTIFACT_DIR}/typecheck.log`);
+  }
+}
+
+function captureDepCheck() {
+  // Auditor reads this for check #12 (lockfile discipline + slopsquatting).
+  // We don't hit the network — instead we check that every dep in package.json
+  // has a corresponding lockfile entry. A new dep without lockfile presence is
+  // either a slopsquatting risk or a forgotten install — both check #12 violations.
+  if (!existsSync('package.json')) {
+    writeFileSync(`${ARTIFACT_DIR}/dep_check.json`, JSON.stringify({ available: false, reason: 'no package.json' }));
+    return;
+  }
+  try {
+    const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
+    const declared = Object.keys({ ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}) });
+    let lockEntries: Set<string> = new Set();
+    const escapeForRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (existsSync('pnpm-lock.yaml')) {
+      // pnpm-lock.yaml uses entries like `'/pkg-name@version':` or `/pkg-name@version:` (older).
+      // Anchor at line start to avoid substring matches across unrelated packages.
+      const lock = readFileSync('pnpm-lock.yaml', 'utf8');
+      declared.forEach((d) => {
+        const pat = new RegExp(`^\\s*'?/${escapeForRegex(d)}@`, 'm');
+        if (pat.test(lock)) lockEntries.add(d);
+      });
+    } else if (existsSync('package-lock.json')) {
+      const lock = JSON.parse(readFileSync('package-lock.json', 'utf8'));
+      lockEntries = new Set(
+        Object.keys(lock.packages || {})
+          .map((p) => p.replace(/^node_modules\//, '').split('/node_modules/').pop() || '')
+          .filter(Boolean),
+      );
+    } else if (existsSync('yarn.lock')) {
+      // yarn.lock entries look like `"pkg-name@^1.0.0":` or `pkg-name@1.0.0:` (anchored to line start).
+      const lock = readFileSync('yarn.lock', 'utf8');
+      declared.forEach((d) => {
+        const pat = new RegExp(`^"?${escapeForRegex(d)}@`, 'm');
+        if (pat.test(lock)) lockEntries.add(d);
+      });
+    }
+    const unlocked = declared.filter((d) => !lockEntries.has(d));
+    const summary = {
+      available: true,
+      declared_count: declared.length,
+      unlocked_deps: unlocked,
+      unlocked_count: unlocked.length,
+    };
+    writeFileSync(`${ARTIFACT_DIR}/dep_check.json`, JSON.stringify(summary, null, 2));
+    if (unlocked.length > 0) {
+      console.error(`[deps] WARN: ${unlocked.length} dep(s) declared in package.json but not found in lockfile: ${unlocked.join(', ')}`);
+    } else {
+      console.log(`[deps] OK: all ${declared.length} declared deps present in lockfile`);
+    }
+  } catch (e) {
+    writeFileSync(`${ARTIFACT_DIR}/dep_check.json`, JSON.stringify({ available: false, reason: (e as Error).message }));
+  }
+}
+
+// Secret-pattern scan against the loaded HTML and all linked script bundles.
+// Catches the canonical "secret accidentally exposed in the client bundle" failure mode.
+// Patterns lifted from gitleaks / TruffleHog / known prefixes; expand as needed for your stack.
+const SECRET_PATTERNS: Array<{ name: string; re: RegExp }> = [
+  { name: 'AWS Access Key',    re: /AKIA[0-9A-Z]{16}/ },
+  { name: 'Stripe Live Key',   re: /sk_live_[0-9a-zA-Z]{24,}/ },
+  { name: 'Stripe Restricted', re: /rk_live_[0-9a-zA-Z]{24,}/ },
+  // OpenAI keys: legacy `sk-` + 48 chars (51 total) or project `sk-proj-` + 64+ chars.
+  // Require 40+ char run to avoid false-positives on minified-bundle identifiers like `sk-foo123abc`.
+  { name: 'OpenAI Key',        re: /sk-(proj-)?[A-Za-z0-9_-]{40,}/ },
+  { name: 'GitHub Token',      re: /gh[pousr]_[A-Za-z0-9]{36,}/ },
+  { name: 'Slack Token',       re: /xox[abprs]-[A-Za-z0-9-]{10,}/ },
+  { name: 'Private Key Block', re: /-----BEGIN (RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/ },
+  { name: 'Google API Key',    re: /AIza[0-9A-Za-z_-]{35}/ },
+];
+
+async function scanBundleForSecrets(page: Page): Promise<string[]> {
+  // Fetch the main HTML + every <script src=...> resource and regex each against known secret patterns.
+  const findings: string[] = [];
+
+  const htmlContent = await page.content();
+  for (const { name, re } of SECRET_PATTERNS) {
+    const match = htmlContent.match(re);
+    if (match) findings.push(`${name} in main HTML: ${match[0].slice(0, 20)}...`);
+  }
+
+  const scriptUrls = await page.locator('script[src]').evaluateAll((els) =>
+    (els as HTMLScriptElement[]).map((el) => el.src).filter(Boolean)
+  );
+
+  for (const url of scriptUrls) {
+    try {
+      const resp = await page.context().request.get(url);
+      if (!resp.ok()) continue;
+      const body = await resp.text();
+      for (const { name, re } of SECRET_PATTERNS) {
+        const match = body.match(re);
+        if (match) findings.push(`${name} in ${url}: ${match[0].slice(0, 20)}...`);
+      }
+    } catch {
+      // Fetch failed; not a secret-scan failure.
+    }
+  }
+  return findings;
+}
+
+// Hydration-mismatch detector — catches SSR/CSR drift bugs that DOM-diff cannot.
+// Patterns from React, Vue, Svelte 5, and generic frameworks.
+const HYDRATION_PATTERNS = [
+  /hydrat/i,             // "Hydration failed", "There was an error while hydrating", Vue's "Hydration completed but contains mismatches"
+  /mismatch/i,           // covers most variants
+  /server.+did not match.+client/i,
+  /text content does not match/i,
+];
+
+function isHydrationWarning(message: string): boolean {
+  return HYDRATION_PATTERNS.some((pat) => pat.test(message));
+}
+
+async function main() {
+  mkdirSync(ARTIFACT_DIR, { recursive: true });
+  const browser = await chromium.launch();
+  const ctx = await browser.newContext();
+
+  // Tracing captures DOM snapshots, network calls, console output, and timing.
+  // The auditors read this trace (via `npx playwright show-trace`) to detect behavior
+  // bugs the screenshot-only check misses — clicks that didn't fire, failed fetches,
+  // state changes that didn't happen.
+  await ctx.tracing.start({ screenshots: true, snapshots: true, sources: false });
+
+  const page = await ctx.newPage();
+
+  // Wire console + page-error listeners BEFORE the first navigation.
+  // Capture FULL console (not just hydration) — auditors read this to detect
+  // failed fetches, unhandled rejections, and other behavior signals.
+  const hydrationWarnings: string[] = [];
+  const consoleEntries: string[] = [];
+  page.on('console', (msg) => {
+    const text = msg.text();
+    const entry = `[${msg.type()}] ${text}`;
+    consoleEntries.push(entry);
+    if ((msg.type() === 'error' || msg.type() === 'warning') && isHydrationWarning(text)) {
+      hydrationWarnings.push(entry);
+    }
+  });
+  page.on('pageerror', (err) => {
+    consoleEntries.push(`[pageerror] ${err.message}`);
+    if (isHydrationWarning(err.message)) {
+      hydrationWarnings.push(`[pageerror] ${err.message}`);
+    }
+  });
+
+  let failed = false;
+
+  await openTruthSurface(page, { width: 1280, height: 800 }, 'desktop');
+  if (!(await assertBehavior(page))) failed = true;
+  if (!(await checkAccessibility(page))) failed = true;
+  await openTruthSurface(page, { width: 375, height: 812 }, 'mobile');
+
+  // Hydration check — behavior question is "did any hydration warnings appear?"
+  // Emptiness IS the success condition (per verifier_prompt.md check #1 carve-out).
+  const hydrationClean = hydrationWarnings.length === 0;
+  if (!hydrationClean) {
+    console.error(`[hydration] FAIL: ${hydrationWarnings.length} warning(s) during run:`);
+    for (const w of hydrationWarnings) console.error(`  ${w}`);
+    failed = true;
+  } else {
+    console.log('[hydration] OK: no warnings in console');
+  }
+
+  // Secret-pattern scan — behavior question is "are any known secret patterns
+  // present in the bundle?" Emptiness IS the success condition (check #1 carve-out).
+  const secretFindings = await scanBundleForSecrets(page);
+  const bundleClean = secretFindings.length === 0;
+  if (!bundleClean) {
+    console.error(`[secrets] FAIL: ${secretFindings.length} match(es):`);
+    for (const f of secretFindings) console.error(`  ${f}`);
+    failed = true;
+  } else {
+    console.log('[secrets] OK: no known secret patterns in HTML or linked scripts');
+  }
+
+  const title = await page.title();
+  const linkCount = await page.locator('a').count();
+  printDiagnostics(title, linkCount);
+
+  // Save browser-side artifacts.
+  const finalDom = await page.content();
+  writeFileSync(`${ARTIFACT_DIR}/dom.html`, finalDom);
+  writeFileSync(`${ARTIFACT_DIR}/console.log`, consoleEntries.join('\n'));
+  await ctx.tracing.stop({ path: `${ARTIFACT_DIR}/trace.zip` });
+  console.log(`[diag] saved ${ARTIFACT_DIR}/dom.html, console.log, trace.zip`);
+
+  // Tier-1-does-the-work: run git/tsc/dep checks so tier-2 auditors don't need Bash.
+  // These functions write structured JSON the auditors read.
+  captureGitDiffSummary();
+  captureTypecheckLog();
+  captureDepCheck();
+
+  await browser.close();
+  process.exit(failed ? 1 : 0);
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

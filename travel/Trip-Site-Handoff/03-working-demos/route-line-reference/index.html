@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Route Line — signature reference (Where To, Crew?)</title>
+
+<!--
+  REFERENCE DEMO for the design tool / build.
+  The "Drawn Route Line" signature: an SVG route draws as you scroll while a
+  marker travels it and the camera follows. Technique = GSAP DrawSVG + MotionPath
+  + ScrollTrigger, smoothed by Lenis. All CDN, no build step.
+  Source pattern: Codrops "Scroll-Driven SVG Map Animations with GSAP" (May 2026).
+  Adapt: swap the <path d> + waypoint coords for the real Kaunas→Kraków→Energylandia→Tatras route,
+  reuse the SAME easing/timing tokens elsewhere (see Trip-Site-Concept-and-Craft.md).
+-->
+
+<style>
+  :root{
+    --forest:#16241c; --forest-2:#1f3328; --terra:#c0613f; --terra-2:#d98c5f;
+    --paper:#f3ede1; --paper-soft:#cdbfa8;
+    /* ONE easing token, reused everywhere (cohesion) */
+    --ease: cubic-bezier(.785,.135,.15,.86);
+  }
+  *{box-sizing:border-box; margin:0;}
+  html,body{background:var(--forest); color:var(--paper);
+    font-family:"Hanken Grotesk",system-ui,-apple-system,Segoe UI,sans-serif;}
+  .wrap{max-width:1100px; margin:0 auto; padding:0 28px;}
+  .eyebrow{font:600 .72rem/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--terra-2);}
+  h1,h2{font-weight:650; letter-spacing:-.02em; line-height:1.02;}
+
+  /* --- intro / outro (just to give scroll room) --- */
+  .panel{min-height:100svh; display:flex; flex-direction:column; justify-content:center; padding:120px 0;}
+  .panel h1{font-size:clamp(2.6rem,7vw,5.5rem); max-width:14ch; margin-top:16px;}
+  .panel .lede{margin-top:20px; max-width:46ch; color:var(--paper-soft); font-size:1.1rem;}
+  .scrollcue{margin-top:40px; font:600 .7rem/1 ui-monospace,monospace; letter-spacing:.2em; color:var(--paper-soft);}
+  .scrollcue .bar{display:block; width:1px; height:46px; margin-top:12px; background:linear-gradient(var(--terra-2),transparent); animation:cue 1.8s ease-in-out infinite; transform-origin:top;}
+  @keyframes cue{0%,100%{transform:scaleY(.4);opacity:.4} 50%{transform:scaleY(1);opacity:1}}
+
+  /* --- the pinned map stage --- */
+  .map-section{position:relative;}
+  .map-stage{height:100svh; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;}
+  .map-stage .tag{position:absolute; top:34px; left:0; right:0;}
+  .map-svg{width:100%; height:100%; display:block;}
+
+  .route{fill:none; stroke:var(--terra); stroke-width:4; stroke-linecap:round; stroke-linejoin:round;}
+  .route-ghost{fill:none; stroke:var(--paper); stroke-opacity:.10; stroke-width:4; stroke-linecap:round;} /* faint full path behind */
+  .wp{transform-box:fill-box; transform-origin:center;}
+  .wp .dot{fill:var(--paper); stroke:var(--terra); stroke-width:3;}
+  .wp .label{fill:var(--paper); font:600 17px/1 "Hanken Grotesk",system-ui,sans-serif;}
+  .wp .sub{fill:var(--paper-soft); font:500 12px/1 ui-monospace,monospace; letter-spacing:.04em;}
+
+  /* traveling marker */
+  #marker .ring{fill:none; stroke:var(--terra-2); stroke-width:2; animation:pulse 1.7s ease-out infinite;}
+  #marker .core{fill:var(--terra);}
+  #marker .glint{fill:var(--paper);}
+  @keyframes pulse{0%{transform:scale(.5);opacity:.9} 70%{transform:scale(1.8);opacity:0} 100%{opacity:0}}
+  #marker .ring{transform-box:fill-box; transform-origin:center;}
+
+  @media(prefers-reduced-motion:reduce){ #marker .ring{animation:none;} .scrollcue .bar{animation:none;} }
+</style>
+</head>
+<body>
+
+<section class="panel wrap">
+  <p class="eyebrow">Where To, Crew? · signature</p>
+  <h1>One line. The whole trip.</h1>
+  <p class="lede">Scroll — the route draws itself from Kaunas to the Tatras, and the crew marker rides along it. This same line is the logo, the nav, the page transitions and the scroll-progress.</p>
+  <div class="scrollcue">SCROLL<span class="bar"></span></div>
+</section>
+
+<!-- PINNED MAP: the route draws + marker travels + camera follows as you scroll through this section -->
+<section class="map-section" id="map">
+  <div class="map-stage" id="stage">
+    <p class="eyebrow tag wrap">The route · Kaunas → Tatras</p>
+    <svg class="map-svg" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <g id="camera">
+        <!-- faint full route behind, so context reads even before it's drawn -->
+        <path class="route-ghost" d="M150,110 C300,170 330,250 470,300 C540,330 520,355 560,385 C620,425 660,475 700,520"/>
+        <!-- the animated route (drawn by DrawSVG) -->
+        <path id="route" class="route" d="M150,110 C300,170 330,250 470,300 C540,330 520,355 560,385 C620,425 660,475 700,520"/>
+
+        <!-- waypoints (pop in as the marker passes) -->
+        <g class="wp wp1"><circle class="dot" cx="150" cy="110" r="8"/><text class="label" x="150" y="92" text-anchor="middle">Kaunas</text><text class="sub" x="150" y="134" text-anchor="middle">start · 05:00</text></g>
+        <g class="wp wp2"><circle class="dot" cx="470" cy="300" r="8"/><text class="label" x="470" y="282" text-anchor="middle">Kraków</text><text class="sub" x="470" y="324" text-anchor="middle">old town night</text></g>
+        <g class="wp wp3"><circle class="dot" cx="560" cy="385" r="8"/><text class="label" x="560" y="367" text-anchor="middle">Energylandia</text><text class="sub" x="560" y="409" text-anchor="middle">full thrill day</text></g>
+        <g class="wp wp4"><circle class="dot" cx="700" cy="520" r="8"/><text class="label" x="700" y="502" text-anchor="middle">Tatra Mts</text><text class="sub" x="700" y="544" text-anchor="middle">Morskie Oko</text></g>
+
+        <!-- traveling marker (rides the path via MotionPath) -->
+        <g id="marker">
+          <circle class="ring" cx="0" cy="0" r="10"/>
+          <circle class="core" cx="0" cy="0" r="8"/>
+          <circle class="glint" cx="0" cy="0" r="2.6"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<section class="panel wrap">
+  <h2 style="font-size:clamp(2rem,5vw,3.6rem); max-width:16ch;">— and that's the crew, on the road.</h2>
+  <p class="lede">Reuse this line everywhere: the loader draws it into the logo; nav hover underlines are a 1‑segment draw; the page-transition extends it to the next pin. One motif = cohesion.</p>
+</section>
+
+<!-- ===== libs (CDN, no build; GSAP is fully free incl. plugins since 2025) ===== -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/DrawSVGPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/MotionPathPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger, DrawSVGPlugin, MotionPathPlugin);
+const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+/* ---- Lenis: ONE smooth-scroll conductor, wired to ScrollTrigger ---- */
+if(!reduce && window.Lenis){
+  const lenis = new Lenis({ lerp:0.1, wheelMultiplier:1 });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((t)=> lenis.raf(t*1000));
+  gsap.ticker.lagSmoothing(0);
+}
+
+const VIEW = {cx:500, cy:310, zoom:1.22};   // camera centres on the marker
+let raw = MotionPathPlugin.getRawPath('#route');
+MotionPathPlugin.cacheRawPathMeasurements(raw);
+
+function setCamera(progress){
+  const pos = MotionPathPlugin.getPositionOnPath(raw, progress, false);
+  const s = VIEW.zoom;
+  document.getElementById('camera').setAttribute(
+    'transform', `translate(${VIEW.cx},${VIEW.cy}) scale(${s}) translate(${-pos.x},${-pos.y})`
+  );
+}
+
+if(reduce){
+  /* reduced motion: show the finished route + all pins, marker at the end, no scrub/zoom */
+  gsap.set('#route', {drawSVG:'0% 100%'});
+  gsap.set('#marker', {motionPath:{path:'#route', align:'#route', alignOrigin:[.5,.5], end:1}});
+} else {
+  /* the signature timeline — drawSVG + motionPath run together; pins pop as the marker arrives */
+  const tl = gsap.timeline({
+    defaults:{ ease:'none' },
+    scrollTrigger:{ trigger:'#map', start:'top top', end:'+=2600', scrub:1, pin:'#stage', anticipatePin:1 }
+  });
+
+  tl.fromTo('#route', {drawSVG:'0% 0%'}, {drawSVG:'0% 100%', duration:1}, 0)
+    .to('#marker', {motionPath:{path:'#route', align:'#route', alignOrigin:[.5,.5], autoRotate:false}, duration:1}, 0)
+    // waypoints: scale in (back-ease) right as the marker passes each one
+    .from('.wp1', {scale:0, opacity:0, ease:'back.out(2)', duration:.05}, 0.00)
+    .from('.wp2', {scale:0, opacity:0, ease:'back.out(2)', duration:.05}, 0.34)
+    .from('.wp3', {scale:0, opacity:0, ease:'back.out(2)', duration:.05}, 0.60)
+    .from('.wp4', {scale:0, opacity:0, ease:'back.out(2)', duration:.05}, 0.90);
+
+  // camera follows the marker each scrub frame
+  tl.eventCallback('onUpdate', ()=> setCamera(tl.progress()));
+  setCamera(0);
+
+  // keep the path measurements correct on resize
+  ScrollTrigger.addEventListener('refreshInit', ()=>{
+    raw = MotionPathPlugin.getRawPath('#route');
+    MotionPathPlugin.cacheRawPathMeasurements(raw);
+  });
+}
+</script>
+</body>
+</html>

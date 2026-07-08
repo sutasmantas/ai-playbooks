@@ -1,0 +1,180 @@
+<!--
+TEMPLATE METADATA — REMOVE THIS BLOCK WHEN GENERATING
+Target: <new-project-root>/PROJECT_PLAN.md
+ALWAYS generated at bootstrap — never skipped, never deferred.
+
+This is the MASTER CHECKLIST — the most important agent-facing file in the
+project. It holds ONLY the WHAT + live state: workstreams, statuses,
+contracts, decisions, milestones, logs. The usage rules (maintenance
+contract, per-item dispatch table, gate reporting package, optional
+section shapes, quality audit) live in process_checklist.md's
+"Working the plan" section — single HOW owner, read at every iteration
+start. Generate BOTH files together.
+
+Modeled on three proven master checklists from prior projects (carvertical_ml
+MULTI_BRAND_CHECKLIST + CHECKLIST_CONSTRUCTION_TEMPLATE, dnd_play
+browser_app_project_checklist): the features that made those work — locked
+decisions with fallback triggers, per-slice acceptance contract, exact-command
+verification ladder, 🧑 user-only verification, honest-evidence warnings,
+append-only logs — are all structural here, not optional.
+
+Placeholders / seeding rules (see ENTRYPOINT step 7):
+  {{PROJECT_NAME}}      — interview 01.1
+  {{DATE}}              — bootstrap date (ISO)
+  {{NEXT_ACTION}}       — at bootstrap this is ALWAYS: "🧑 Review this plan —
+                          read the objective, workstreams, milestones, and locked
+                          decisions; correct anything wrong; no work item starts
+                          before this is checked." Only after the user confirms
+                          does it move to milestone M0's first workstream item.
+  {{PROJECT_GOAL}}      — interview 01.5 (end-goal scope question)
+  {{SCOPE_BOUNDARY}}    — interview 01.5 (what is explicitly OUT of scope)
+  {{LOCKED_DECISIONS}}  — stack + architectural choices already made (from
+                          interview + pre-detection); each entry records the
+                          alternative considered and the fallback trigger
+  {{REFERENCE_DOCS}}    — specs, parity references, design docs that exist
+                          (or "none yet — first research task is creating one")
+  {{COMPLETION_RULES}}  — per-item-type evidence rules, filled concretely for
+                          this project's stack (UI items, data items, authz
+                          items, test items)
+  (the exact-command verification ladder is generated into
+   process_checklist.md, NOT here — one owner, no drift)
+  {{WORKSTREAMS}}       — one `### W<n>` section per major module/workstream.
+                          Seed from interview 01.5 PLUS codebase pre-detection
+                          (existing routes/pages/modules seed as `[~]`, never
+                          `[x]` — "it renders" is not "it's done").
+  {{MILESTONES}}        — coarse ordering from interview 01.5, each with a
+                          named gate and the reason user review is needed.
+
+Never generate this file empty or with placeholder workstreams. If the user
+cannot articulate full scope yet, the honest seed is: detected codebase state
+as `[~]` items plus a top item "- [ ] Define remaining scope with user".
+-->
+
+# {{PROJECT_NAME}} — Project Plan (master checklist)
+
+Opened: {{DATE}}
+Last updated: {{DATE}}
+**Next action:** {{NEXT_ACTION}}  <!-- always the first unchecked item of the SINGLE active workstream; updated at every stage-8 bookkeeping -->
+
+**Primary objective:** {{PROJECT_GOAL}}
+
+**Scope boundary (what this project is NOT):** {{SCOPE_BOUNDARY}}
+
+**Reference docs** (read the relevant one BEFORE building or before claiming a feature does/doesn't exist; if an item has no reference doc, writing one is that item's first research sub-task):
+{{REFERENCE_DOCS}}
+
+**Honest-evidence warning:** a passing validator or test means "the automated check passed" — NOT "a human used it and it behaved". Treat automated `[x]` as a floor, not a ceiling; the 🧑 user-verification items exist because some checks cannot be automated.
+
+**This file is the master checklist.** Complementary artifacts:
+- `process_checklist.md` — the per-iteration gate loop (validate → truth surface → verifier). Run it around every item taken from this file.
+- `plans/YYYY-MM-DD-<slug>/plan.md` — per-initiative slice plans. Each is the child of exactly ONE item here and links back; when it closes, the item's status updates here.
+- `decision_log.md` — ADR-style reasoning for non-trivial choices (if generated).
+
+## Locked decisions
+
+Decisions already made. Do not re-litigate without a written trigger. Each entry: the decision, the strongest alternative considered, and what would reopen it.
+
+{{LOCKED_DECISIONS}}
+
+<!-- Format:
+- **<Decision>** — chosen over <alternative> because <reason>. Reopen if: <EVENT-based trigger the agent can observe — "N failed attempts at X", "test Y still red after the fix", "dependency Z unavailable". NEVER time-based ("after 2 weeks") — the agent has no time sense; a time lock either never fires or fires for the wrong reason>.
+-->
+
+
+## How to work this file
+
+Only WHAT + live state lives here. The usage rules — maintenance contract, per-item dispatch table, gate reporting package, optional section shapes, plan quality audit — live in `process_checklist.md` → "Working the plan" (mandatory reading at every iteration start; single HOW owner). The archive rule that bounds this file is part of the gate package there (gate-triggered, never time-based).
+
+## Status legend
+
+- `[ ]` — not started.
+- `[~]` — **exists but not verified**: built in some form, but incomplete, unhardened, or not behavior-verified on the truth surface.
+- `[x]` — done **and** verified: behavior confirmed on the rendered truth surface, per-change gates satisfied (validator + tier-2 verifier; paired test + decision_log entry where stake-tagged).
+- `🧑` prefix — user-only manual verification: the agent CANNOT check this box; only the user can, after personally performing the step.
+
+## Completion rules (evidence per item type)
+
+{{COMPLETION_RULES}}
+
+<!-- Fill concretely, e.g.:
+- A checked UI item = the control was exercised in the running app and behaved correctly (incl. repeat, dismiss, reload), at desktop and one narrower width.
+- A checked data item = verified against real persisted rows through the app's access rules, not just "a row exists".
+- A checked test item = the test exists and ran green at least once AFTER the implementation it covers.
+- Screenshots alone never satisfy a behavior item. A smoke test that only proves "no crash" never satisfies an interaction item.
+-->
+
+## Current status (newest entry first; append, don't rewrite)
+
+- {{DATE}} — Plan created at bootstrap. <one-paragraph honest position: what exists, what's verified, what's next.>
+
+## Workstreams
+
+{{WORKSTREAMS}}
+
+<!-- Section shape — repeat per workstream:
+
+### W<n> — <name>  *(stake: <tags, if any>)*
+
+- **Output:** <the artifact this workstream delivers>
+- **Decision:** pending — recorded at the gate (target: shipped / parked / rejected). Never write `shipped` on unverified work.
+- **Evidence to close:** <what must be OBSERVED — concrete, testable>
+- **Risk:** <the one most-likely failure here — feeds riskiest-first ordering>
+- **Status:** not started | active (only ONE in the whole file) | blocked by: <ref> | done
+
+Research (do first; record findings here):
+- [ ] <read X reference / audit existing code path Y; write findings>
+
+Items (in execution order; each tagged S/M/L):
+- [ ] <item>
+- [~] <existing-but-unverified item — note what verification is missing>
+
+🧑 User manual verification (agent cannot check these):
+- [ ] 🧑 <step only a human can judge — feel, readability, real-device behavior>
+
+Acceptance criteria (frozen before the workstream goes active):
+- [ ] <observable condition 1>
+-->
+
+## Milestones
+
+{{MILESTONES}}
+
+<!-- Format — each milestone names its gate AND why the user must review:
+- **M0 — <name>** (<workstreams/items>). *Gate: <evidence that closes it>. User review needed because: <what only the user can judge>.*
+-->
+
+## Progress-triggered chores (automatic — never user-triggered, never time-based)
+
+No chore fires on a calendar — time-based checks are how things silently never run. Every chore hangs off a PROGRESS EVENT the agent always observes, and records the event it last ran at (a commit hash or gate name — never a date), so "trigger fired but chore didn't run" is mechanically checkable at iteration start.
+
+| Chore | Fires on (progress event) | Last ran at |
+|---|---|---|
+| Dependency audit (ecosystem `audit` command); patch or EXCEPTIONS-log high-severity | manifest/lockfile changed (same PR — see verification ladder) AND every milestone gate | <commit / gate> |
+| `EXCEPTIONS.md` retirement review *(delete row if not generated)* — expired-waiver flagging is already event-owned by the verifier, which reads EXCEPTIONS.md on every dispatch | every milestone gate | <gate> |
+| Canary calibration — verifier must flag `canary/known-bad-example.md`; GREEN = broken verifier *(delete row if not generated)* | every milestone gate, BEFORE trusting that gate's verifier verdict | <gate> |
+| Pitfall-register retirement audit (rule-retirement procedure) *(delete row if not generated)* | register hits its 200-line cap, OR every 3rd milestone gate (count gate-log entries) | <gate> |
+
+## Open questions
+
+Questions that block or shape future work. Each gets an owner (user / research task) and a "blocks what" note. Number entries (`OQ1`, `OQ2`, …) so `blocked by: OQ<n>` is a resolvable reference. Resolve into Locked decisions.
+
+- _(none yet)_
+
+## 🧑 Definition of done for the first usable version (user-only)
+
+The user, not the agent, checks these — after personally using the product.
+
+- [ ] 🧑 <end-to-end flow the user performs personally and judges acceptable>
+- [ ] 🧑 <…>
+
+## Review gate log (append-only)
+
+<!-- - YYYY-MM-DD — gate name — built / verified / missing / defects / next. Link the full gate-report package. -->
+
+## Discovered work (append-only)
+
+<!-- - [YYYY-MM-DD] <what needs doing> — <promote into W<n> / new workstream / can wait because…> -->
+
+## Defect log (append-only)
+
+<!-- Items that failed review go back to [ ]/[~] and get a line here with the EXACT failure observed. -->
