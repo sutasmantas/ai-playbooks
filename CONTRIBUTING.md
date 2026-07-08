@@ -1,96 +1,73 @@
 # Contributing to ai-playbooks
 
-Contributions are research artifacts, not code patches. Every accepted contribution includes evidence — a trial result, a specific failure case, or a documented methodology improvement.
+## Where things stand
 
-First response to all issues and PRs within 48 hours.
+| | Status |
+|---|---|
+| angle-gen-kit | Done — validated on 22 inputs |
+| research-synthesis-kit | Draft — not fully validated yet |
+| kit-maker process | Active — being refined as more kits are built |
+| Next planned kits | No fixed list — open to suggestions |
 
----
-
-## What contributions are accepted
-
-### Type 1 — New playbook
-
-A new playbook for a different task class (e.g., literature review synthesis, hypothesis generation, experiment design critique).
-
-**Minimum bar:**
-- Complete methodology following the 8-phase build process (see below)
-- Trial results: ≥10 inputs, blind evaluation against named quality dimensions
-- Weakness register — documented honestly; "no known weaknesses" is not accepted
-- All kit files: intake procedure, core procedure, quality gates, CLAUDE.md behavioral contract
-
-**Submit:** Open a PR with the kit folder and a description of the trial design and results. The PR description must include the quality scores, not just a claim that it works.
+The core project (kit-maker) is still being developed. The methodology improves as we build more kits, get more test results, and find better research about how AI agents work.
 
 ---
 
-### Type 2 — Playbook improvement
+## What actually helps
 
-A change to an existing playbook that measurably improves a quality dimension.
+### 1. Research a question
 
-**Minimum bar:**
-- Specific claim: "this change improves Q5 (framing distinctiveness) by eliminating the following failure mode: ..."
-- Evidence: either (a) a before/after comparison on ≥3 inputs scored on the relevant dimension, or (b) a documented failure case the change prevents
-- Changes made "because it seems better" are not accepted
+This is the most wanted contribution.
 
-**Submit:** Open a PR. Include the failure mode being fixed and the evidence.
+Building kits requires a lot of research — finding papers, practitioner write-ups, real examples of what works and what doesn't. This is time-consuming and token-intensive to do with AI, so we want humans who enjoy digging for evidence.
 
----
+**How it works:**
+- Look at [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md) — a list of questions we're trying to answer
+- Pick one (or suggest a new one that seems relevant)
+- Search for evidence online: papers, technical blogs, GitHub repos, conference talks, whatever you find
+- Write up what you found: what the evidence says, where it came from, how confident you are in it
+- Open a PR adding your writeup to `kit-maker-research/` (one markdown file per question, any format is fine)
 
-### Type 3 — Validation data
+You don't need to follow a specific format. If you found useful evidence, just document it clearly. We'll handle turning it into structured research.
 
-Additional trial results for an existing playbook on new inputs.
-
-**Minimum bar:**
-- ≥5 new inputs not in the original trial
-- Scored using the existing rubric (Q3, Q5, Q7 or the kit's named dimensions)
-- Scoring was done independently — not by the same person who ran the kit
-- Results submitted in the same format as the existing trial data
-
-**Submit:** Open a PR adding your results to the kit's `research_archive/` or trial directory, or open an issue with the data attached.
+Note: All submitted research must be from real sources you actually read. We need to be able to verify it.
 
 ---
 
-### Type 4 — Issue or edge case report
+### 2. Test a playbook
 
-A documented case where a playbook produced wrong output.
+Run a playbook on topics from your own work and report what happened.
 
-**Minimum bar:**
-- Which kit, which step
-- Exact input used
-- Actual output produced
-- What was wrong and why (not just "it didn't work")
-- Whether this is a known case in the weakness register
+**For angle-gen-kit:**
+- Use it on 5+ research topics you actually care about (not examples from the docs)
+- Note which inputs worked well and which didn't
+- Open an issue with your report: what topics you used, what the kit produced, what was good, what was frustrating
 
-**Submit:** Open an issue using the bug template. Failure reports that identify the *class* of failure (not just the specific instance) are most useful.
+This helps more than you might think — we've only tested it on topics we chose ourselves.
 
 ---
 
-## AI contribution policy
+### 3. Suggest a direction
 
-AI tools may be used to draft documentation. All submitted validation data must come from human-supervised runs against real inputs. Fabricated or AI-hallucinated trial results will result in permanent contributor ban. Disclose AI tool usage in your PR description.
+If you have a thought about where this project should go — a new kit domain, something wrong with the current methodology, a better way to think about a design decision — open a Discussion.
 
----
-
-## How the 8-phase build process works
-
-For new playbooks, each phase has a gate that must pass before the next phase starts:
-
-| Phase | Output required |
-|-------|----------------|
-| 1 — Discovery | Task class defined; quality dimensions named |
-| 2 — Domain brief | Realistic input scale confirmed; failure modes identified |
-| 3 — Research | ≥6 angles researched to saturation; research archive written |
-| 4 — Synthesis | Confidence map; contested claims marked |
-| 5 — Plan | Playbook structure specified |
-| 6 — Build | All files written; behavioral contract complete |
-| 7 — Trial | ≥10 inputs × 3 conditions; blind evaluation; verdict |
-| 8 — Archive | Weakness register, pitfall register, research archive present |
-
-Phases cannot be skipped. A playbook that skips Phase 7 (trial) has not been validated and will not be merged.
+What's useful:
+- AI task classes that produce inconsistent results (potential new kit domains)
+- Fundamental problems with how the kits are structured
+- Research you've done that seems relevant
 
 ---
 
-## Process notes
+### 4. Build a new kit
 
-- The weakness register is not a sign of weakness — kits without one listed have not been honestly evaluated
-- If you run a kit and find a failure case not in the weakness register, that is valuable data — please report it
-- Questions about the methodology: open a Discussion
+The most effort, and the most valuable.
+
+Read [`kit-maker/ENTRYPOINT.md`](kit-maker/ENTRYPOINT.md) to understand the full 8-phase process. Building a kit takes multiple sessions — research, synthesis, writing, and a controlled trial on real inputs. The existing kits in this repo were all built this way.
+
+If you want to build one, open a Discussion first so we can discuss the domain and whether it's a good fit.
+
+---
+
+## Questions
+
+Open a Discussion. Response within 48 hours.
