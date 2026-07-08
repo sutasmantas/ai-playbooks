@@ -1,8 +1,0 @@
-name = "wtc-store"
-main = "worker.js"
-compatibility_date = "2024-11-01"
-workers_dev = true
-
-[[kv_namespaces]]
-binding = "WTC"
-id = "f319cc6950ff461f955c63cc762d6eb4"

@@ -20,3 +20,13 @@ website_safety/tools/
 
 # Browser "Save Page As" asset dumps — contain embedded API keys
 *_files/
+
+# Personal research — not part of ai-playbooks project
+sport/
+travel/
+website_safety/
+creatine-cat.md
+Poland-Travel-Phrases.md
+
+# Unvalidated/below-bar kits — excluded until they meet the quality standard
+trial-coding-review-kit/
