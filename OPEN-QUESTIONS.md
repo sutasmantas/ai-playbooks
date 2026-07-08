@@ -2,7 +2,7 @@
 
 These are questions we're actively trying to answer. Each one feeds into either improving the kit-maker process or improving an existing playbook.
 
-If you find evidence for any of these — papers, real-world examples, practitioner write-ups — see [CONTRIBUTING.md](CONTRIBUTING.md) for how to submit it.
+To contribute research on any of these: see [CONTRIBUTING.md](CONTRIBUTING.md). Research contributions run the AI research workflow on your own PC — not manual searching.
 
 If you have a question to add, open a Discussion.
 
