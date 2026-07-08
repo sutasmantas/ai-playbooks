@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: ai-playbooks
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: Šutas
+    given-names: Mantas
+    email: mantas.sutas@softeta.com
+repository-code: "https://github.com/sutasmantas/ai-playbooks"
+url: "https://github.com/sutasmantas/ai-playbooks"
+abstract: >-
+  Structured, research-backed playbooks for AI agents — built with scientific
+  rigor and validated through controlled trials. The first playbook,
+  angle-gen-kit, generates vocabulary-diverse research angles from a 1-2
+  sentence topic, validated across 22 inputs (Q7 avg 3.0/3, Q5 avg 2.82/3).
+keywords:
+  - ai-agents
+  - prompt-engineering
+  - llm
+  - research-methodology
+  - playbooks
+  - angle-generation
+license: MIT
+date-released: "2026-07-08"

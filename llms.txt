@@ -1,0 +1,28 @@
+# ai-playbooks
+
+> Structured, research-backed playbooks for AI agents — built with scientific rigor and validated through controlled trials.
+
+## What this is
+
+AI agents produce inconsistent results because they operate without structured procedures. This project builds **playbooks**: step-by-step procedures an AI agent follows to reliably produce high-quality output on a specific task class.
+
+Each playbook is research-backed (synthesized from academic and practitioner literature), tested (validated through controlled trials), and self-correcting (behavioral contracts, quality gates, failure-mode registers).
+
+## Available playbooks
+
+- [angle-gen-kit](angle-gen-kit/): Research angle generation — given a 1-2 sentence topic, generates vocabulary-diverse research angles covering traditions a keyword search would miss. Validated: 22/22 inputs, Q7 avg 3.0/3, Q5 avg 2.82/3.
+
+## Key files
+
+- [angle-gen-kit/angle-generation.md](angle-gen-kit/angle-generation.md): The main procedure
+- [angle-gen-kit/intake.md](angle-gen-kit/intake.md): Intake protocol
+- [angle-gen-kit/angle-quality.md](angle-gen-kit/angle-quality.md): Quality gates and rubric
+- [angle-gen-kit/CLAUDE.md](angle-gen-kit/CLAUDE.md): Behavioral contract for agents using the kit
+
+## How to use
+
+Copy the playbook files into your project and instruct your AI agent to follow the procedure. The CLAUDE.md file is the entry point for Claude-based agents.
+
+## License
+
+MIT
