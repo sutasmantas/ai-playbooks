@@ -58,9 +58,13 @@ The test design and scoring rubric are in the kit folder.
 
 ## Get started
 
-- **To use an existing playbook:** start with [`angle-gen-kit/CLAUDE.md`](angle-gen-kit/CLAUDE.md)
-- **To build your own:** start with [`kit-maker/ENTRYPOINT.md`](kit-maker/ENTRYPOINT.md)
-- **To see a complete example of what a playbook looks like:** browse [`angle-gen-kit/`](angle-gen-kit/)
+These are procedures for AI agents — you don't read the files yourself, you point Claude at them.
+
+**To get research angles on a topic:**
+Copy `angle-gen-kit/CLAUDE.md` into your Claude Code project (or clone this repo and work in it). Ask Claude to generate research angles for your topic. Claude reads the procedure and runs it — you don't need to open any of the procedure files.
+
+**To build a playbook for a task you care about:**
+Clone this repo and open Claude Code in it. Tell Claude the task you want to build a playbook for. Claude reads `kit-maker/ENTRYPOINT.md` and walks through each of the 8 phases with you over multiple sessions.
 
 ---
 

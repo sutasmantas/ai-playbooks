@@ -87,11 +87,9 @@ Open a [Discussion](https://github.com/sutasmantas/ai-playbooks/discussions) if 
 
 ---
 
-## AI tool policy
+## Evidence requirements
 
-This project is built and tested with AI tools. Contributions using Claude Code or similar AI agents are expected and welcome — the kit-maker process is designed for AI execution.
-
-**Required:** the AI actually ran the procedure. Submitted outputs must be from real runs, not fabricated or hallucinated. If the AI produced low-quality output, document it as a finding — that's a test result, not a disqualification. Submitting fabricated outputs wastes everyone's time and poisons the research base.
+Every research submission must link real sources (papers, repos, practitioner posts). We need to verify what was found. Submitted outputs must be from real runs — if the AI produced low-quality output, document it as a finding, don't discard it.
 
 ---
 
