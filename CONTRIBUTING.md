@@ -1,83 +1,96 @@
-# Contributing to Kit-Maker
+# Contributing to ai-playbooks
 
-Thank you for contributing. This document covers how to add a new domain kit, improve existing procedures, and add research angles.
+Contributions are research artifacts, not code patches. Every accepted contribution includes evidence — a trial result, a specific failure case, or a documented methodology improvement.
 
----
-
-## What contributions are welcome
-
-| Type | Description |
-|------|-------------|
-| **New domain kits** | Run Phases 2–8 of the kit-maker on a new domain; submit the complete kit |
-| **Research angles** | Add angles to the queue with proper format, queries, and priority |
-| **Procedure improvements** | Fixes to existing kit-maker procedures — must cite a source |
-| **Test inputs** | Realistic-scale test inputs for existing kits |
-| **Failure reports** | Document a case where a kit produced wrong output; add to the relevant pitfall_register.md |
+First response to all issues and PRs within 48 hours.
 
 ---
 
-## Quality bar
+## What contributions are accepted
 
-All contributions must meet the quality bar described in [`kit-maker/definitions/working-kit.md`](kit-maker/definitions/working-kit.md).
+### Type 1 — New playbook
 
-**For new domain kits:** all six working-kit properties must be present. The PR description must include:
-- Test run output on a realistic-scale input (not a toy example)
-- Evaluation against all six properties
-- An honest weakness_register.md — "no known weaknesses" is not accepted
+A new playbook for a different task class (e.g., literature review synthesis, hypothesis generation, experiment design critique).
 
-**For procedure improvements:** every change must either (a) cite a specific research claim from an archive file, or (b) document a real failure mode that the change prevents. Changes made "because it seems better" will not be merged.
+**Minimum bar:**
+- Complete methodology following the 8-phase build process (see below)
+- Trial results: ≥10 inputs, blind evaluation against named quality dimensions
+- Weakness register — documented honestly; "no known weaknesses" is not accepted
+- All kit files: intake procedure, core procedure, quality gates, CLAUDE.md behavioral contract
 
-**For research angles:** follow the angle format in [`kit-maker-research/RESEARCH_ANGLES.md`](kit-maker-research/RESEARCH_ANGLES.md). Each angle needs a title, description of the research question, 4–5 queries, and a priority tier (P1/P2/P3) with justification.
-
----
-
-## How to build a new domain kit
-
-1. **Read** [`kit-maker/ENTRYPOINT.md`](kit-maker/ENTRYPOINT.md) completely before starting. The process has hard gates — skipping phases produces kits that look complete but aren't.
-
-2. **Run Phase 2 (INTAKE).** Use the interview script at [`kit-maker/interview/01-domain-brief.md`](kit-maker/interview/01-domain-brief.md). The domain brief must include quality dimensions, systematic omission bias, parameterization inputs, and realistic input scale.
-
-3. **Run Phase 3 (RESEARCH).** Show the angle list to reviewers before launching (open an issue or PR draft). Minimum 6 angles including the mandatory ones (GitHub broad discovery, scale failure modes). Research must reach saturation before proceeding.
-
-4. **Run Phases 4–8** as described in ENTRYPOINT.md. Each phase has a gate checklist — answer every gate question before advancing.
-
-5. **Submit the kit** in `kit-maker-test/[domain-name]/` via PR. Include:
-   - All kit files (CLAUDE.md, procedures/, weakness_register.md, pitfall_register.md, research_archive/)
-   - At least one test run with a realistic-scale input
-   - Evaluation against all six working-kit properties
+**Submit:** Open a PR with the kit folder and a description of the trial design and results. The PR description must include the quality scores, not just a claim that it works.
 
 ---
 
-## How to add research angles
+### Type 2 — Playbook improvement
 
-1. Open `kit-maker-research/RESEARCH_ANGLES.md`
-2. Add your angle(s) in the appropriate section with:
-   - A sequential number (next after the current last)
-   - A descriptive title
-   - A clear research question (not just a topic name)
-   - 4–5 queries covering: foundational source, meta-analysis, criticisms, practitioner version, quantitative study
-   - Priority tier (P1/P2/P3) with a one-line justification
-3. Submit via PR
+A change to an existing playbook that measurably improves a quality dimension.
 
-Good angles have a specific, answerable question — not "LLM research" but "does forcing explicit criteria definition before alternatives evaluation change which option is selected, and what structural prompts reliably elicit criteria rather than post-hoc rationalization?"
+**Minimum bar:**
+- Specific claim: "this change improves Q5 (framing distinctiveness) by eliminating the following failure mode: ..."
+- Evidence: either (a) a before/after comparison on ≥3 inputs scored on the relevant dimension, or (b) a documented failure case the change prevents
+- Changes made "because it seems better" are not accepted
+
+**Submit:** Open a PR. Include the failure mode being fixed and the evidence.
 
 ---
 
-## How to report a procedure failure
+### Type 3 — Validation data
 
-If you run a kit and it produces output that violates one of the six working-kit properties, or if you find a procedure rule that produces wrong output in a case not covered by the weakness register:
+Additional trial results for an existing playbook on new inputs.
 
-1. Open an issue using the **Procedure Gap** template
-2. Include: which kit, which procedure step, what input, what output, what was wrong
-3. If you have a proposed fix: include it in the issue
+**Minimum bar:**
+- ≥5 new inputs not in the original trial
+- Scored using the existing rubric (Q3, Q5, Q7 or the kit's named dimensions)
+- Scoring was done independently — not by the same person who ran the kit
+- Results submitted in the same format as the existing trial data
 
-Failure reports that identify the *class* of failure (not just the specific instance) are most valuable. See [`kit-maker/procedures/class-before-instance.md`](kit-maker/procedures/class-before-instance.md).
+**Submit:** Open a PR adding your results to the kit's `research_archive/` or trial directory, or open an issue with the data attached.
+
+---
+
+### Type 4 — Issue or edge case report
+
+A documented case where a playbook produced wrong output.
+
+**Minimum bar:**
+- Which kit, which step
+- Exact input used
+- Actual output produced
+- What was wrong and why (not just "it didn't work")
+- Whether this is a known case in the weakness register
+
+**Submit:** Open an issue using the bug template. Failure reports that identify the *class* of failure (not just the specific instance) are most useful.
+
+---
+
+## AI contribution policy
+
+AI tools may be used to draft documentation. All submitted validation data must come from human-supervised runs against real inputs. Fabricated or AI-hallucinated trial results will result in permanent contributor ban. Disclose AI tool usage in your PR description.
+
+---
+
+## How the 8-phase build process works
+
+For new playbooks, each phase has a gate that must pass before the next phase starts:
+
+| Phase | Output required |
+|-------|----------------|
+| 1 — Discovery | Task class defined; quality dimensions named |
+| 2 — Domain brief | Realistic input scale confirmed; failure modes identified |
+| 3 — Research | ≥6 angles researched to saturation; research archive written |
+| 4 — Synthesis | Confidence map; contested claims marked |
+| 5 — Plan | Playbook structure specified |
+| 6 — Build | All files written; behavioral contract complete |
+| 7 — Trial | ≥10 inputs × 3 conditions; blind evaluation; verdict |
+| 8 — Archive | Weakness register, pitfall register, research archive present |
+
+Phases cannot be skipped. A playbook that skips Phase 7 (trial) has not been validated and will not be merged.
 
 ---
 
 ## Process notes
 
-- The kit-maker process takes multiple sessions for a new domain. This is expected — research saturation takes time.
-- The two-auditor model (Completeness + Correctness) must be run on every non-trivial kit file. Do not skip it.
-- If you need to skip a step, document the skip and the reason in the design_log.md. Silence is not a skip.
-- The weakness register is not a sign of weakness — it is a sign that the kit was honestly evaluated. Kits without weaknesses listed have not been honestly evaluated.
+- The weakness register is not a sign of weakness — kits without one listed have not been honestly evaluated
+- If you run a kit and find a failure case not in the weakness register, that is valuable data — please report it
+- Questions about the methodology: open a Discussion
